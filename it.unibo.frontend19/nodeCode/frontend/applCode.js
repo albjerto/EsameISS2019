@@ -127,12 +127,12 @@ app.get('/appl', function(req, res) {
 	
 	//--------------nostre aggiunte--------------------
 	app.post("/consultFridge", function(req, res,next) {
-  		publishMsgToFridge( "showState"  );
+  		publishMsgToFridge( "showFridge"  );
   		next();
  	});			
 	
 	app.post("/consultTable", function(req, res,next) {
-  		publishMsgToFridge( "showState"  );
+  		publishMsgToServer( "showTable"  );
   		next();
  	});		
 	
@@ -206,12 +206,6 @@ var publishMsgToRobotapplication = function (cmd){
    	mqttUtils.publish( msgstr, "unibo/qak/robotmindapplication" );
 }
 
-//da cambiare il nome dell'attore
-var publishMsgToFridge = function (cmd){
-   	var msgstr = "msg(" + cmd + ",dispatch,js,robotmindapplication,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
-  	console.log("publishMsgToRobotapplication forward> "+ msgstr);
-   	mqttUtils.publish( msgstr, "unibo/qak/robotmindapplication" );
-}
 
 //Towards the butler application => send to butlermind
 var publishMsgToButlerapplication = function (cmd){
@@ -221,6 +215,22 @@ var publishMsgToButlerapplication = function (cmd){
 }
 
 
+
+//---------------FATTO DA NOI----------------------------------------
+//da cambiare il nome dell'attore
+var publishMsgToFridge = function (cmd){
+   	var msgstr = "msg(" + cmd + ",dispatch,js,robotmindapplication,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
+  	console.log("publishMsgToRobotapplication forward> "+ msgstr);
+   	mqttUtils.publish( msgstr, "unibo/qak/robotmindapplication" );
+}
+//cambiare il nome dell'attore
+var publishMsgToServer = function (cmd){
+   	var msgstr = "msg(" + cmd + ",dispatch,js,robotmindapplication,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
+  	console.log("publishMsgToRobotapplication forward> "+ msgstr);
+   	mqttUtils.publish( msgstr, "unibo/qak/robotmindapplication" );
+}
+
+//--------------------------------------------------------------
 
 var publishEmitEvent = function( ev, evContent ){  
  	var eventstr = "msg("+ev+",event,js,none,"+evContent+",1)"  ;  	//TODO: replace 1 with counter
