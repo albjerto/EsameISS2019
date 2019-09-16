@@ -93,7 +93,7 @@ app.get('/appl', function(req, res) {
   		next();
  	});		
 	app.post("/add", function(req, res,next) {
-  		publishMsgToButlerapplication(  "add("+req.param('foodCode')+")"  );
+  		publishMsgToButlerapplication(  "add("+req.param('foodCode')+")"  );	//aggiunto foodCode
   		next();
  	});		
 	app.post("/stopappl", function(req, res,next) {
@@ -129,12 +129,17 @@ app.get('/appl', function(req, res) {
 	app.post("/consultFridge", function(req, res,next) {
   		publishMsgToFridge( "showFridge"  );
   		next();
- 	});			
+ 	});
+
+	app.post("/foodAvailability", function(req, res, next) {
+		publishMsgToFridge( "isAvailable("+req.param('foodCode')+")" );
+		next();
+	});	
 	
 	app.post("/consultTable", function(req, res,next) {
   		publishMsgToServer( "showTable"  );
   		next();
- 	});		
+ 	});
 	
 	
 
