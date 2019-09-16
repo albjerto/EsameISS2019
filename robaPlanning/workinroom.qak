@@ -1,0 +1,688 @@
+/*
+* The robot plans a trip from home to the east part of the table
+* and executes it.
+*/ 
+System workinroom  
+mqttBroker "localhost" : 1883   
+   
+Dispatch modelChange  : modelChange( TARGET, VALUE )   
+Dispatch modelUpdate  : modelUpdate( TARGET, VALUE )
+
+Dispatch onestep       : onestep(DURATION)  
+Dispatch stepOk        : stepOk(V)		//TODO eliminate  V
+Dispatch stepFail      : stepFail(R,T) //R=ok | obstacle, T = time
+
+Dispatch execButlerPlan: execButlerPlan( ACTION )
+
+Dispatch prepare       : prepare(ARG)
+Dispatch clear         : clear(ARG)
+Dispatch add           : add(ARG)
+
+Dispatch showFridgeState	: showFridgeState() // per il frigo
+Dispatch showTableState		: showTableState() // per il tavolo
+
+Dispatch moveButlerTo  : moveButlerTo(X,Y,D) 
+Dispatch goalReached   : goalReached(V)  	//V=ok | ko
+
+Dispatch startTask     : startTask(T)		//T = fridge, table, pantry, dishwasher
+Dispatch taskDone      : taskDone(V)  	    //V= ... 
+Dispatch targetReached : targetReached(V)  	//V=ok | ko
+
+Dispatch robotCmd      : robotCmd( CMD )	
+
+Event  sonarRobot     : sonar( DISTANCE )	     //from  sonar on robot 
+Event  stopAppl       : stopAppl( CMD )  
+Event  reactivateAppl : reactivateAppl( CMD )  
+ 
+/*
+ * 
+ */ 
+ 
+Context ctxWorkInRoom     ip [host="localhost" port=8038]   -mqtt 
+Context ctxDummyForMind   ip [host="otherhost" port=8035]   -mqtt 
+
+ExternalQActor resourcemodel context ctxDummyForMind 
+ExternalQActor onestepahead  context ctxDummyForMind
+ExternalQActor basicrobot    context ctxDummyForMind
+
+
+QActor butlermind context ctxWorkInRoom{     
+["var ButlerStarted = false"]
+	State s0 initial {	
+		println("&&&  butlermind STARTED ")		 
+  	}
+  	Transition t0  
+  		whenMsg prepare  -> doprepare
+   	
+   	State doprepare{
+  		println("&&&  butlermind doprepare")
+  		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(prepare)
+  	}
+  	Transition t0  whenMsg targetReached -> afterPrepare
+     	
+ 	State afterPrepare{
+ 		println("&&&  butlermind afterPrepare")
+ 	}  	
+  	Transition t0  
+     		whenMsg clear   -> doclear
+    		whenMsg add     -> doadd
+   	
+   	State doadd{
+  		println("&&&  butlermind doadd")
+  		/*
+  		 * Va aggiunto il controllo della presenza del cibo in base al foodcode 
+  		 * Possibile metodo scritto nel commento nella roba in fondo commentata
+  		 * oppure si può semplicemente usare il fatto che il messaggio di add avrà
+  		 * il code come parametro dato che apparentemente c'è il modo di gestire
+  		 * i parametri dei messaggi da qua solo che nessuno ce l'ha spiegato :)
+  		 */
+  		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(add)
+  	}
+  	Transition t0  whenMsg targetReached -> afterPrepare
+    	
+   	State doclear{
+  		println("&&&  butlermind doclear")	
+  		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(clearnofood)
+  	}
+  	Goto s0
+
+
+}	
+
+
+QActor butlerplanexecutor context ctxWorkInRoom{   
+["
+var PlanCompleted = false
+var CurTarget     = \"home\"
+var CurDirection  = \"south\"
+"]
+	State s0 initial {	
+ 		solve( consult(  "butlerplansapriori.pl"  ) ) 
+  	}
+  	Goto doWork
+  	
+  	State doWork{
+  		println("&&&  butlerplanexecutor doWork")	
+  	}
+  	Transition t0 whenMsg execButlerPlan -> doButlerPlan
+
+  	State doButlerPlan{
+  		["var action =\"\" "]
+  		onMsg( execButlerPlan : execButlerPlan(ACTION) ){
+  			["action = payloadArg(0)"]
+ 			println("&&&  butlerplanexecutor execButlerPlan $action ")		 			
+  			solve( storePlan( "$action"  ) )  			
+  		}
+  	}
+  	Goto execButlerPlan
+  	
+  	State execButlerPlan{
+  		solve( consume( A,X,Y,D ) )
+  		ifSolved{
+["
+CurTarget    = getCurSol(\"A\").toString()
+CurDirection = getCurSol(\"D\").toString()
+val Target = \"Target=\" + CurTarget +  \" X=\" + getCurSol(\"X\") + \" Y=\" + getCurSol(\"Y\") + \" DIRECTION=\" + getCurSol(\"D\")  
+"]
+  			println( "consume( $Target )"  ) 
+   			forward workerinroom -m moveButlerTo : moveButlerTo(#X,#Y,#D) 
+  		}else{ ["PlanCompleted = true"] }
+  	}
+  	Goto planExecuted if "PlanCompleted" else waitEndOfButlerPlanMove
+  	
+  	State waitEndOfButlerPlanMove{}
+  	Transition t0 whenMsg goalReached -> doTheButlerJob
+
+  	State doTheButlerJob{
+		["val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)"]
+   		println("butlerplanexecutor has reached $CurTarget/direction=$CurDirection, ButlerDirection=$ButlerDirection" ) 
+   		if "CurTarget==\"table\"" { println("butlerplanexecutor works on the table " ) }
+  		//Rotate the butler to perform the job
+  		run itunibo.applUtil.applUtil.changeDirection( myself, CurDirection )
+  		forward  butlermind -m targetReached : targetReached(ok)  	
+  		run itunibo.planner.moveUtils.showCurrentRobotState()
+  		delay 2000
+  		//solve( dialog(F) )		//wait after goalReached
+  	}
+  	Goto execButlerPlan
+  	
+  	State planExecuted{
+  		["PlanCompleted = false"]		//reset to redo
+  	}
+  	Goto doWork
+  	
+
+}
+
+
+/* 
+ * =============================================
+ * workerinroom
+ * =============================================
+ */
+QActor workerinroom context ctxWorkInRoom{     
+["
+var mapEmpty    = false
+val mapname     = \"roomMbotWithTable\" //yyy \"roomMapWithTable\"
+
+var Curmove     = \"\" 
+var curmoveIsForward = false 
+
+//REAL ROBOT
+//var StepTime   = 1000 	 
+//var PauseTime  = 500 
+
+//VIRTUAL ROBOT
+var StepTime   = 327	//for virtual // modificato era a 330
+var PauseTime  = 500
+
+var PauseTimeL  = PauseTime.toLong()
+
+var timePreStep = 1L // per calcolo time backstep
+var crashCounter = 0 // per riprovare a muoversi avanti supponendo ostacolo mobile
+var timeBack = -1 // tempo di backstep
+
+"]	 
+	State s0 initial {	    
+	    solve( consult("moves.pl")	 )
+		run itunibo.coap.client.resourceObserverCoapClient.create( "coap://localhost:5683/resourcemodel" )
+ 		run itunibo.planner.plannerUtil.initAI()
+  		run itunibo.planner.moveUtils.loadRoomMap( myself, mapname )	
+  		run itunibo.planner.moveUtils.showCurrentRobotState()
+	 	["	val MapStr =  itunibo.planner.plannerUtil.getMapOneLine()  "]
+	 	forward resourcemodel -m modelUpdate : modelUpdate(roomMap,$MapStr)   
+	 	println("&&&  workerinroom STARTED")		
+	 	// forward workerinroom -m moveButlerTo : moveButlerTo(5,3,downDir) // ho decommentato e aggiunto dir
+ 	}  
+	Transition t0 whenMsg moveButlerTo -> setGoalAndDo
+  
+  	State setGoalAndDo{
+  		onMsg( moveButlerTo : moveButlerTo(X,Y,D) ) {
+  			printCurrentMessage
+  			["storeCurrentMessageForReply()"]  	//TODO: introduce a qak operation
+  			run itunibo.planner.plannerUtil.setGoal(payloadArg(0),payloadArg(1))
+  			run itunibo.planner.moveUtils.doPlan( myself )
+  		}
+  	}
+  	Goto executePlannedActions   
+  
+	State executePlannedActions{ 
+		//solve( showMoves ) 
+		solve( retract( move(M) ) ) 
+		ifSolved {  
+			["Curmove = getCurSol(\"M\").toString() 
+              curmoveIsForward=(Curmove == \"w\")
+	        "]
+		} else { ["Curmove = \"\"; curmoveIsForward=false"]  }  
+		//println("executePlannedActions doing $Curmove")
+ 	}
+	Goto checkAndDoAction  if "(Curmove.length>0) " else goalOk 
+
+ 	State goalOk{		  
+ 		//run itunibo.planner.moveUtils.showCurrentRobotState()
+	 	["	val MapStr =  itunibo.planner.plannerUtil.getMapOneLine()  "]
+	 	forward resourcemodel -m modelUpdate : modelUpdate(roomMap,$MapStr)   
+	 	["replyToCaller(\"goalReached\", \"goalReached(ok)\")"]  //TODO: introduce a qak operation
+	}
+	Transition t0 whenMsg moveButlerTo -> setGoalAndDo
+  	
+ 	//Execute the move if it is a rotation or halt
+	State checkAndDoAction{	 }
+	Goto doForwardMove if "curmoveIsForward" else doTheMove
+	  
+	State doTheMove{
+ 		run itunibo.planner.moveUtils.rotate(myself, Curmove, PauseTime) //modifies also the planner state 		 
+  	}
+	Goto executePlannedActions 
+	
+ 	State doForwardMove{
+ 		delayVar PauseTimeL  //Otherwise is too fast, even with remote interaction
+ 		run itunibo.planner.moveUtils.attemptTomoveAhead(myself, StepTime) //forwards to onestepahead
+		["timePreStep = System.currentTimeMillis()"]
+	} 
+	Transition t0   whenEvent stopAppl -> handleStopAppl
+					whenMsg stepOk     -> handleStepOk   
+					whenMsg stepFail   -> hadleStepFail 	
+    	
+    	
+   State handleStopAppl{
+    	println("APPLICATION STOPPED. Waiting for a reactivate")
+    } 
+    Transition t0  whenEvent reactivateAppl -> handleReactivateAppl
+    
+    State handleReactivateAppl{
+    	println("APPLICATION RESUMED")
+    } 
+	Transition t0   whenMsg stepOk   -> handleStepOk   
+					whenMsg stepFail -> hadleStepFail 	
+    
+	State handleStepOk{
+ 		run itunibo.planner.moveUtils.updateMapAfterAheadOk(myself)
+ 		["crashCounter = 0"] // o non viene resettato in caso di ostacolo mobile
+	}
+	Goto executePlannedActions
+	
+	/* We could reach this state since the robot moves are not precise enough */
+ 	State hadleStepFail{
+ 		if "crashCounter == 0"{
+ 			/* 
+ 		 	*  Cerco di calcolare il tempo di backstep perfetto per evitare successive 
+ 		 	*  collisioni, chiaramente è soggetto al ritardo variabile dovuto alla 
+ 		 	*  computazione e ai messaggi, non va granché bene
+ 		 	*/
+			println("timeBack fatto da noi")
+ 			["timeBack = (System.currentTimeMillis() - timePreStep - 45).toInt()"]
+ 			println("timeBack = $timeBack")
+			
+			/*
+ 			onMsg(stepFail : stepFail(Obs, Time)){
+ 				["timeBack = payloadArg(1).toString().toInt()"]
+ 				println("timeBack col payload")
+ 				println("timeBack = $timeBack")
+ 			}
+ 			*/
+ 		}
+ 		
+ 		["crashCounter++"]
+ 		// backstep senza usare delay che non accetta variabili
+		run itunibo.planner.moveUtils.backToCompensate(myself, timeBack, 0)
+ 		
+ 		/*
+ 		 * Valutare la possibilità di aggiungere un altro stato per evitare
+ 		 * di avere tutto sto bordello con l'if, tipo handleStepFail aumenta
+ 		 * il counter e un altro stato per rifare il plan e risettare il 
+ 		 * counter a 0
+ 		 */
+ 		if "(crashCounter > 2)"{
+			println("Static obstacle found!")
+			["val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)"]
+			println("ButlerDirection = $ButlerDirection")
+		
+			println("Updating map with the found static obstacle")
+			run itunibo.planner.moveUtils.setObstacleOnCurrentDirection(myself)
+			println("New map")
+			run itunibo.planner.moveUtils.showCurrentRobotState()
+		
+			println("Updating plan")
+			solve( retractall( move(_) ))
+			run itunibo.planner.moveUtils.doPlan(myself)
+
+			["crashCounter = 0"]
+		}
+		else{
+			println("Found obstacle, supposedly a moving one")
+			["var timesLeft = 3 - crashCounter"]
+			println("Trying to move ahead other $timesLeft times")
+			
+			/*
+			 * Ho bisogno di riporre nel kb l'ultima mossa consumata (per forza una w)
+			 * altrimenti è come se andassimo avanti. Due modi:
+			 * - asserta per rimettere la mossa in cima e farla consumare per prima
+			 * - retractall e poi doPlan, tanto non ho ancora posto la X sulla mappa,
+			 *   il piano sarà ricalcolato uguale
+			 */
+			solve( asserta(move(w)) )
+		}
+	}
+	Goto executePlannedActions
+}
+
+// chiaramente da spostare in un altro qak, contesto diverso
+QActor fridge context ctxWorkInRoom{
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		println("&&&  fridge starting, initial state as follows")
+		solve(showState)
+	}
+	Goto waitCmd
+	
+	State waitCmd{
+		println("&&&  fridge waiting for command")
+	}
+	Transition t0 whenMsg prepare -> prepareTask
+				  whenMsg add -> addTask
+				  whenMsg showFridgeState -> showTask
+				  
+	State prepareTask{
+		solve(consult("prepareFoodList.pl"))
+		println("&&&  fridge received prepare, handing over food")
+		solve(prepare)
+		println("&&&  fridge state modified, now as follows")
+		solve(showState)
+	}
+	Goto waitCmd
+	
+	State addTask{
+		["var code =\"\" "]
+		onMsg(add : add(C)){
+			["code = payloadArg(0)"]
+			println("&&& fridge received add, checking availability of food with code $code")
+			solve(isThere("$code"))
+			ifSolved{
+				solve(get("$code",1)) // per il momento la add prende sempre 1 quantità
+				ifSolved{
+					println("Add possibile, fridge informa RBR")
+					// forward alla mind che la add è andata a buon fine
+				}else{
+					println("Add impossibile, quantita' insufficiente nel frigo")
+					/*
+					 * Gestione fallimento, come fare? Supponiamo che il check sia
+					 * fatto prima che il robot si muova, per cui il messaggio di add
+					 * passa prima dal server centrale che chieda al frigo ed in base
+					 * alla risposta scelga se girare il messaggio al robot? Oppure
+					 * robot si muove fino al frigo ed in caso di fallimento torna
+					 * alla home? Probabilmente più facile gestire il primo caso
+					 */
+				}
+			}else{
+				println("Add impossibile, code inesistente o cibo terminato")
+				// gestione fallimento, leggi commento sopra
+			}
+		}
+	}
+	Goto waitCmd
+	
+	State showTask{
+		println("&&&  fridge received showState, executing")
+		solve(showState)
+	}
+	Goto waitCmd
+	
+}
+
+QActor fridgeuserdummy context ctxWorkInRoom{
+	State s0 initial{
+		println("fridgeUserDummy, invio prepare al frigo tra 10 secondi")
+		delay 10000
+		forward fridge -m prepare : prepare()
+		
+		println("fridgeUserDummy, invio add al frigo tra 10 secondi")
+		delay 10000
+		forward fridge -m add : add(d01)
+		
+		println("fridgeUserDummy, invio showFridgeState al frigo tra 10 secondi")
+		delay 10000
+		forward fridge -m showFridgeState : showFridgeState()
+	}
+}
+
+
+/*
+ * Server centrale che gestisca gli stati degli enti non intelligenti 
+ * Robe da ricordare:
+ *    - per il momento non gestiamo i piatti ma non dovrebbe essere troppo diverso
+ *      dai cibi
+ *    - i cibi sul tavolo sono gli stessi che prendo dal frigo sulla prepare -> sfrutto
+ *      lo stesso file
+ *    - ad ogni richiesta dello stato del tavolo, prima di inviare lo stato al maitre,
+ *      simulare il consumo di una quantità randomica di cibo, una random per cibo che
+ *      vari da 0 a N, così alcuni cibi restano immutati (altrimenti creare un actor
+ *		che autonomamente ogni delay x simuli consumazioni randomiche)
+ *    - non si occupa di gestire il frigo che è una entità smart autonoma, maitre 
+ *      chiede direttamente al frigo
+ *    - lavastoviglie è libera finché non si fa la clear e clear è la fine del work,
+ *      che senso ha gestirne lo stato?
+ *    - Quando faccio la add non passo dalla credenza -> non prendo altri piatti,
+ *      che senso ha gestire lo stato della credenza e dei piatti in generale se
+ *      tanto questi sono messi nel tavolo, mai utilizzati esplicitamente e messi
+ *      solo alla fine dell'applicazione nella lavastoviglie?
+ */
+QActor centralstateserver context ctxWorkInRoom{
+	State s0 initial{
+		println("&&& centralStateServer starting")
+		solve(consult("prepareFoodList.pl")) // motivazione nel commento qui sopra
+	}
+	Goto waitCmd
+	
+	State waitCmd{
+		println("&&& centralStateServer waiting for command")
+	}
+	Transition t0 whenMsg showTableState -> showTableTask
+				  whenMsg prepare -> prepareTable
+				  whenMsg add -> addTable
+				  whenMsg clear -> clearTable
+				  // aggiungere le show del resto
+				
+	// modificare tutte le show perché inviino gli output al frontend  
+	State showTableTask{
+		println("&&& centralStateServer showTableState")
+		solve(showTableState)
+	}
+	Goto waitCmd
+	
+	State randomConsumation{
+		
+	}
+	
+	State prepareTable{
+		println("&&& centralStateServer prepareTable, now table state as follows")
+		solve(consult("fridgeInit.pl"))
+		solve(showTableState)
+	}
+	Goto waitCmd
+	
+	State addTable{
+		println("&&& centralStateServer updating tableState after add")
+		["var code = \"\" "]
+		onMsg(add : add(CODE)){
+			["code = payloadArg(0)"]
+			solve(addTable("$code",1))
+		}
+		println("&&& centralStateServer updated table, now table state as follows")
+		solve(showTableState)
+	}
+	Goto waitCmd
+	
+	State clearTable{
+		println("&&& centralStateServer updating tableState after clear")
+		solve(retractAll(foodTable(C,N)))
+		println("&&& centralStateServer updated table, now table state as follows")
+		solve(showTableState)
+	}
+	Goto waitCmd
+	
+}
+
+/* Commento per usare il frontend
+ 
+QActor frontenddummy context ctxWorkInRoom{
+	State s0 initial {
+		println("&&&  frontendDummy start")
+	}
+	Goto sendPrepare
+	
+	State sendPrepare{
+		println("&&&  frontenddummy will send prepare msg to butlermind in 5 seconds")
+		delay 5000
+		println("&&&  frontenddummy sends now prepare msg")
+		forward butlermind -m prepare : prepare()
+	}
+	Goto sendPause
+	
+	State sendPause{
+		println("&&&  frontenddummy will send pause event in 5 seconds")
+		delay 5000
+		println("&&&  frontenddummy sends now pause event")
+		emit stopAppl : stopAppl()
+	}
+	Goto sendReactivate
+	
+	State sendReactivate{
+		println("&&&  frontenddummy will send reactivate event in 5 seconds")
+		delay 5000
+		println("&&&  frontenddummy sends now reactivate event")
+		emit reactivateAppl : reactivateAppl()
+	}
+	Goto sendAdd
+	
+	State sendAdd{
+		println("&&&  frontenddummy will send add msg to addtask in 40 seconds")
+		delay 40000
+		println("&&&  frontenddummy sends now add msg")
+		forward butlermind -m add : add(foodCode)
+	}
+	Goto sendClear
+	
+	State sendClear{
+		println("&&&  frontenddummy will send clear msg to cleartask in 30 seconds")
+		delay 30000
+		println("&&&  frontenddummy sends now clear msg")
+		forward butlermind -m clear : clear()
+	}
+	Goto workDone
+	
+	State workDone{
+		println("&&&  frontenddummy workDone")
+	}
+	
+}
+*/
+
+/*
+ 
+Apparentemente tutta sta shit è actually useless dato che la butlermind in cima sembra gestire tutto
+
+QActor preparetask context ctxWorkInRoom{   // invertito l'ordine dei movimenti, prima da pantry
+
+	State s0 initial {	
+		println("&&&  butlermind prepareTask")		
+  	}
+  	Transition t0  whenMsg prepare -> doprepare	
+  	
+  	State doprepare{
+  		println("&&&  butlermind PREPARING")	
+  	}
+  	Goto managePantry
+  	
+  	State managePantry{
+  		forward butlertask -m startTask : startTask( pantry )
+  	}
+  	Transition t0 whenMsg taskDone -> manageFridge		//butler at home again
+  	
+  	State manageFridge{
+   		forward butlertask -m startTask : startTask( fridge ) 		
+  	}
+  	Transition t0 whenMsg taskDone -> prepareDone		//butler at home again
+  	
+  	State prepareDone{
+  		println("&&&  butlermind prepareDone")
+  	}
+
+}
+
+QActor addtask context ctxWorkInRoom{
+	
+	State s0 initial {
+		println("&&&  butlermind addtask")
+	}
+    Transition t0 whenMsg add -> doAdd
+    
+    State doAdd{
+    	println("&&&  butlermind ADDING")
+    } Goto manageFridge
+	
+	State manageFridge{
+  		// Per il testing della presenza del cibo nel frigo si potrebbe far sì che 
+  		// il frontend mandi un event col code del cibo -> così lo riceve sia
+  		// butlermind che l'attore frigo -> butlermind alla ricezione si mette in 
+  		// attesa di un messaggio da parte del frigo -> se il messaggio è di
+  		// conferma allora il robot esegue il compito, altrimenti si invia il
+  		// warning al maitre 
+   		forward butlertask -m startTask : startTask( fridge ) 		
+  	}
+  	Transition t0 whenMsg taskDone -> addDone		//butler at home again
+  	
+  	State addDone{
+  		println("&&&  butlermind addDone")
+  	}
+	
+}
+
+QActor cleartask context ctxWorkInRoom{   // clear non va per bene perché in fondo a butlertask il messaggio taskCompleted viene sempre inviato al preparetask, andrebbe diviso
+
+	State s0 initial {	
+		println("&&&  butlermind clearTask")		
+  	}
+  	Transition t0  whenMsg clear -> doClear	
+  	
+  	State doClear{
+  		println("&&&  butlermind CLEARING")	
+  	}
+  	Goto manageTable
+  	
+  	State manageTable{
+  		forward butlertask -m startTask : startTask( table )
+  	}
+  	Transition t0 whenMsg taskDone -> manageFridge		//butler at home again
+  	
+  	State manageFridge{
+   		forward butlertask -m startTask : startTask( fridge ) 		
+  	}
+  	Transition t0 whenMsg taskDone -> manageDishwasher		//butler at home again
+  	
+  	State manageDishwasher{
+   		forward butlertask -m startTask : startTask( dishwasher ) 		
+  	}
+  	Transition t0 whenMsg taskDone -> clearDone		//butler at home again
+  	
+  	State clearDone{
+  		println("&&&  butlermind clearDone")
+  	}
+
+}
+
+QActor butlertask context ctxWorkInRoom{     
+	State s0 initial {	
+		println("&&&  butlertask STARTED  ")		
+  	}
+  	Transition t0  whenMsg startTask   -> execTask
+  	
+  	State execTask{
+  		onMsg( startTask : startTask( pantry ) ) {
+			delay 1000	
+			println("&&&  butler going to PANTRY")
+			forward workerinroom -m moveButlerTo : moveButlerTo(1,4,downDir) // aggiunta dir			
+  		}
+  		onMsg( startTask : startTask( fridge ) ) {
+			delay 1000	
+			println("&&&  butler going  to FRIDGE")
+			forward workerinroom -m moveButlerTo : moveButlerTo(6,0,upDir) // aggiunta dir	
+  		}
+    	onMsg( startTask : startTask( dishwasher ) ) {
+			delay 1000	
+			println("&&&  butler going to DISHWASHER")
+			forward workerinroom -m moveButlerTo : moveButlerTo(5,4,downDir) // aggiunta dir				
+  		}
+  		onMsg( startTask : startTask( table ) ) { // aggiunta per non rifare ma tanto andrà tutto rifatto icsdì
+			forward butlertask -m goalReached : goalReached( ok )
+		} 
+  	}
+  	Transition t0 whenMsg goalReached -> reachTheTable
+  	
+  	State reachTheTable{
+  		//TODO: Set the proper direction
+		delay 1000	
+		println("&&&  butler going to TABLE")
+		//TODO: Oprimize the goal for the table according to the current target (fridge/pantry)
+		forward workerinroom -m moveButlerTo : moveButlerTo(5,3,downDir) // aggiunta dir				 		
+  	}
+  	Transition t0 whenMsg goalReached -> againToHome
+
+  	State againToHome{
+		delay 1000	
+		println("&&&  butler going to HOME")
+		forward workerinroom -m moveButlerTo : moveButlerTo(0,0,downDir) // aggiunta dir	
+		//TODO: Set the proper direction 			 		
+  	}
+  	Transition t0 whenMsg goalReached -> taskCompleted
+  	
+  	State taskCompleted{
+  		println("&&& sending taskDone to preparetask")
+  		// forward butlermind -m taskDone : taskDone(ok) cambiata in quello sotto  		
+  		forward preparetask -m taskDone : taskDone(ok)
+  	} 	
+  	Goto s0
+  	  	
+}
+
+*/
