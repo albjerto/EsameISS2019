@@ -93,7 +93,7 @@ app.get('/appl', function(req, res) {
   		next();
  	});		
 	app.post("/add", function(req, res,next) {
-  		publishMsgToButlerapplication(  "add"  );
+  		publishMsgToButlerapplication(  "add("+req.param('foodCode')+")"  );
   		next();
  	});		
 	app.post("/stopappl", function(req, res,next) {
