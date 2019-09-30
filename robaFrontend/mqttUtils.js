@@ -44,7 +44,7 @@ client.on('message', function (topic, message){
   var spSonarRobot    = msgStr.indexOf("sonarRobot");
   var spRoomMap       = msgStr.indexOf("roomMap");
   var spFridge        = msgStr.indexOf("fridge"); // elaborazione relativa al fridge
-  var spFridge        = msgStr.indexOf("table"); // elaborazione relativa al fridge
+  var spTable        = msgStr.indexOf("table"); // elaborazione relativa al fridge
   var sp1             = msgStr.indexOf("state");
   var msgStr          = msgStr.substr(sp1);
   var sp2             = msgStr.indexOf("))");
