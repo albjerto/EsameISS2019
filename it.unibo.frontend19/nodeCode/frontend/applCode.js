@@ -225,13 +225,13 @@ var publishMsgToButlerapplication = function (cmd){
 //da cambiare il nome dell'attore
 var publishMsgToFridge = function (cmd){
    	var msgstr = "msg(" + cmd + ",dispatch,js,fridge,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
-  	console.log("publishMsgToRobotapplication forward> "+ msgstr);
+  	console.log("publishMsgToFridge forward> "+ msgstr);
    	mqttUtils.publish( msgstr, "unibo/qak/fridge" );
 }
 //cambiare il nome dell'attore
 var publishMsgToServer = function (cmd){
    	var msgstr = "msg(" + cmd + ",dispatch,js,centralstateserver,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
-  	console.log("publishMsgToRobotapplication forward> "+ msgstr);
+  	console.log("publishMsgToCentralStateServer forward> "+ msgstr);
    	mqttUtils.publish( msgstr, "unibo/qak/centralstateserver" );
 }
 
