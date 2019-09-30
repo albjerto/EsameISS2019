@@ -17,6 +17,8 @@ function escapeRegExp(str) {
        		console.log("RECEIVED " + v);
         	if( v.indexOf("robotState:") >= 0 ){document.getElementById('robotDisplay').innerHTML=v; }
         	if( v.indexOf("sonarRobot:") >= 0 ){document.getElementById('sonarRobotDisplay').innerHTML=v; }
+			if( v.indexOf("fridge:") >= 0 ){document.getElementById('fridgeDisplay').innerHTML=v; }
+			if( v.indexOf("table:") >= 0 ){document.getElementById('tableDisplay').innerHTML=v; }
         	if( v.indexOf("roomMap:") >= 0 ){
         		v1 = v.replace("roomMap:state('", "").replace("')", "");
         		v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
@@ -225,10 +227,13 @@ The event is handled by robotCmdExec.py
   		<b>SONAR STATE</b>: <span id="sonarRobotDisplay"></span>
 	</div>
 	<div>
-  		<b>ROOM MAP</b>: <span id="mapDisplay"></span>
+  		<b>FRIDGE STATE</b>: <span id="fridgeDisplay"></span>
 	</div>
 	<div>
-  		<b>FRIDGE STATE</b>: <span id="fridgeDisplay"></span>
+  		<b>TABLE STATE</b>: <span id="tableDisplay"></span>
+	</div>
+	<div>
+  		<b>ROOM MAP</b>: <span id="mapDisplay"></span>
 	</div>
 
 </div>

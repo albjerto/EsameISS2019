@@ -15,6 +15,8 @@ var io  ; 	//Upgrade for socketIo;
 var robotModel    = "none";
 var sonarModel    = "none";
 var roomMapModel  = "none";
+var fridgeModel   = "none"; // per show contenuto del fridge sul frontend
+var tableModel    = "none"; // per show contenuto del table sul frontend
 
 console.log("mqtt client= " + client );
 
@@ -41,6 +43,8 @@ client.on('message', function (topic, message){
   var spRobot         = msgStr.indexOf("robot");
   var spSonarRobot    = msgStr.indexOf("sonarRobot");
   var spRoomMap       = msgStr.indexOf("roomMap");
+  var spFridge        = msgStr.indexOf("fridge"); // elaborazione relativa al fridge
+  var spTable        = msgStr.indexOf("table"); // elaborazione relativa al table
   var sp1             = msgStr.indexOf("state");
   var msgStr          = msgStr.substr(sp1);
   var sp2             = msgStr.indexOf("))");
@@ -49,6 +53,8 @@ client.on('message', function (topic, message){
 	  if( spRobot > 0      ) { msg = msg + "robotState:"; robotModel   = msg+content ;   };
 	  if( spSonarRobot > 0 ) { msg = msg + "sonarRobot:"; sonarModel   = msg+content ; };
 	  if( spRoomMap > 0 )    { msg = msg + "roomMap:";    roomMapModel = msg+content ; };
+	  if( spFridge > 0 )     { msg = msg + "fridge:";     fridgeModel  = msg+content ; }; // elaborazione relativa al fridge
+	  if( spTable > 0 )     { msg = msg + "table:";     tableModel  = msg+content ; }; // elaborazione relativa al table
 	  msg = msg + content  ;		 
 	  //console.log("mqtt send on io.sockets| "+ msg  + " content=" + content);  
 	  io.sockets.send( msg );   

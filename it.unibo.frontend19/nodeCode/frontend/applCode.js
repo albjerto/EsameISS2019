@@ -93,7 +93,7 @@ app.get('/appl', function(req, res) {
   		next();
  	});		
 	app.post("/add", function(req, res,next) {
-  		publishMsgToButlerapplication(  "add("+req.param('foodCode')+")"  );	//aggiunto foodCode
+  		publishMsgToButlerapplication(  "add("+req.param('foodCode')+")"  );	//aggiunto foodCode --> la add viene mandata al robot o al frigo??
   		next();
  	});		
 	app.post("/stopappl", function(req, res,next) {
@@ -224,15 +224,15 @@ var publishMsgToButlerapplication = function (cmd){
 //---------------FATTO DA NOI----------------------------------------
 //da cambiare il nome dell'attore
 var publishMsgToFridge = function (cmd){
-   	var msgstr = "msg(" + cmd + ",dispatch,js,robotmindapplication,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
+   	var msgstr = "msg(" + cmd + ",dispatch,js,fridge,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
   	console.log("publishMsgToRobotapplication forward> "+ msgstr);
-   	mqttUtils.publish( msgstr, "unibo/qak/robotmindapplication" );
+   	mqttUtils.publish( msgstr, "unibo/qak/fridge" );
 }
 //cambiare il nome dell'attore
 var publishMsgToServer = function (cmd){
-   	var msgstr = "msg(" + cmd + ",dispatch,js,robotmindapplication,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
+   	var msgstr = "msg(" + cmd + ",dispatch,js,centralstateserver,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
   	console.log("publishMsgToRobotapplication forward> "+ msgstr);
-   	mqttUtils.publish( msgstr, "unibo/qak/robotmindapplication" );
+   	mqttUtils.publish( msgstr, "unibo/qak/centralstateserver" );
 }
 
 //--------------------------------------------------------------
