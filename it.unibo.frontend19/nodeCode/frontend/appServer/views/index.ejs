@@ -159,7 +159,7 @@ The event is handled by robotCmdExec.py
  						<td align="center">
 							<form action="/add" method="post">
 							<fieldset>
-								<input type="number" style="font-size:20px; max-width: 50px; margin-left: 25px;" name ="foodCode" required>
+								<input type="text" style="font-size:20px; max-width: 50px; margin-left: 25px;" name ="foodCode" required>
 							  	<input type="submit" style="font-size:20px; margin-right: 25px;"  value="ADD" >
 							</fieldset>
 							</form>
@@ -192,7 +192,7 @@ The event is handled by robotCmdExec.py
 				<table>
 					<tr>
 								<td align="center">							
-									<form action="/reactivateappl" method="post">							    
+									<form action="/consultTable" method="post">							    
 										<input type="submit" style="font-size:20px; color:black;"  value="CONSULT TABLE"  >							  	 
 									</form>
 								</td>
@@ -202,13 +202,13 @@ The event is handled by robotCmdExec.py
 									</form>
 								</td>
 								<td align="center">							
-									<form action="/reactivateappl" method="post">							    
+									<form action="/reactivateappl" method="post">		<!-- a chi manda il messaggio consultDishwasher? al centralStateServer? -->					    
 										<input type="submit" style="font-size:20px; color:black;"  value="CONSULT DISHWASHER"  >							  	 
 									</form>
 								</td>			
 								<td align="center">
 									<form action="/foodAvailability" method="post">
-										<input type="number" style="font-size:20px; max-width: 50px; margin-left: 25px;" name ="foodCode" required>
+										<input type="text" style="font-size:20px; max-width: 50px; margin-left: 25px;" name ="foodCode" required>
 										<input type="submit" style="font-size:20px; margin-right: 25px;"  value="CHECK AVAILABILITY" >
 									</form>
 								</td>

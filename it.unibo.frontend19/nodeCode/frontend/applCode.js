@@ -93,7 +93,7 @@ app.get('/appl', function(req, res) {
   		next();
  	});		
 	app.post("/add", function(req, res,next) {
-  		publishMsgToButlerapplication(  "add("+req.param('foodCode')+")"  );	//aggiunto foodCode --> la add viene mandata al robot o al frigo??
+  		publishMsgToFridgeWithCode(  "add", req.param('foodCode')  );	//aggiunto foodCode --> la add viene mandata al robot o al frigo?? al frigo
   		next();
  	});		
 	app.post("/stopappl", function(req, res,next) {
@@ -118,26 +118,26 @@ app.get('/appl', function(req, res) {
   		next();
  	});	
 
-	
+	/*
 	app.post("/addFood", function(req, res,next) {
   		publishMsgToRobotapplication( "addFood"  );
   		next();
  	});	
-
+*/
 	
 	//--------------nostre aggiunte--------------------
 	app.post("/consultFridge", function(req, res,next) {
-  		publishMsgToFridge( "showFridge"  );
+  		publishMsgToFridge( "showFridgeState"  );
   		next();
  	});
 
 	app.post("/foodAvailability", function(req, res, next) {
-		publishMsgToFridge( "isAvailable("+req.param('foodCode')+")" );
+		publishMsgToFridgeWithCode( "isAvailable", req.param("foodCode") );
 		next();
 	});	
 	
 	app.post("/consultTable", function(req, res,next) {
-  		publishMsgToServer( "showTable"  );
+  		publishMsgToServer( "showTableState"  );
   		next();
  	});
 	
@@ -224,13 +224,20 @@ var publishMsgToButlerapplication = function (cmd){
 //---------------FATTO DA NOI----------------------------------------
 //da cambiare il nome dell'attore
 var publishMsgToFridge = function (cmd){
-   	var msgstr = "msg(" + cmd + ",dispatch,js,fridge,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
+   	var msgstr = "msg(" + cmd + ",dispatch,js,fridge,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
   	console.log("publishMsgToFridge forward> "+ msgstr);
    	mqttUtils.publish( msgstr, "unibo/qak/fridge" );
 }
+
+var publishMsgToFridgeWithCode = function (cmd, foodCode){
+   	var msgstr = "msg("+ cmd + ",dispatch,js,fridge,"+ cmd +"("+ foodCode +"),1)"  ;  //TODO: replace 1 with counter
+  	console.log("publishMsgToFridgeWithCode forward> "+ msgstr);
+   	mqttUtils.publish( msgstr, "unibo/qak/fridge" );
+}
+
 //cambiare il nome dell'attore
 var publishMsgToServer = function (cmd){
-   	var msgstr = "msg(" + cmd + ",dispatch,js,centralstateserver,"+ cmd +"(go),1)"  ;  //TODO: replace 1 with counter
+   	var msgstr = "msg(" + cmd + ",dispatch,js,centralstateserver,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
   	console.log("publishMsgToCentralStateServer forward> "+ msgstr);
    	mqttUtils.publish( msgstr, "unibo/qak/centralstateserver" );
 }
