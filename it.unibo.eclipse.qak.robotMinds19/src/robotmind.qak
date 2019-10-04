@@ -57,8 +57,13 @@ QActor resourcemodel context ctxRobotMind{
 			println("modelUpdate roomMap  ")
 			run itunibo.robot.resourceModelSupport.updateRoomMapModel( myself, payloadArg(1) )
 		}
+		// è corretto che gli update del frigo e del tavolo siano gestiti da questo resourcemodel?
 		onMsg( modelUpdate : modelUpdate(fridge,V ) ) {
-			run itunibo.robot.resourceModelSupport.updateFridgeModel( myself, payloadArg(1) )
+			run itunibo.robot.resourceModelSupport.updateFridgeModel(myself,payloadArg(1))
+		}
+		onMsg( modelUpdate : modelUpdate(foodTable,V ) ) {
+			println("modelUpdate foodTable")
+			run itunibo.robot.resourceModelSupport.updateFoodTableModel(myself,payloadArg(1))
 		}
 	} 
     Goto  waitModelChange
