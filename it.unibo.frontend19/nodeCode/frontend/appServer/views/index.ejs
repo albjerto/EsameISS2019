@@ -17,15 +17,22 @@ function escapeRegExp(str) {
        		console.log("RECEIVED " + v);
         	if( v.indexOf("robotState:") >= 0 ){document.getElementById('robotDisplay').innerHTML=v; }
         	if( v.indexOf("sonarRobot:") >= 0 ){document.getElementById('sonarRobotDisplay').innerHTML=v; }
-			if( v.indexOf("fridge:") >= 0 ){document.getElementById('fridgeDisplay').innerHTML=v; }
-			if( v.indexOf("table:") >= 0 ){document.getElementById('tableDisplay').innerHTML=v; }
+		if( v.indexOf("fridge:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
+			v1 = v.replace("fridge:state('", "").replace("')", "");
+			v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
+			document.getElementById('fridgeDisplay').innerHTML=v2; 
+		}
+		if( v.indexOf("table:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
+			v1 = v.replace("table:state('", "").replace("')", "");
+			v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
+			document.getElementById('tableDisplay').innerHTML=v2; 
+		}
         	if( v.indexOf("roomMap:") >= 0 ){
         		v1 = v.replace("roomMap:state('", "").replace("')", "");
         		v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
           		console.log("v2= " + v2);
         		document.getElementById('mapDisplay').innerHTML=v2; 
         	}
-			if(v.indexOf("fridgeState")>=0){document.getElementById('fridgeDisplay').innerHTML=v;}
        	});
 </script>
  
