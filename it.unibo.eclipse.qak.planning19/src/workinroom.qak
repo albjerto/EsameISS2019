@@ -71,7 +71,7 @@ QActor butlermind context ctxWorkInRoom{
    	State doadd{
   		println("&&&  butlermind doadd")
   		/*
-  		 * Controllo della presenza del cibo Ë gi‡ stato effettuato con successo se 
+  		 * Controllo della presenza del cibo √® gi√† stato effettuato con successo se 
   		 * sono arrivato qui, eseguo il ritiro dal frigo
   		 */
   		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(add)
@@ -265,8 +265,8 @@ var timeBack = -1 // tempo di backstep
  		if "crashCounter == 0"{
  			/* 
  		 	*  Cerco di calcolare il tempo di backstep perfetto per evitare successive 
- 		 	*  collisioni, chiaramente Ë soggetto al ritardo variabile dovuto alla 
- 		 	*  computazione e ai messaggi, non va granchÈ bene
+ 		 	*  collisioni, chiaramente √® soggetto al ritardo variabile dovuto alla 
+ 		 	*  computazione e ai messaggi, non va granch√© bene
  		 	*/
 			println("timeBack fatto da noi")
  			["timeBack = (System.currentTimeMillis() - timePreStep - 45).toInt()"]
@@ -286,7 +286,7 @@ var timeBack = -1 // tempo di backstep
 		run itunibo.planner.moveUtils.backToCompensate(myself, timeBack, 0)
  		
  		/*
- 		 * Valutare la possibilit‡ di aggiungere un altro stato per evitare
+ 		 * Valutare la possibilit√† di aggiungere un altro stato per evitare
  		 * di avere tutto sto bordello con l'if, tipo handleStepFail aumenta
  		 * il counter e un altro stato per rifare il plan e risettare il 
  		 * counter a 0
@@ -309,15 +309,15 @@ var timeBack = -1 // tempo di backstep
 		}
 		else{
 			println("Found obstacle, supposedly a moving one")
-			["var timesLeft = 3 - crashCounter"]
+			["var timesLeft = 3 - crashCounter"] // da modificare per match con lo sbattere max 2 volte
 			println("Trying to move ahead other $timesLeft times")
 			
 			/*
 			 * Ho bisogno di riporre nel kb l'ultima mossa consumata (per forza una w)
-			 * altrimenti Ë come se andassimo avanti. Due modi:
+			 * altrimenti √® come se andassimo avanti. Due modi:
 			 * - asserta per rimettere la mossa in cima e farla consumare per prima
 			 * - retractall e poi doPlan, tanto non ho ancora posto la X sulla mappa,
-			 *   il piano sar‡ ricalcolato uguale
+			 *   il piano sar√† ricalcolato uguale
 			 */
 			solve( asserta(move(w)) )
 		}
@@ -330,7 +330,7 @@ QActor fridge context ctxWorkInRoom{
 	State s0 initial{
 		solve(consult("fridgeInit.pl"))
 		println("&&&  fridge starting, initial state as follows")
-		solve(showState)
+		solve(showFridgeState)
 	}
 	Goto waitCmd
 	
@@ -347,33 +347,38 @@ QActor fridge context ctxWorkInRoom{
 		println("&&&  fridge received prepare, handing over food")
 		solve(prepare)
 		println("&&&  fridge state modified, now as follows")
-		solve(showState)
+		solve(showFridgeState)
 	}
 	Goto waitCmd
 	
 	State addTask{
-		["var code =\"\" "]
+		["var Code =\"\" "] // sono costretto all'iniziale maiuscola o non posso usarlo come argomento di un messaggio
 		onMsg(add : add(C)){
-			["code = payloadArg(0)"]
-			println("&&& fridge received add, checking availability of food with code $code")
-			solve(isThere("$code"))
+			["Code = payloadArg(0)"]
+			println("&&& fridge received add, checking availability of food with code $Code")
+			solve(isThere("$Code"))
 			ifSolved{
-				solve(get("$code",1)) // per il momento la add prende sempre 1 quantit‡
+				solve(get("$Code",1)) // per il momento la add prende sempre 1 quantit√†
 				ifSolved{
 					println("Add possibile, fridge informa RBR")
 					/* 
 					 * Forward alla mind di un messaggio di add, dato che quello ricevuto qui
-					 * dal frigo Ë stato inviato dal frontend e voglio che il robot si muova 
-					 * solo se il cibo Ë disponibile
+					 * dal frigo √® stato inviato dal frontend e voglio che il robot si muova 
+					 * solo se il cibo √® disponibile
+					 * Seems like sta cosa andr√† cambiata e si dovr√† passare dal frontend al
+					 * robot e solo poi qui al frigo
 					 * Non ha importanza girare il foodCode al robot
 					 */
 					forward butlermind -m add : add()
 					// girare al centralstateserver l'add per aggiornamento stato tavolo
+					forward centralstateserver -m add : add($Code)
 				}else{
 					println("Add impossibile, quantita' insufficiente nel frigo")
 					/*
 					 * Se il check fallisce il robot in quanto intelligente non compie la 
 					 * add -> qui invio solo il warning al frontend
+					 * Seems like sta cosa andr√† cambiata e si dovr√† passare dal frontend al
+					 * robot e solo poi qui al frigo
 					 */
 					 forward resourcemodel -m modelUpdate : modelUpdate(fridge, addImpossibleWarning )
 				}
@@ -386,9 +391,27 @@ QActor fridge context ctxWorkInRoom{
 	Goto waitCmd
 	
 	State showTask{
-		println("&&&  fridge received showState, executing")
-		solve(showState)
-		// aggiungere l'invio al frontend dello stato
+		println("&&&  fridge received showFridgeState, executing")
+		solve(showFridgeState)
+		// invio al frontend dello stato, da sostituire con invio coap?
+		solve(getFridgeState(L))
+		ifSolved{
+			/* 
+			 * Porre il parsing in un metodo utility, tanto √® lo stesso per tutti
+			 * Parsing in questo modo perch√© il resto √® lato frontend
+			 */
+			["
+		val str1 = getCurSol(\"L\").toString()
+		val str2 = str1.replace(\"],[\",\"@\")
+		val str3 = str2.replace(\"[\",\"\'\")
+		val str4 = str3.replace(\"]\",\"\'\")
+		val FridgeStateString = str4.substring(1,str4.length-1)
+			"]
+  			println("fridgeStateString = \\n$FridgeStateString")
+  			forward resourcemodel -m modelUpdate : modelUpdate(fridge, $FridgeStateString )
+   		}else{
+   			println("getFridgeState FAIL")
+   		}
 	}
 	Goto waitCmd
 	
@@ -437,12 +460,12 @@ QActor fridgeuserdummy context ctxWorkInRoom{
  *    - i cibi sul tavolo sono gli stessi che prendo dal frigo sulla prepare -> sfrutto
  *      lo stesso file
  *    - ad ogni richiesta dello stato del tavolo, prima di inviare lo stato al maitre (o 
- * 		dopo),simulare il consumo di una quantit‡ randomica di cibo, una random per cibo 
- *		che vari da 0 a N, cosÏ alcuni cibi restano immutati (altrimenti creare un actor
+ * 		dopo), simulare il consumo di una quantit√† randomica di cibo, una random per cibo 
+ *		che vari da 0 a N, cos√¨ alcuni cibi restano immutati (altrimenti creare un actor
  *		che autonomamente ogni delay x simuli consumazioni randomiche)
- *    - non si occupa di gestire il frigo che Ë una entit‡ smart autonoma, maitre 
+ *    - non si occupa di gestire il frigo che √® una entit√† smart autonoma, maitre 
  *      chiede direttamente al frigo
- *    - lavastoviglie Ë libera finchÈ non si fa la clear e clear Ë la fine del work,
+ *    - lavastoviglie √® libera finch√© non si fa la clear e clear √® la fine del work,
  *      che senso ha gestirne lo stato?
  *    - Quando faccio la add non passo dalla credenza -> non prendo altri piatti,
  *      che senso ha gestire lo stato della credenza e dei piatti in generale se
@@ -465,25 +488,43 @@ QActor centralstateserver context ctxWorkInRoom{
 				  whenMsg clear -> clearTable
 				  // aggiungere le show del resto se richieste
 				
-	// modificare tutte le show perchÈ inviino gli output al frontend  
+	// modificare tutte le show perch√© inviino gli output al frontend  
 	State showTableTask{
 		println("&&& centralStateServer showTableState")
-		solve(showTableState)
+		solve(showFoodTableState)
+		solve(getFoodTableState(L))
+		ifSolved{
+			/* 
+			 * Porre il parsing in un metodo utility, tanto √® lo stesso per tutti
+			 * Parsing in questo modo perch√© il resto √® lato frontend
+			 */
+			["
+		val str1 = getCurSol(\"L\").toString()
+		val str2 = str1.replace(\"],[\",\"@\")
+		val str3 = str2.replace(\"[\",\"\'\")
+		val str4 = str3.replace(\"]\",\"\'\")
+		val FoodTableStateString = str4.substring(1,str4.length-1)
+			"]
+  			println("foodTableStateString = \\n$FoodTableStateString")
+  			forward resourcemodel -m modelUpdate : modelUpdate(foodTable, $FoodTableStateString)
+   		}else{
+   			println("getFoodTableState FAIL")
+   		}
 	}
 	Goto randomConsumption
 	
 	State randomConsumption{
 		println("&&& centralStateServer randomly consuming")
-		solve(randomConsume)
+		solve(randomFoodConsumption)
 		println("&&& centralStateServer randomConsumption executed, now table state as follows")
-		solve(showTableState)
+		solve(showFoodTableState)
 	}
 	Goto waitCmd
 	
 	State prepareTable{
 		println("&&& centralStateServer prepareTable, now table state as follows")
-		solve(consult("fridgeInit.pl"))
-		solve(showTableState)
+		solve(assert(enabled(true))) // rende visibili i cibi
+		solve(showFoodTableState)
 	}
 	Goto waitCmd
 	
@@ -495,7 +536,7 @@ QActor centralstateserver context ctxWorkInRoom{
 			solve(addTable("$code",1))
 		}
 		println("&&& centralStateServer updated table, now table state as follows")
-		solve(showTableState)
+		solve(showFoodTableState)
 	}
 	Goto waitCmd
 	
@@ -503,7 +544,7 @@ QActor centralstateserver context ctxWorkInRoom{
 		println("&&& centralStateServer updating tableState after clear")
 		solve(retractAll(foodTable(C,N)))
 		println("&&& centralStateServer updated table, now table state as follows")
-		solve(showTableState)
+		solve(showFoodTableState)
 	}
 	Goto waitCmd
 	
