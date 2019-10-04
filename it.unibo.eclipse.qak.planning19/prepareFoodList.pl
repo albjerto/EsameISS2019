@@ -1,57 +1,63 @@
 %% fatto da noi
 %% cibo da porre sul tavolo col comando prepare
-%% i cibi vanno indicati come foodTable(codice,quantit‡)
+%% modificare solo le quantit√† (l'ultimo campo)
+%% lasciarlo a 0 se non si vuol prendere il cibo dal frigo
+%% ma NON cancellare la rule
+%% quantit√† disponibile di ogni cibo visibile in fridgeInit.pl
 
 %% bevande
-foodTable(b01,2).
-foodTable(b02,2).
-foodTable(b03,2).
-foodTable(b04,2).
+foodTable(succoBuono,b01,3).
+foodTable(birraBella,b02,3).
+foodTable(acquaGelidaImbevibile,b03,3).
+foodTable(punchNeiDenti,b04,3).
 
 %% frutta
-foodTable(f01,2).
-foodTable(f02,2).
-foodTable(f03,2).
+foodTable(meloneVerdeImmaturo,f01,3).
+foodTable(peschePescate,f02,3).
+foodTable(meleMlem,f03,3).
 
 %% verdura
-foodTable(v01,2).
-foodTable(v02,2).
-foodTable(v03,2).
+foodTable(pomodoriComePatatine,v01,3).
+foodTable(caroteCheSuccedeAmico,v02,3).
+foodTable(ravanelliXtraSpicy,v03,3).
 
 %% affettato
-foodTable(a01,2).
-foodTable(a02,2).
-foodTable(a03,2).
-foodTable(a04,2).
+foodTable(salameGrassissimo,a01,3).
+foodTable(prosciuttoTroppoCostoso,a02,3).
+foodTable(coppaDeiCampioni,a03,3).
+foodTable(mortazzaDelVanish,a04,3).
 
 %% salato
-foodTable(s01,2).
-foodTable(s02,2).
-foodTable(s03,2).
+foodTable(pizzetteCompleanno,s01,3).
+foodTable(quelleRobePastaSfogliaEWurstel,s02,3).
+foodTable(piadaDelParco,s03,3).
 
 %% dolci
-foodTable(d01,2).
-foodTable(d02,2).
-foodTable(d03,2).
+foodTable(pannaCottaPoco,d01,3).
+foodTable(mascarponeDaMontagna,d02,3).
+foodTable(cheeseCakeHoFame,d03,3).
 
-%% print dello stato, suppongo di aver fatto la consult anche di fridgeInit.pl per
-%% poter ricavare il nome del cibo dal codice
-%% NB senza aver fatto la consult di fridgeInit.pl, il comando non stampa nulla, sfrutto
-%% la cosa per mettere tale consult solo nello stato raggiunto dopo il messaggio relativo
-%% alla prepare avvenuta, cosÏ se viene richiesto lo stato del tavolo prima della prepare
-%% il risultato Ë il vuoto, come dovrebbe essere
-showTableState :- foodTable(C,N), food(F,C,N1), N > 0, outputTable(food(F,C,N)), fail.
-showTableState.			
-outputTable(food(F,C,N)) :- stdout <- print(F), stdout <- print(' '), stdout <- println(N).
+%% print dello stato, restituisce i cibi presenti solo se √® prima stata invocata
+%% la prepare, dato che con essa √® stata fatta l'assert di enabled(true)
+%% tolto check N > 0, mostro anche i cibi terminati per chiarezza
+showFoodTableState :- enabled(true), foodTable(F,C,N), outputTable(foodTable(F,C,N)), fail.
+showFoodTableState.			
+outputTable(foodTable(F,C,N)) :- stdout <- print(F), stdout <- print(' '), stdout <- println(N).
+
+%% genera la stringa contenente lo stato del tavolo (da parsare lato kotlin)
+getFoodTableState(L) :- findall([F,N],multipleGoal(F,N),L).
+multipleGoal(F,N) :- enabled(true),foodTable(F,_,N).
 
 %% aggiorna stato del tavolo dopo una add avvenuta con successo
-%% se aggiungo del cibo gi‡ presente unifico con la prima regola e basta,
-%% altrimenti la prima fallisce perciÚ il cibo non Ë presente sul tavolo -> lo
-%% aggiungo
-addTable(C,N) :- foodTable(C,N1), retract(foodTable(C,N1)), N2 is N1 + N, assert(foodTable(C,N2)).
-addTable(C,N) :- assert(foodTable(C,N)).
+addTable(C,N) :- foodTable(F,C,N1), retract(foodTable(F,C,N1)), N2 is N1 + N, assert(foodTable(F,C,N2)).
 
-%% consuma randomicamente una certa quantit‡ di ogni cibo
-%% prego ganesh che il prolog non aggiorni i punti di scelta del backtracking dopo la assert o non va un cazzo
-randomConsume :- foodTable(C,N), random_between(0,N,R), retract(foodTable(C,N)), N1 is N - R, assert(foodTable(C,N1)), fail.
-randomConsume.
+%% consuma randomicamente una certa quantit√† di ogni cibo
+%% rand_int genera un random tra 0 e N-1 inclusi
+randomFoodConsumption :- foodTable(F,C,N), rand_int(N,R), R1 is R + 1, 
+						 retract(foodTable(F,C,N)), N1 is N - R1, 
+						 assert(foodTable(F,C,N1)), fail.
+randomFoodConsumption.
+
+%% da provare dopo averla aggiornata con rand_int
+%%randomFoodConsumption :- forall(foodTable(F,C,N),doRandomConsume(F,C,N)).
+%%doRandomFoodConsumption(F,C,N) :- foodTable(F,C,N), random_between(0,N,R), retract(foodTable(F,C,N)), N1 is N - R, assert(foodTable(F,C,N1)).
