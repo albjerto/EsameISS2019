@@ -1,6 +1,6 @@
 %% fatto da noi
 %% cibi inizialmente nel frigo
-%% cibo reso come food(nome, foodCode, quantit‡)
+%% cibo reso come food(nome, foodCode, quantit√†)
 
 %% bevande
 food(succoBuono,b01,5).
@@ -16,7 +16,7 @@ food(meleMlem,f03,5).
 %% verdura
 food(pomodoriComePatatine,v01,5).
 food(caroteCheSuccedeAmico,v02,5).
-food(ravanelliSpicyAf,v03,5).
+food(ravanelliXtraSpicy,v03,5).
 
 %% affettato
 food(salameGrassissimo,a01,5).
@@ -35,19 +35,31 @@ food(mascarponeDaMontagna,d02,5).
 food(cheeseCakeHoFame,d03,5).
 
 %% print dello stato
-showState :- food(F,C,N), N > 0, output(food(F,C,N)), fail.
-showState.			
-output(food(F,C,N)) :- stdout <- print(F), stdout <- print(' '), stdout <- println(N).
+showFridgeState :- food(F,C,N), N > 0, outputFridge(food(F,C,N)), fail.
+showFridgeState.			
+outputFridge(food(F,C,N)) :- stdout <- print(F), stdout <- print(' '), stdout <- println(N).
+
+%% genera la stringa contenente lo stato del frigo (da parsare lato kotlin)
+getFridgeState(L) :- findall([F,N],food(F,_,N),L).
+
+%% per non dimenticare
+%%getFridgeStateString(S) :- food(F,C,N), N > 0, atom_concat(F,' ',I1), 
+%%							number_codes(N,C1), atom_codes(A,C1), atom_concat(I1,A,I2), 
+%%							atom_concat(I2,' | ',I3), retract(food(F,C,N)), 
+%%							getFridgeStateString(S1), atom_concat(I3,S1,S), 
+%%							assertz(food(F,C,N)).
+%%getFridgeStateString(S) :- loopEnder(S).
+%%loopEnder('|'). %% altrimenti l'ultimo S1 non √® un atomo
 
 %% controllo presenza cibo con code C
 isThere(C) :- food(_,C,N), N > 0.
 
-%% ritiro di una quantit‡ N del cibo con code C
+%% ritiro di una quantit√† N del cibo con code C
 get(C,N) :- food(F,C,N1), N1 >= N, retract(food(F,C,N1)), N2 is N1 - N, assert(food(F,C,N2)).
 
-%% aggiunta di una quantit‡ N del cibo con code C
+%% aggiunta di una quantit√† N del cibo con code C
 put(C,N) :- food(F,C,N1), retract(food(F,C,N1)), N2 is N1 + N, assert(food(F,C,N2))
 
 %% prepare, pone sul tavolo i cibi specificati in prepareFoodList.pl
-prepare :- foodTable(C,N), get(C,N), fail.
+prepare :- foodTable(_,C,N), get(C,N), fail.
 prepare.
