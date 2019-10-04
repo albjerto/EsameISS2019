@@ -41,12 +41,31 @@ lateinit var resourcecoap : modelResourceCoap
  			}	
 	}
 	
-	// comunicazione dal frigo al frontend
+	/*
+ 	 * Comunicazione dal frigo al frontend
+ 	 * La resourcecoap.updateState  manda solo il messaggio al rettangolino verde, si intende
+ 	 * questo dicendo che il frigo deve poter rispondere alle richieste tramite coap? In caso
+ 	 * contrario, il tipo di comunicazione verso il frontend tramite mqtt qui implementato
+ 	 * (invio messaggio sul topic dentro la emit) non va bene?
+ 	 */
 	fun updateFridgeModel( actor: ActorBasic, content: String ){
 		println("			resourceModelSupport updateFridgeModel content=$content")
 			actor.scope.launch{
 				actor.emit( "modelContent" , "content( fridge( state( '$content' ) ) )" )
  				resourcecoap.updateState( "fridge( '$content' )" )
+ 			}	
+	}
+	
+	/*
+ 	 * Comunicazione dal table al frontend riguardo il cibo
+	 * Dovremo probabilmente prevedere anche un updateTablewareTableModel, in caso modificare
+ 	 * anche questo metodo accordingly
+	 */
+ 	fun updateFoodTableModel( actor: ActorBasic, content: String ){
+		println("			resourceModelSupport updateFoodTableModel content=$content")
+			actor.scope.launch{
+				actor.emit( "modelContent" , "content( table( state( '$content' ) ) )" )
+ 				resourcecoap.updateState( "table( '$content' )" )
  			}	
 	}
 	
