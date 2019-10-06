@@ -570,6 +570,7 @@ QActor centralstateserver context ctxWorkInRoom{
 		}
 		println("&&& centralStateServer updated table, now table state as follows")
 		solve(showFoodTableState)
+		solve(showTablewareTableState)
 		/*
 		 * Sarebbe cool se alla add di un cibo si aggiungesse anche il
 		 * corrispettivo tableware (anche se si tratta di una modifica alla
@@ -606,6 +607,7 @@ QActor centralstateserver context ctxWorkInRoom{
 		solve(clearTableware)
 		println("&&& centralStateServer updated table, now table state as follows")
 		solve(showFoodTableState)
+		solve(showTablewareTableState)
 	}
 	Goto waitCmd
 	
