@@ -56,16 +56,22 @@ lateinit var resourcecoap : modelResourceCoap
  			}	
 	}
 	
-	/*
- 	 * Comunicazione dal table al frontend riguardo il cibo
-	 * Dovremo probabilmente prevedere anche un updateTablewareTableModel, in caso modificare
- 	 * anche questo metodo accordingly
-	 */
+	// comunicazione dal table al frontend riguardo il cibo
  	fun updateFoodTableModel( actor: ActorBasic, content: String ){
 		println("			resourceModelSupport updateFoodTableModel content=$content")
 			actor.scope.launch{
-				actor.emit( "modelContent" , "content( table( state( '$content' ) ) )" )
- 				resourcecoap.updateState( "table( '$content' )" )
+				actor.emit( "modelContent" , "content( tableFood( state( '$content' ) ) )" )
+ 				resourcecoap.updateState( "tableFood( '$content' )" )
+ 			}	
+	}
+	
+	// NB ancora da fare tutta la gestione lato frontend con anche aggiornamento della gui
+	// comunicazione dal table al frontend riguardo i tableware
+	fun updateTablewareTableModel( actor: ActorBasic, content: String ){
+		println("			resourceModelSupport updateTablewareTableModel content=$content")
+			actor.scope.launch{
+				actor.emit( "modelContent" , "content( tableTableware( state( '$content' ) ) )" )
+ 				resourcecoap.updateState( "tableTableware( '$content' )" )
  			}	
 	}
 	
