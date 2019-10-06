@@ -345,7 +345,7 @@ QActor fridge context ctxWorkInRoom{
 	State prepareTask{
 		solve(consult("prepareFoodList.pl"))
 		println("&&&  fridge received prepare, handing over food")
-		solve(prepare)
+		solve(prepareFood)
 		println("&&&  fridge state modified, now as follows")
 		solve(showFridgeState)
 	}
@@ -420,7 +420,7 @@ QActor fridge context ctxWorkInRoom{
 		["var code = \"\" "]
 		onMsg(isAvailable : isAvailable(CODE)){
 			["code = payloadArg(0)"]
-			solve(isThere("$code"))
+			solve(isThereFood("$code"))
 			ifSolved{
 				println("Food available")
 				forward resourcemodel -m modelUpdate : modelUpdate(fridge, foodAvailable )
@@ -476,6 +476,9 @@ QActor centralstateserver context ctxWorkInRoom{
 	State s0 initial{
 		println("&&& centralStateServer starting")
 		solve(consult("prepareFoodList.pl")) // motivazione nel commento qui sopra
+		// tentativo gestione piatti (tableware)
+		solve(consult("pantryInit.pl"))
+		solve(consult("prepareTablewareList.pl"))
 	}
 	Goto waitCmd
 	
@@ -510,21 +513,51 @@ QActor centralstateserver context ctxWorkInRoom{
    		}else{
    			println("getFoodTableState FAIL")
    		}
+   		// show piatti (tableware)
+   		solve(showTablewareTableState)
+		solve(getTablewareTableState(L))
+		ifSolved{
+			/* 
+			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
+			 * Parsing in questo modo perché il resto è lato frontend
+			 */
+			["
+		val str5 = getCurSol(\"L\").toString()
+		val str6 = str5.replace(\"],[\",\"@\")
+		val str7 = str6.replace(\"[\",\"\'\")
+		val str8 = str7.replace(\"]\",\"\'\")
+		val TablewareTableStateString = str8.substring(1,str8.length-1)
+			"]
+  			println("tablewareTableStateString = \\n$TablewareTableStateString")
+  			forward resourcemodel -m modelUpdate : modelUpdate(tablewareTable, $TablewareTableStateString)
+   		}else{
+   			println("getTablewareTableState FAIL")
+   		}
 	}
 	Goto randomConsumption
 	
 	State randomConsumption{
 		println("&&& centralStateServer randomly consuming")
 		solve(randomFoodConsumption)
+		/*
+		 * Anche qui sarebbe nice se la radomConsumption dei tableware fosse
+		 * relativa ai cibi consumati -> ad esempio se consumo una bibita dovrò
+		 * consumare un bicchiere ecc -> implementarlo lato prolog con un unico
+		 * predicato randomConsumption?
+		 */
+		solve(randomTablewareConsumption)
 		println("&&& centralStateServer randomConsumption executed, now table state as follows")
 		solve(showFoodTableState)
+		solve(showTablewareTableState)
 	}
 	Goto waitCmd
 	
 	State prepareTable{
 		println("&&& centralStateServer prepareTable, now table state as follows")
-		solve(assert(enabled(true))) // rende visibili i cibi
+		solve(assert(enabled(true))) // rende visibili i cibi e i piatti
+		solve(prepareTableware) // non c'è l'attore pantry, gestisco qui il ritiro piatti
 		solve(showFoodTableState)
+		solve(showTablewareTableState)
 	}
 	Goto waitCmd
 	
@@ -537,12 +570,40 @@ QActor centralstateserver context ctxWorkInRoom{
 		}
 		println("&&& centralStateServer updated table, now table state as follows")
 		solve(showFoodTableState)
+		/*
+		 * Sarebbe cool se alla add di un cibo si aggiungesse anche il
+		 * corrispettivo tableware (anche se si tratta di una modifica alla
+		 * richiesta del comportamento della add, dovendo così passare anche
+		 * dalla pantry)
+		 * In alternativa si può porre sul tavolo un numero gigante di tableware
+		 * così non ci sarà mai da rifornire
+		 */
 	}
 	Goto waitCmd
 	
 	State clearTable{
 		println("&&& centralStateServer updating tableState after clear")
-		solve(retractAll(foodTable(C,N)))
+		/*
+		 * Modificato da solve(retractAll(foodTable(F,C,N))) dato che è molto
+		 * più pulito fare una retract(enabled(true))
+		 * Inoltre ho bisogno che le info sugli item sul tavolo rimangano
+		 * dato che devo riportare tali item nei rispettivi contenitori
+		 * NB se devo effettivamente liberare il tavolo dai piatti dovrò 
+		 * passare dalla pantry -> modifica a parte del comportamento
+		 * richiesto alla clear -> è corretto?
+		 */ 
+		solve(retract(enabled(true)))
+		// aggiungere la gestione della riconsegna cibo
+		/*
+		 * Riconsegna tableware è semplice dato che lo stato della pantry è
+		 * mantenuto da questo stesso attore, ma non posso fare la clear
+		 * del cibo allo stesso modo -> ci dovrà essere uno scambio di 
+		 * messaggi verso il frigo (probabilmente implementabile come
+		 * ottenimento della stringa di stato del cibo, passaggio della stessa
+		 * al frigo, parsing lato kotlin di ogni cibo e put nel frigo dando
+		 * come argomento ognuno dei parametri ricavati)
+		 */
+		solve(clearTableware)
 		println("&&& centralStateServer updated table, now table state as follows")
 		solve(showFoodTableState)
 	}
