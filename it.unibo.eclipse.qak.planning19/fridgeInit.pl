@@ -52,7 +52,7 @@ getFridgeState(L) :- findall([F,N],food(F,_,N),L).
 %%loopEnder('|'). %% altrimenti l'ultimo S1 non è un atomo
 
 %% controllo presenza cibo con code C
-isThere(C) :- food(_,C,N), N > 0.
+isThereFood(C) :- food(_,C,N), N > 0.
 
 %% ritiro di una quantità N del cibo con code C
 get(C,N) :- food(F,C,N1), N1 >= N, retract(food(F,C,N1)), N2 is N1 - N, assert(food(F,C,N2)).
@@ -61,5 +61,5 @@ get(C,N) :- food(F,C,N1), N1 >= N, retract(food(F,C,N1)), N2 is N1 - N, assert(f
 put(C,N) :- food(F,C,N1), retract(food(F,C,N1)), N2 is N1 + N, assert(food(F,C,N2))
 
 %% prepare, pone sul tavolo i cibi specificati in prepareFoodList.pl
-prepare :- foodTable(_,C,N), get(C,N), fail.
-prepare.
+prepareFood :- foodTable(_,C,N), get(C,N), fail.
+prepareFood.
