@@ -40,13 +40,15 @@ foodTable(cheeseCakeHoFame,d03,3).
 %% print dello stato, restituisce i cibi presenti solo se è prima stata invocata
 %% la prepare, dato che con essa è stata fatta l'assert di enabled(true)
 %% tolto check N > 0, mostro anche i cibi terminati per chiarezza
-showFoodTableState :- enabled(true), foodTable(F,C,N), outputTable(foodTable(F,C,N)), fail.
+showFoodTableState :- enabled(true), foodTable(F,C,N), 
+					  outputFoodTable(foodTable(F,C,N)), fail.
 showFoodTableState.			
-outputTable(foodTable(F,C,N)) :- stdout <- print(F), stdout <- print(' '), stdout <- println(N).
+outputFoodTable(foodTable(F,C,N)) :- stdout <- print(F), stdout <- print(' '), 
+								 stdout <- println(N).
 
-%% genera la stringa contenente lo stato del tavolo (da parsare lato kotlin)
-getFoodTableState(L) :- findall([F,N],multipleGoal(F,N),L).
-multipleGoal(F,N) :- enabled(true),foodTable(F,_,N).
+%% genera la stringa contenente lo stato del foodTable (da parsare lato kotlin)
+getFoodTableState(L) :- findall([F,N],multipleFoodGoal(F,N),L).
+multipleFoodGoal(F,N) :- enabled(true),foodTable(F,_,N).
 
 %% aggiorna stato del tavolo dopo una add avvenuta con successo
 addTable(C,N) :- foodTable(F,C,N1), retract(foodTable(F,C,N1)), N2 is N1 + N, assert(foodTable(F,C,N2)).
@@ -59,5 +61,5 @@ randomFoodConsumption :- foodTable(F,C,N), rand_int(N,R), R1 is R + 1,
 randomFoodConsumption.
 
 %% da provare dopo averla aggiornata con rand_int
-%%randomFoodConsumption :- forall(foodTable(F,C,N),doRandomConsume(F,C,N)).
+%%randomFoodConsumption :- forall(foodTable(F,C,N),doRandomFoodConsumption(F,C,N)).
 %%doRandomFoodConsumption(F,C,N) :- foodTable(F,C,N), random_between(0,N,R), retract(foodTable(F,C,N)), N1 is N - R, assert(foodTable(F,C,N1)).
