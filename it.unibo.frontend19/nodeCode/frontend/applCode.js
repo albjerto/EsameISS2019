@@ -141,7 +141,10 @@ app.get('/appl', function(req, res) {
   		next();
  	});
 	
-	
+	app.post("/consultDishwasher", function(req, res,next) {
+  		publishMsgToServer( "showDishwasherState"  );
+  		next();
+ 	});
 
 	
 	//--------------------------------------------------------
