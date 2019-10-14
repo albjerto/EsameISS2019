@@ -65,7 +65,6 @@ lateinit var resourcecoap : modelResourceCoap
  			}	
 	}
 	
-	// NB ancora da fare tutta la gestione lato frontend con anche aggiornamento della gui
 	// comunicazione dal table al frontend riguardo i tableware
 	fun updateTablewareTableModel( actor: ActorBasic, content: String ){
 		println("			resourceModelSupport updateTablewareTableModel content=$content")
@@ -75,7 +74,6 @@ lateinit var resourcecoap : modelResourceCoap
  			}	
 	}
 	
-	// NB ancora da fare tutta la gestione lato frontend con anche aggiornamento della gui
 	// comunicazione dalla dishwasher al frontend riguardo lo stato
 	fun updateDishwasherModel( actor: ActorBasic, content: String ){
 		println("			resourceModelSupport updateDishwasherModel content=$content")
