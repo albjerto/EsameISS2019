@@ -17,22 +17,32 @@ function escapeRegExp(str) {
        		console.log("RECEIVED " + v);
         	if( v.indexOf("robotState:") >= 0 ){document.getElementById('robotDisplay').innerHTML=v; }
         	if( v.indexOf("sonarRobot:") >= 0 ){document.getElementById('sonarRobotDisplay').innerHTML=v; }
-		if( v.indexOf("fridge:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-			v1 = v.replace("fridge:state('", "").replace("')", "");
-			v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-			document.getElementById('fridgeDisplay').innerHTML=v2; 
-		}
-		if( v.indexOf("table:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-			v1 = v.replace("table:state('", "").replace("')", "");
-			v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-			document.getElementById('tableDisplay').innerHTML=v2; 
-		}
-        	if( v.indexOf("roomMap:") >= 0 ){
-        		v1 = v.replace("roomMap:state('", "").replace("')", "");
-        		v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-          		console.log("v2= " + v2);
-        		document.getElementById('mapDisplay').innerHTML=v2; 
-        	}
+			if( v.indexOf("fridge:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
+				v1 = v.replace("fridge:state('", "").replace("')", "");
+				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
+				document.getElementById('fridgeDisplay').innerHTML=v2; 
+			}
+			if( v.indexOf("tableFood:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
+				v1 = v.replace("tableFood:state('", "").replace("')", "");
+				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
+				document.getElementById('tableFoodDisplay').innerHTML=v2; 
+			}
+			if( v.indexOf("tableTableware:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
+				v1 = v.replace("tableTableware:state('", "").replace("')", "");
+				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
+				document.getElementById('tableTablewareDisplay').innerHTML=v2; 
+			}
+			if( v.indexOf("dishwasher:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
+				v1 = v.replace("dishwasher:state('", "").replace("')", "");
+				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
+				document.getElementById('dishwasherDisplay').innerHTML=v2; 
+			}
+			if( v.indexOf("roomMap:") >= 0 ){
+				v1 = v.replace("roomMap:state('", "").replace("')", "");
+				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
+				console.log("v2= " + v2);
+				document.getElementById('mapDisplay').innerHTML=v2; 
+			}
        	});
 </script>
  
@@ -209,7 +219,7 @@ The event is handled by robotCmdExec.py
 									</form>
 								</td>
 								<td align="center">							
-									<form action="/reactivateappl" method="post">		<!-- a chi manda il messaggio consultDishwasher? al centralStateServer? -->					    
+									<form action="/consultDishwasher" method="post">		<!-- a chi manda il messaggio consultDishwasher? al centralStateServer? -->					    
 										<input type="submit" style="font-size:20px; color:black;"  value="CONSULT DISHWASHER"  >							  	 
 									</form>
 								</td>			
@@ -237,7 +247,12 @@ The event is handled by robotCmdExec.py
   		<b>FRIDGE STATE</b>: <span id="fridgeDisplay"></span>
 	</div>
 	<div>
-  		<b>TABLE STATE</b>: <span id="tableDisplay"></span>
+  		<b>TABLE STATE</b>: <br/>
+		<b>&nbsp&nbsp&nbsp&nbsp&nbspFOOD STATE</b>: <span id="foodTableDisplay"></span> <br/>
+		<b>&nbsp&nbsp&nbsp&nbsp&nbspTABLEWARE STATE</b>: <span id="tablewareTableDisplay"></span>
+	</div>
+	<div>
+  		<b>DISHWASHER STATE</b>: <span id="dishwasherDisplay"></span>
 	</div>
 	<div>
   		<b>ROOM MAP</b>: <span id="mapDisplay"></span>
