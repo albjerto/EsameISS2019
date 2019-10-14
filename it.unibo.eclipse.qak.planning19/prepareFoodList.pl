@@ -50,15 +50,17 @@ outputFoodTable(foodTable(F,C,N)) :- stdout <- print(F), stdout <- print(' '),
 getFoodTableState(L) :- findall([F,N],multipleFoodGoal(F,N),L).
 multipleFoodGoal(F,N) :- enabled(true),foodTable(F,_,N).
 
-%% aggiorna stato del tavolo dopo una add avvenuta con successo
-addTable(C,N) :- foodTable(F,C,N1), retract(foodTable(F,C,N1)), N2 is N1 + N, assert(foodTable(F,C,N2)).
+%% aggiorna stato del tavolo dopo una add cibo avvenuta con successo
+addFoodTable(C,N) :- foodTable(F,C,N1), retract(foodTable(F,C,N1)), N2 is N1 + N, assert(foodTable(F,C,N2)).
 
-%% consuma randomicamente una certa quantità di ogni cibo
+%% consuma randomicamente una certa quantità di ogni cibo e dei relativi
+%% tableware, vedi correspondingTablewareConsumption in prepareTablewareList.pl
 %% rand_int genera un random tra 0 e N-1 inclusi
-randomFoodConsumption :- foodTable(F,C,N), rand_int(N,R), R1 is R + 1, 
-						 retract(foodTable(F,C,N)), N1 is N - R1, 
-						 assert(foodTable(F,C,N1)), fail.
-randomFoodConsumption.
+randomConsumption :- foodTable(F,C,N), N1 is N + 1, rand_int(N1,R), 
+						 retract(foodTable(F,C,N)), N2 is N - R, 
+						 assert(foodTable(F,C,N2)), 
+						 correspondingTablewareConsumption(C,R), fail.
+randomConsumption.
 
 %% da provare dopo averla aggiornata con rand_int
 %%randomFoodConsumption :- forall(foodTable(F,C,N),doRandomFoodConsumption(F,C,N)).
