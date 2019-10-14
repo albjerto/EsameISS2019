@@ -11,4 +11,4 @@ Inoltre è da controllare che così facendo il comportamento resti invariato -> 
 - provare il robot fisico
 - fare i test
 - fare la roba nei commenti dei vari file
-- rendere meno strongly coupled gli enti non intelligenti (table, dishwasher ecc) prevedendo la possibilità che diventino intelligenti?
+- rendere meno strongly coupled gli enti non intelligenti (table, dishwasher ecc) prevedendo la possibilità che diventino intelligenti? (regola prolog del tipo smart(true) che ricerco nella kb e se solved allora ricerco anche locazione dell'ente per parlargli altrimenti si svolge tutto come già è?)
