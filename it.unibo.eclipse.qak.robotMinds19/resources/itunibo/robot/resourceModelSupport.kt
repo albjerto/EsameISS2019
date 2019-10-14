@@ -75,5 +75,15 @@ lateinit var resourcecoap : modelResourceCoap
  			}	
 	}
 	
+	// NB ancora da fare tutta la gestione lato frontend con anche aggiornamento della gui
+	// comunicazione dalla dishwasher al frontend riguardo lo stato
+	fun updateDishwasherModel( actor: ActorBasic, content: String ){
+		println("			resourceModelSupport updateDishwasherModel content=$content")
+			actor.scope.launch{
+				actor.emit( "modelContent" , "content( dishwasher( state( '$content' ) ) )" )
+ 				resourcecoap.updateState( "dishwasher( '$content' )" )
+ 			}	
+	}
+	
 }
 
