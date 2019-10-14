@@ -108,7 +108,9 @@ app.get('/appl', function(req, res) {
 	app.post("/explore", function(req, res,next) {
   		publishMsgToRobotapplication( "explore" );
   		next();
- 	});		
+ 	});
+
+	/*
 	app.post("/prepare", function(req, res,next) {
   		publishMsgToRobotapplication( "prepare" );
   		next();
@@ -117,13 +119,11 @@ app.get('/appl', function(req, res) {
   		publishMsgToRobotapplication( "clear" );
   		next();
  	});	
-
-	/*
 	app.post("/addFood", function(req, res,next) {
   		publishMsgToRobotapplication( "addFood"  );
   		next();
  	});	
-*/
+	*/
 	
 	//--------------nostre aggiunte--------------------
 	app.post("/consultFridge", function(req, res,next) {
