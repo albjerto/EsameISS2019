@@ -69,6 +69,10 @@ QActor resourcemodel context ctxRobotMind{
 			println("modelUpdate tablewareTable")
 			run itunibo.robot.resourceModelSupport.updateTablewareTableModel(myself,payloadArg(1))
 		}
+		onMsg( modelUpdate : modelUpdate(dishwasher,V ) ) {
+			println("modelUpdate dishwasher")
+			run itunibo.robot.resourceModelSupport.updateDishwasherModel(myself,payloadArg(1))
+		}
 	} 
     Goto  waitModelChange
     
