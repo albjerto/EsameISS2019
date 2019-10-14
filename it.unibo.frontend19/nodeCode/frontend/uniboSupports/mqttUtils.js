@@ -15,8 +15,10 @@ var io  ; 	//Upgrade for socketIo;
 var robotModel    = "none";
 var sonarModel    = "none";
 var roomMapModel  = "none";
-var fridgeModel   = "none"; // per show contenuto del fridge sul frontend
-var tableModel    = "none"; // per show contenuto del table sul frontend
+var fridgeModel = "none"; // per show contenuto del fridge sul frontend
+var tableFoodModel = "none"; // per show contenuto del cibo sul tavolo sul frontend
+var tableTablewareModel = "none"; // per show contenuto del tableware sul tavolo sul frontend
+var dishwasherModel = "none"; // per show contenuto della dishwasher sul frontend
 
 console.log("mqtt client= " + client );
 
@@ -40,21 +42,25 @@ client.on('message', function (topic, message){
    
   var msgStr          = message.toString();
   if(msgStr.indexOf("content")<0) return; 		//it is some other message sent via MQTT
-  var spRobot         = msgStr.indexOf("robot");
-  var spSonarRobot    = msgStr.indexOf("sonarRobot");
-  var spRoomMap       = msgStr.indexOf("roomMap");
-  var spFridge        = msgStr.indexOf("fridge"); // elaborazione relativa al fridge
-  var spTable        = msgStr.indexOf("table"); // elaborazione relativa al table
-  var sp1             = msgStr.indexOf("state");
-  var msgStr          = msgStr.substr(sp1);
-  var sp2             = msgStr.indexOf("))");
-  var msg             = ""; 
-  var content         = message.toString().substr(sp1,sp2+1);
+  var spRobot			= msgStr.indexOf("robot");
+  var spSonarRobot		= msgStr.indexOf("sonarRobot");
+  var spRoomMap			= msgStr.indexOf("roomMap");
+  var spFridge			= msgStr.indexOf("fridge"); // elaborazione relativa al fridge
+  var spTableFood		= msgStr.indexOf("tableFood"); // elaborazione relativa al cibo sul tavolo
+  var spTableTableware	= msgStr.indexOf("tableTableware"); // elaborazione relativa al tableware sul tavolo
+  var spDishwasher		= msgStr.indexOf("dishwasher"); // elaborazione relativa alla dishwasher
+  var sp1				= msgStr.indexOf("state");
+  var msgStr			= msgStr.substr(sp1);
+  var sp2				= msgStr.indexOf("))");
+  var msg				= ""; 
+  var content			= message.toString().substr(sp1,sp2+1);
 	  if( spRobot > 0      ) { msg = msg + "robotState:"; robotModel   = msg+content ;   };
 	  if( spSonarRobot > 0 ) { msg = msg + "sonarRobot:"; sonarModel   = msg+content ; };
 	  if( spRoomMap > 0 )    { msg = msg + "roomMap:";    roomMapModel = msg+content ; };
 	  if( spFridge > 0 )     { msg = msg + "fridge:";     fridgeModel  = msg+content ; }; // elaborazione relativa al fridge
-	  if( spTable > 0 )     { msg = msg + "table:";     tableModel  = msg+content ; }; // elaborazione relativa al table
+	  if( spTableFood > 0 )     { msg = msg + "tableFood:";     tableFoodModel  = msg+content ; }; // elaborazione relativa al cibo sul tavolo
+	  if( spTableTableware > 0 )     { msg = msg + "tableTableware:";     tableTablewareModel  = msg+content ; }; // elaborazione relativa al tableware sul tavolo
+	  if( spDishwasher > 0 )     { msg = msg + "dishwasher:";     dishwasherModel  = msg+content ; }; // elaborazione relativa alla dishwasher
 	  msg = msg + content  ;		 
 	  //console.log("mqtt send on io.sockets| "+ msg  + " content=" + content);  
 	  io.sockets.send( msg );   
