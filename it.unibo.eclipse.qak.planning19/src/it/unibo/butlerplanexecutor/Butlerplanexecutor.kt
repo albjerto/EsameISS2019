@@ -19,6 +19,7 @@ class Butlerplanexecutor ( name: String, scope: CoroutineScope ) : ActorBasicFsm
 		var PlanCompleted = false
 		var CurTarget     = "home"
 		var CurDirection  = "south"
+		var globalAction = ""
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
@@ -34,12 +35,11 @@ class Butlerplanexecutor ( name: String, scope: CoroutineScope ) : ActorBasicFsm
 				}	 
 				state("doButlerPlan") { //this:State
 					action { //it:State
-						var action ="" 
 						if( checkMsgContent( Term.createTerm("execButlerPlan(ACTION)"), Term.createTerm("execButlerPlan(ACTION)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								action = payloadArg(0)
-								println("&&&  butlerplanexecutor execButlerPlan $action ")
-								solve("storePlan('$action')","") //set resVar	
+								globalAction = payloadArg(0)
+								println("&&&  butlerplanexecutor execButlerPlan $globalAction ")
+								solve("storePlan('$globalAction')","") //set resVar	
 						}
 					}
 					 transition( edgeName="goto",targetState="execButlerPlan", cond=doswitch() )
@@ -68,10 +68,17 @@ class Butlerplanexecutor ( name: String, scope: CoroutineScope ) : ActorBasicFsm
 				}	 
 				state("doTheButlerJob") { //this:State
 					action { //it:State
-						val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)
+						
+								val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)
+								var lastTarget = "" // per gestire bene roba nel commento sotto
 						println("butlerplanexecutor has reached $CurTarget/direction=$CurDirection, ButlerDirection=$ButlerDirection")
 						if(CurTarget=="table"){ println("butlerplanexecutor works on the table ")
 						 }
+						if(globalAction == "prepare" && CurTarget == "fridge"){ forward("prepare", "prepare()" ,"fridge" ) 
+						 }
+						if(globalAction == "prepare" && CurTarget == "table" && lastTarget == "pantry"){ forward("prepare", "prepare()" ,"centralstateserver" ) 
+						 }
+						lastTarget = CurTarget
 						itunibo.applUtil.applUtil.changeDirection(myself ,CurDirection )
 						forward("targetReached", "targetReached(ok)" ,"butlermind" ) 
 						itunibo.planner.moveUtils.showCurrentRobotState(  )

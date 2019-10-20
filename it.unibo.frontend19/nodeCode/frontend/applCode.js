@@ -15,7 +15,7 @@ var io              ; 	//Upgrade for socketIo;
 const mqttUtils     = require('./uniboSupports/mqttUtils');  
 const coap          = require('./uniboSupports/coapClientToResourceModel');  
 //require("node-coap-client").CoapClient; 
-
+const coapFridge		= require('./uniboSupports/coapClientToFridge'); 
 var app              = express();
 
 
@@ -108,9 +108,7 @@ app.get('/appl', function(req, res) {
 	app.post("/explore", function(req, res,next) {
   		publishMsgToRobotapplication( "explore" );
   		next();
- 	});
-
-	/*
+ 	});		
 	app.post("/prepare", function(req, res,next) {
   		publishMsgToRobotapplication( "prepare" );
   		next();
@@ -119,18 +117,19 @@ app.get('/appl', function(req, res) {
   		publishMsgToRobotapplication( "clear" );
   		next();
  	});	
+
+	/*
 	app.post("/addFood", function(req, res,next) {
   		publishMsgToRobotapplication( "addFood"  );
   		next();
  	});	
-	*/
+*/
 	
-	//--------------nostre aggiunte--------------------
+		//--------------nostre aggiunte--------------------
 	app.post("/consultFridge", function(req, res,next) {
-  		publishMsgToFridge( "showFridgeState"  );
-  		next();
+  		handleCoapRequestToFridge("showFridgeState","showing fridge state",req,res,next);
  	});
-
+	
 	app.post("/foodAvailability", function(req, res, next) {
 		publishMsgToFridgeWithCode( "isAvailable", req.param("foodCode") );
 		next();
@@ -141,13 +140,20 @@ app.get('/appl', function(req, res) {
   		next();
  	});
 	
-	app.post("/consultDishwasher", function(req, res,next) {
-  		publishMsgToServer( "showDishwasherState"  );
-  		next();
- 	});
+	
 
 	
 	//--------------------------------------------------------
+	
+	function handleCoapRequestToFridge(cmd,msg,req,res,next){
+		result = "Web server done: " + cmd
+		console.log("coap PUT> "+ cmd);
+		coapFridge.coapPut(cmd);	//see coapClientToFridge
+		next();
+	}
+
+	
+	
 function handlePostMove( cmd, msg, req, res, next ){
 		result = "Web server done: " + cmd
  		delegate( cmd, msg, req, res);	
@@ -160,6 +166,7 @@ var result = "";
 app.setIoSocket = function( iosock ){
  	io    = iosock;
  	mqttUtils.setIoSocket(iosock);
+	coapFridge.setIoSocket(iosock);
 	console.log("app SETIOSOCKET io=" + io);
 }
 
@@ -259,6 +266,7 @@ var publishEmitEvent = function( ev, evContent ){
 */
 app.use( function(req,res){
 	console.info("SENDING THE ANSWER " + result + " json:" + req.accepts('josn') );
+	coapFridge.observeFridge();
 	try{
 	    console.log("answer> "+ result  );
 	    /*

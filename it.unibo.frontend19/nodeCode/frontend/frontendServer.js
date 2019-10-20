@@ -2,6 +2,7 @@
  * frontend/frontendServer.js 
  */
 const coap = require('./uniboSupports/coapClientToResourceModel');  
+const coapFridge = require('./uniboSupports/coapClientToFridge')
 var appl   = require('./applCode');  //previously was app;
 var http   = require('http');
 var io              ; 	//Upgrade for socketIo;
@@ -45,6 +46,8 @@ function main() {
 	console.log("coapAddress=" + String(process.argv[2]) );
     const coapAddr = String(process.argv[2])
     coap.setcoapAddr( coapAddr )
+	coapFridge.setcoapAddr(coapAddr)
+	//coapFridge.observeFridge();
     createServer( 8080 );     
 }
 

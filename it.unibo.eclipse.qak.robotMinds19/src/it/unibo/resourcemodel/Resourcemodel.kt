@@ -52,6 +52,21 @@ class Resourcemodel ( name: String, scope: CoroutineScope ) : ActorBasicFsm( nam
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								itunibo.robot.resourceModelSupport.updateFridgeModel(myself ,payloadArg(1) )
 						}
+						if( checkMsgContent( Term.createTerm("modelUpdate(TARGET,VALUE)"), Term.createTerm("modelUpdate(foodTable,V)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("modelUpdate foodTable")
+								itunibo.robot.resourceModelSupport.updateFoodTableModel(myself ,payloadArg(1) )
+						}
+						if( checkMsgContent( Term.createTerm("modelUpdate(TARGET,VALUE)"), Term.createTerm("modelUpdate(tablewareTable,V)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("modelUpdate tablewareTable")
+								itunibo.robot.resourceModelSupport.updateTablewareTableModel(myself ,payloadArg(1) )
+						}
+						if( checkMsgContent( Term.createTerm("modelUpdate(TARGET,VALUE)"), Term.createTerm("modelUpdate(dishwasher,V)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("modelUpdate dishwasher")
+								itunibo.robot.resourceModelSupport.updateDishwasherModel(myself ,payloadArg(1) )
+						}
 					}
 					 transition( edgeName="goto",targetState="waitModelChange", cond=doswitch() )
 				}	 

@@ -133,7 +133,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						 }
 						crashCounter++
 						itunibo.planner.moveUtils.backToCompensate(myself ,timeBack, 0 )
-						if((crashCounter > 2)){ println("Static obstacle found!")
+						if((crashCounter > 1)){ println("Static obstacle found!")
 						val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)
 						println("ButlerDirection = $ButlerDirection")
 						println("Updating map with the found static obstacle")
@@ -147,8 +147,9 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						 }
 						else
 						 { println("Found obstacle, supposedly a moving one")
-						 var timesLeft = 3 - crashCounter
+						 var timesLeft = 2 - crashCounter
 						 println("Trying to move ahead other $timesLeft times")
+						 delay(2000) 
 						 solve("asserta(move(w))","") //set resVar	
 						  }
 					}

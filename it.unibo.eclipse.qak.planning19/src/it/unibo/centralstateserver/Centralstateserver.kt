@@ -18,8 +18,11 @@ class Centralstateserver ( name: String, scope: CoroutineScope ) : ActorBasicFsm
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("&&& centralStateServer starting")
+						println("&&& centralStateServer STARTED")
 						solve("consult('prepareFoodList.pl')","") //set resVar	
+						solve("consult('pantryInit.pl')","") //set resVar	
+						solve("consult('prepareTablewareList.pl')","") //set resVar	
+						solve("consult('dishwasherSupport.pl')","") //set resVar	
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
@@ -27,55 +30,163 @@ class Centralstateserver ( name: String, scope: CoroutineScope ) : ActorBasicFsm
 					action { //it:State
 						println("&&& centralStateServer waiting for command")
 					}
-					 transition(edgeName="t019",targetState="showTableTask",cond=whenDispatch("showTableState"))
-					transition(edgeName="t020",targetState="prepareTable",cond=whenDispatch("prepare"))
-					transition(edgeName="t021",targetState="addTable",cond=whenDispatch("add"))
-					transition(edgeName="t022",targetState="clearTable",cond=whenDispatch("clear"))
+					 transition(edgeName="t020",targetState="showTableTask",cond=whenDispatch("showTableState"))
+					transition(edgeName="t021",targetState="prepareTable",cond=whenDispatch("prepare"))
+					transition(edgeName="t022",targetState="addTable",cond=whenDispatch("add"))
+					transition(edgeName="t023",targetState="clearTable",cond=whenDispatch("clear"))
+					transition(edgeName="t024",targetState="showDishwasherTask",cond=whenDispatch("showDishwasherState"))
 				}	 
 				state("showTableTask") { //this:State
 					action { //it:State
 						println("&&& centralStateServer showTableState")
-						solve("showTableState","") //set resVar	
+						solve("showFoodTableState","") //set resVar	
+						solve("getFoodTableState(L)","") //set resVar	
+						if(currentSolution.isSuccess()) { 
+								val str1 = getCurSol("L").toString()
+								val str2 = str1.replace("],[","@")
+								val str3 = str2.replace("[","'")
+								val str4 = str3.replace("]","'")
+								val FoodTableStateString = str4.substring(1,str4.length-1)
+						println("foodTableStateString = \n$FoodTableStateString")
+						forward("modelUpdate", "modelUpdate(foodTable,$FoodTableStateString)" ,"resourcemodel" ) 
+						 }
+						else
+						{ println("getFoodTableState FAIL")
+						 }
+						solve("showTablewareTableState","") //set resVar	
+						solve("getTablewareTableState(L)","") //set resVar	
+						if(currentSolution.isSuccess()) { 
+								val str5 = getCurSol("L").toString()
+								val str6 = str5.replace("],[","@")
+								val str7 = str6.replace("[","'")
+								val str8 = str7.replace("]","'")
+								val TablewareTableStateString = str8.substring(1,str8.length-1)
+						println("tablewareTableStateString = \n$TablewareTableStateString")
+						forward("modelUpdate", "modelUpdate(tablewareTable,$TablewareTableStateString)" ,"resourcemodel" ) 
+						 }
+						else
+						{ println("getTablewareTableState FAIL")
+						 }
 					}
 					 transition( edgeName="goto",targetState="randomConsumption", cond=doswitch() )
 				}	 
 				state("randomConsumption") { //this:State
 					action { //it:State
 						println("&&& centralStateServer randomly consuming")
-						solve("randomConsume","") //set resVar	
+						solve("randomConsumption","") //set resVar	
 						println("&&& centralStateServer randomConsumption executed, now table state as follows")
-						solve("showTableState","") //set resVar	
+						solve("showFoodTableState","") //set resVar	
+						solve("showTablewareTableState","") //set resVar	
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
 				state("prepareTable") { //this:State
 					action { //it:State
 						println("&&& centralStateServer prepareTable, now table state as follows")
-						solve("consult('fridgeInit.pl')","") //set resVar	
-						solve("showTableState","") //set resVar	
+						solve("assert(enabled(true))","") //set resVar	
+						solve("prepareTableware","") //set resVar	
+						solve("showFoodTableState","") //set resVar	
+						solve("showTablewareTableState","") //set resVar	
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
 				state("addTable") { //this:State
 					action { //it:State
-						println("&&& centralStateServer updating tableState after add")
-						var code = "" 
 						if( checkMsgContent( Term.createTerm("add(ARG)"), Term.createTerm("add(CODE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								code = payloadArg(0)
-								solve("addTable('$code',1)","") //set resVar	
+								println("&&& centralStateServer updating tableState after add")
+								val code = payloadArg(0)
+								solve("addFoodTable('$code',1)","") //set resVar	
+								
+											// bevanda
+											if(code.startsWith("b")){
+												solve("getTableware(bicchiere,1)","")
+												if(currentSolution.isSuccess()){ // ifSolved
+													solve("addTablewareTable(bicchiere,1)","")
+												}
+											}
+											// frutta e verdura
+											if(code.startsWith("f") || code.startsWith("v")){
+												solve("getTableware(ciotola,1)","")
+												if(currentSolution.isSuccess()){ // ifSolved
+													solve("addTablewareTable(ciotola,1)","")
+													solve("getTableware(coltello,1)","")
+													if(currentSolution.isSuccess()){ // ifSolved
+														solve("addTablewareTable(coltello,1)","")
+													}
+												}
+											}
+											// affettato e salato
+											if(code.startsWith("a") || code.startsWith("s")){
+												solve("getTableware(piattoPiano,1)","")
+												if(currentSolution.isSuccess()){ // ifSolved
+													solve("addTablewareTable(piattoPiano,1)","")
+													solve("getTableware(forchetta,1)","")
+													if(currentSolution.isSuccess()){ // ifSolved
+														solve("addTablewareTable(forchetta,1)","")
+													}
+												}
+											}
+											// dolci
+											if(code.startsWith("d")){
+												solve("getTableware(piattoPiano,1)","")
+												if(currentSolution.isSuccess()){ // ifSolved
+													solve("addTablewareTable(piattoPiano,1)","")
+													solve("getTableware(cucchiaio,1)","")
+													if(currentSolution.isSuccess()){ // ifSolved
+														solve("addTablewareTable(cucchiaio,1)","")
+													}
+												}
+											}
+								println("&&& centralStateServer updated table, now table state as follows")
+								solve("showFoodTableState","") //set resVar	
+								solve("showTablewareTableState","") //set resVar	
 						}
-						println("&&& centralStateServer updated table, now table state as follows")
-						solve("showTableState","") //set resVar	
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
 				state("clearTable") { //this:State
 					action { //it:State
 						println("&&& centralStateServer updating tableState after clear")
-						solve("retractAll(foodTable(C,N))","") //set resVar	
+						solve("retract(enabled(true))","") //set resVar	
+						solve("getFoodTableState(L)","") //set resVar	
+						if(currentSolution.isSuccess()) { 
+								val str1 = getCurSol("L").toString()
+								val str2 = str1.replace("],[","@")
+								val str3 = str2.replace("[","'")
+								val str4 = str3.replace("]","'")
+								val FoodTableStateString = str4.substring(1,str4.length-1)
+						forward("clear", "clear($FoodTableStateString)" ,"fridge" ) 
+						 }
+						else
+						{ println("getFoodTableState FAIL")
+						 }
+						solve("retractall(foodTable(F,C,N))","") //set resVar	
+						solve("clearTableware","") //set resVar	
 						println("&&& centralStateServer updated table, now table state as follows")
-						solve("showTableState","") //set resVar	
+						solve("showFoodTableState","") //set resVar	
+						solve("showTablewareTableState","") //set resVar	
+						println("Updating dishwasher state")
+						solve("assert(dishwasherEnabled(true))","") //set resVar	
+						println("Dishwasher state as follows")
+						solve("showDishwasherState","") //set resVar	
+					}
+					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+				}	 
+				state("showDishwasherTask") { //this:State
+					action { //it:State
+						solve("getDishwasherState(L)","") //set resVar	
+						if(currentSolution.isSuccess()) { 
+								val str1 = getCurSol("L").toString()
+								val str2 = str1.replace("],[","@")
+								val str3 = str2.replace("[","'")
+								val str4 = str3.replace("]","'")
+								val DishwasherState = str4.substring(1,str4.length-1)
+						forward("modelUpdate", "modelUpdate(dishwasher,$DishwasherState)" ,"resourcemodel" ) 
+						 }
+						else
+						{ println("getDishwasherState FAIL")
+						 }
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 

@@ -27,7 +27,7 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     flatDir { //grazie Mattia Piretti
-       dirs '/C:/Users/Gioele Pisanelli/Desktop/RobaISS/iss2019Lab/libs'	//full path
+       dirs 'C:/Users/Tommy/Desktop/lab/iss2019Lab/libs'	//full path
    }
 }
 

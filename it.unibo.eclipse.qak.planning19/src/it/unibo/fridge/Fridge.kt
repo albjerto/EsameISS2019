@@ -20,7 +20,7 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 					action { //it:State
 						solve("consult('fridgeInit.pl')","") //set resVar	
 						println("&&&  fridge starting, initial state as follows")
-						solve("showState","") //set resVar	
+						solve("showFridgeState","") //set resVar	
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
@@ -28,41 +28,35 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 					action { //it:State
 						println("&&&  fridge waiting for command")
 					}
-					 transition(edgeName="t015",targetState="prepareTask",cond=whenDispatch("prepare"))
-					transition(edgeName="t016",targetState="addTask",cond=whenDispatch("add"))
-					transition(edgeName="t017",targetState="showTask",cond=whenDispatch("showFridgeState"))
-					transition(edgeName="t018",targetState="checkAvailability",cond=whenDispatch("isAvailable"))
+					 transition(edgeName="t06",targetState="prepareTask",cond=whenDispatch("prepare"))
+					transition(edgeName="t07",targetState="addTask",cond=whenDispatch("add"))
+					transition(edgeName="t08",targetState="showTask",cond=whenDispatch("showFridgeState"))
+					transition(edgeName="t09",targetState="checkAvailability",cond=whenDispatch("isAvailable"))
 				}	 
 				state("prepareTask") { //this:State
 					action { //it:State
 						solve("consult('prepareFoodList.pl')","") //set resVar	
 						println("&&&  fridge received prepare, handing over food")
-						solve("prepare","") //set resVar	
+						solve("prepareFood","") //set resVar	
 						println("&&&  fridge state modified, now as follows")
-						solve("showState","") //set resVar	
+						solve("showFridgeState","") //set resVar	
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
 				state("addTask") { //this:State
 					action { //it:State
-						var code ="" 
+						var Code ="" 
 						if( checkMsgContent( Term.createTerm("add(ARG)"), Term.createTerm("add(C)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								code = payloadArg(0)
-								println("&&& fridge received add, checking availability of food with code $code")
-								solve("isThere('$code')","") //set resVar	
-								if(currentSolution.isSuccess()) { solve("get('$code',1)","") //set resVar	
+								Code = payloadArg(0)
+								solve("get('$Code',1)","") //set resVar	
 								if(currentSolution.isSuccess()) { println("Add possibile, fridge informa RBR")
-								forward("add", "add()" ,"butlermind" ) 
+								emit("stateChanged", "stateChanged()" ) 
+								forward("modelUpdate", "modelUpdate(fridge,addCompleted)" ,"serverproxy" ) 
 								 }
 								else
 								{ println("Add impossibile, quantita' insufficiente nel frigo")
-								forward("modelUpdate", "modelUpdate(fridge,addImpossibleWarning)" ,"resourcemodel" ) 
-								 }
-								 }
-								else
-								{ println("Add impossibile, code inesistente o cibo terminato")
-								forward("modelUpdate", "modelUpdate(fridge,addImpossibleWarning)" ,"resourcemodel" ) 
+								forward("modelUpdate", "modelUpdate(fridge,addImpossibleWarning)" ,"serverproxy" ) 
 								 }
 						}
 					}
@@ -70,8 +64,21 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 				}	 
 				state("showTask") { //this:State
 					action { //it:State
-						println("&&&  fridge received showState, executing")
-						solve("showState","") //set resVar	
+						println("&&&  fridge received showFridgeState, executing")
+						solve("showFridgeState","") //set resVar	
+						solve("getFridgeState(L)","") //set resVar	
+						if(currentSolution.isSuccess()) { 
+								val str1 = getCurSol("L").toString()
+								val str2 = str1.replace("],[","@")
+								val str3 = str2.replace("[","'")
+								val str4 = str3.replace("]","'")
+								val FridgeStateString = str4.substring(1,str4.length-1)
+						println("fridgeStateString = \n$FridgeStateString")
+						forward("modelUpdate", "modelUpdate(fridge,$FridgeStateString)" ,"serverproxy" ) 
+						 }
+						else
+						{ println("getFridgeState FAIL")
+						 }
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
@@ -82,13 +89,13 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 						if( checkMsgContent( Term.createTerm("isAvalaible(CODE)"), Term.createTerm("isAvailable(CODE)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								code = payloadArg(0)
-								solve("isThere('$code')","") //set resVar	
+								solve("isThereFood('$code')","") //set resVar	
 								if(currentSolution.isSuccess()) { println("Food available")
-								forward("modelUpdate", "modelUpdate(fridge,foodAvailable)" ,"resourcemodel" ) 
+								forward("modelUpdate", "modelUpdate(fridge,foodAvailable)" ,"serverproxy" ) 
 								 }
 								else
 								{ println("Food not found")
-								forward("modelUpdate", "modelUpdate(fridge,foodNotFound)" ,"resourcemodel" ) 
+								forward("modelUpdate", "modelUpdate(fridge,foodNotFound)" ,"serverproxy" ) 
 								 }
 						}
 					}
