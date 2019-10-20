@@ -737,6 +737,62 @@ QActor centralstateserver context ctxWorkInRoom{
 }
 
 
+// chiaramente da spostare in un altro qak, contesto diverso
+QActor proxyfridge context ctxWorkInRoom{
+	["
+	val actor=this
+	val serverAddr=\"coap://localhost:5683\"
+	"]
+	
+	State s0 initial{
+		println("&&&  proxyClientFridge STARTED")
+		["itunibo.coap.client.CoapClientControl.create(actor,serverAddr)"]	
+		//solve(showFridgeState)
+	}
+	Goto waitCmd
+	
+	State waitCmd{
+		println("&&&  fridge waiting for command")
+	}
+	Transition t0 whenMsg prepare -> prepareTask
+				  whenMsg add -> addTask
+				  whenMsg clear -> clearTask
+				  whenMsg showFridgeState -> showTask
+				  whenMsg isAvailable -> checkAvailability
+				  
+	State prepareTask{
+		["itunibo.coap.client.CoapClientControl.send(\"prepare\")"]	
+	}
+	Goto waitCmd
+	
+	State addTask{
+		["itunibo.coap.client.CoapClientControl.send(\"add\")"]	
+		}
+	Goto waitCmd
+	
+	State clearTask{
+		onMsg(clear : clear(S)){
+			["itunibo.coap.client.CoapClientControl.send(\"clear\")"]	
+		}
+	}
+	Goto waitCmd
+	
+	State showTask{
+		["itunibo.coap.client.CoapClientControl.send(\"showFridgeState\")"]
+	}
+	Goto waitCmd
+	
+	State checkAvailability{
+		["itunibo.coap.client.CoapClientControl.send(\"isAvailable\")"]
+	}
+	Goto waitCmd
+	
+}
+
+
+
+
+
 // commento la roba di seguito per usare il frontend
 /*  
 

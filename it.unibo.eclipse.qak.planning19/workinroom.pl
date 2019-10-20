@@ -12,3 +12,4 @@ context(ctxdummyformind, "otherhost",  "MQTT", "0" ).
   qactor( workerinroom, ctxworkinroom, "it.unibo.workerinroom.Workerinroom").
   qactor( fridge, ctxworkinroom, "it.unibo.fridge.Fridge").
   qactor( centralstateserver, ctxworkinroom, "it.unibo.centralstateserver.Centralstateserver").
+  qactor( proxyfridge, ctxworkinroom, "it.unibo.proxyfridge.Proxyfridge").
