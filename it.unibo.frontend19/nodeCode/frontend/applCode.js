@@ -130,16 +130,7 @@ app.get('/appl', function(req, res) {
   		handleCoapRequestToFridge("showFridgeState","showing fridge state",req,res,next);
  	});
 	
-	app.post("/foodAvailability", function(req, res, next) {
-		publishMsgToFridgeWithCode( "isAvailable", req.param("foodCode") );
-		next();
-	});	
-	
-	app.post("/consultTable", function(req, res,next) {
-  		publishMsgToServer( "showTableState"  );
-  		next();
- 	});
-	
+
 	
 
 	
@@ -230,27 +221,6 @@ var publishMsgToButlerapplication = function (cmd){
 }
 
 
-
-//---------------FATTO DA NOI----------------------------------------
-//da cambiare il nome dell'attore
-var publishMsgToFridge = function (cmd){
-   	var msgstr = "msg(" + cmd + ",dispatch,js,fridge,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
-  	console.log("publishMsgToFridge forward> "+ msgstr);
-   	mqttUtils.publish( msgstr, "unibo/qak/fridge" );
-}
-
-var publishMsgToFridgeWithCode = function (cmd, foodCode){
-   	var msgstr = "msg("+ cmd + ",dispatch,js,fridge,"+ cmd +"("+ foodCode +"),1)"  ;  //TODO: replace 1 with counter
-  	console.log("publishMsgToFridgeWithCode forward> "+ msgstr);
-   	mqttUtils.publish( msgstr, "unibo/qak/fridge" );
-}
-
-//cambiare il nome dell'attore
-var publishMsgToServer = function (cmd){
-   	var msgstr = "msg(" + cmd + ",dispatch,js,centralstateserver,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
-  	console.log("publishMsgToCentralStateServer forward> "+ msgstr);
-   	mqttUtils.publish( msgstr, "unibo/qak/centralstateserver" );
-}
 
 //--------------------------------------------------------------
 
