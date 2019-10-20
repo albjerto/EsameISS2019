@@ -1,0 +1,5 @@
+Scrivo qui i percorsi di ogni file rispetto al progetto perché sono nabbo e
+non volevo caricare l'intero progetto
+
+it.unibo.eclipse.qak.robotMinds19\src\robotmind.qak
+it.unibo.eclipse.qak.robotMinds19\resources\itunibo\robot\resourceModelSupport.kt

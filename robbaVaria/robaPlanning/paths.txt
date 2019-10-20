@@ -1,0 +1,6 @@
+Scrivo qui i percorsi di ogni file rispetto al progetto perché sono nabbo e
+non volevo caricare l'intero progetto
+
+it.unibo.eclipse.qak.planning19\fridgeInit.pl
+it.unibo.eclipse.qak.planning19\prepareFoodList.pl
+it.unibo.eclipse.qak.planning19\src\workinroom.qak
