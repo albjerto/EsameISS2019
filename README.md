@@ -1,6 +1,6 @@
 # buonNatali
 Ancora da fare (aggiornare se ci ricordiamo altro):
-- decidere come gestire i cibi del frigo dopo la clear (se prevediamo che si possa fare prepare dopo clear, bisogna decidere se mantenere nel frigo il cibo inserito dalla clear alla fine del party o se cassare via tutto e ri-inizializzare il frigo)
+- decidere come gestire i cibi del frigo dopo la clear (se prevediamo che si possa fare <b>prepare</b> dopo <b>clear</b>, bisogna decidere se mantenere nel frigo il cibo inserito dalla clear alla fine del party o se cassare via tutto e ri-inizializzare il frigo)
 - rendere il frigo funzionante con coap 
 (
 Il coap server frigo mantiene una variabile actor basic in cui alla creazione del server stesso dall'attore frigo poniamo l'attore frigo (dal codice qak gli si passa myself)
