@@ -85,7 +85,7 @@ app.get('/appl', function(req, res) {
   		next();
  	});		
 	app.post("/prepare", function(req, res,next) {
-  		publishMsgToButlerapplication(  "prepare" );
+  		publishMsgToButlerapplication(  "prepare"  );
   		next();
  	});		
 	app.post("/clear", function(req, res,next) {
@@ -109,10 +109,10 @@ app.get('/appl', function(req, res) {
   		publishMsgToRobotapplication( "explore" );
   		next();
  	});		
-	app.post("/prepare", function(req, res,next) {
+	/*app.post("/prepare", function(req, res,next) {
   		publishMsgToRobotapplication( "prepare" );
   		next();
- 	});		
+ 	});	*/	
 	app.post("/clear", function(req, res,next) {
   		publishMsgToRobotapplication( "clear" );
   		next();
@@ -212,6 +212,38 @@ var publishMsgToRobotapplication = function (cmd){
    	mqttUtils.publish( msgstr, "unibo/qak/robotmindapplication" );
 }
 
+var publishMsgToDishwasher= function (cmd){
+   	var msgstr = "msg(" + cmd + ",dispatch,js,dishwasher,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
+  	console.log("publishMsgToCentralStateServer forward> "+ msgstr);
+   	mqttUtils.publish( msgstr, "unibo/qak/dishwasher" );
+}
+
+var publishMsgToPantry= function (cmd){
+   	var msgstr = "msg(" + cmd + ",dispatch,js,pantry,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
+  	console.log("publishMsgToCentralStateServer forward> "+ msgstr);
+   	mqttUtils.publish( msgstr, "unibo/qak/pantry" );
+}
+
+var publishMsgToTable= function (cmd){
+   	var msgstr = "msg(" + cmd + ",dispatch,js,table,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
+  	console.log("publishMsgToCentralStateServer forward> "+ msgstr);
+   	mqttUtils.publish( msgstr, "unibo/qak/table" );
+}
+
+var publishMsgToFridge= function (cmd){
+   	var msgstr = "msg(" + cmd + ",dispatch,js,fridge,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
+  	console.log("publishMsgToCentralStateServer forward> "+ msgstr);
+   	mqttUtils.publish( msgstr, "unibo/qak/fridge" );
+}
+
+
+var observeRoom = function(){
+	 publishMsgToDishwasher("showState");
+	 publishMsgToPantry("showState");
+	 publishMsgToFridge("showState");
+	 publishMsgToTable("showState");
+}
+
 
 //Towards the butler application => send to butlermind
 var publishMsgToButlerapplication = function (cmd){
@@ -235,8 +267,9 @@ var publishEmitEvent = function( ev, evContent ){
 * ====================== REPRESENTATION ================
 */
 app.use( function(req,res){
-	console.info("SENDING THE ANSWER " + result + " json:" + req.accepts('josn') );
-	coapFridge.observeFridge();
+	console.info("SENDING THE ANSWER " + result + " json:" + req.accepts('json') );
+	observeRoom();
+	
 	try{
 	    console.log("answer> "+ result  );
 	    /*

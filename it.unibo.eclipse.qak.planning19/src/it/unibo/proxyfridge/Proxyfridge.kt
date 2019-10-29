@@ -30,11 +30,11 @@ class Proxyfridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 					action { //it:State
 						println("&&&  fridge waiting for command")
 					}
-					 transition(edgeName="t025",targetState="prepareTask",cond=whenDispatch("prepare"))
-					transition(edgeName="t026",targetState="addTask",cond=whenDispatch("add"))
-					transition(edgeName="t027",targetState="clearTask",cond=whenDispatch("clear"))
-					transition(edgeName="t028",targetState="showTask",cond=whenDispatch("showFridgeState"))
-					transition(edgeName="t029",targetState="checkAvailability",cond=whenDispatch("isAvailable"))
+					 transition(edgeName="t029",targetState="prepareTask",cond=whenDispatch("prepare"))
+					transition(edgeName="t030",targetState="addTask",cond=whenDispatch("add"))
+					transition(edgeName="t031",targetState="clearTask",cond=whenDispatch("clear"))
+					transition(edgeName="t032",targetState="showTask",cond=whenDispatch("showFridgeState"))
+					transition(edgeName="t033",targetState="checkAvailability",cond=whenDispatch("isAvailable"))
 				}	 
 				state("prepareTask") { //this:State
 					action { //it:State

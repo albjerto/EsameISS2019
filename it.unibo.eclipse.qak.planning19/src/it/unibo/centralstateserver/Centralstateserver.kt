@@ -30,11 +30,11 @@ class Centralstateserver ( name: String, scope: CoroutineScope ) : ActorBasicFsm
 					action { //it:State
 						println("&&& centralStateServer waiting for command")
 					}
-					 transition(edgeName="t020",targetState="showTableTask",cond=whenDispatch("showTableState"))
-					transition(edgeName="t021",targetState="prepareTable",cond=whenDispatch("prepare"))
-					transition(edgeName="t022",targetState="addTable",cond=whenDispatch("add"))
-					transition(edgeName="t023",targetState="clearTable",cond=whenDispatch("clear"))
-					transition(edgeName="t024",targetState="showDishwasherTask",cond=whenDispatch("showDishwasherState"))
+					 transition(edgeName="t024",targetState="showTableTask",cond=whenDispatch("showTableState"))
+					transition(edgeName="t025",targetState="prepareTable",cond=whenDispatch("prepare"))
+					transition(edgeName="t026",targetState="addTable",cond=whenDispatch("add"))
+					transition(edgeName="t027",targetState="clearTable",cond=whenDispatch("clear"))
+					transition(edgeName="t028",targetState="showDishwasherTask",cond=whenDispatch("showDishwasherState"))
 				}	 
 				state("showTableTask") { //this:State
 					action { //it:State

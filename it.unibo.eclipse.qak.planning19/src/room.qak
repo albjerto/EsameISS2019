@@ -1,0 +1,276 @@
+System room 
+ 
+mqttBroker "localhost" : 1883   
+
+
+Dispatch showState	: showState()
+
+
+Event modelcontent: modelcontent(CONTENT)
+
+//Dispatch prepare		:	prepare(ARG)
+Dispatch isAvailable	:	isAvailable(ARG)
+Dispatch clear			:	clear(ARG)
+Dispatch add			:	add(ARG)
+Dispatch get			:	get(ARG)
+Dispatch put			:	put(ARG)
+
+Context ctxRoom    ip [host="localhost" port=8038]   -mqtt 
+
+QActor dishwasher context ctxRoom{
+	/*
+	 * dishawasher:
+	 * ->put, <-remove
+	 */
+	 
+	State s0 initial{
+		println("&&& dishwasher STARTED")
+		// preparazione futura gestione dishwasher
+		solve(consult("dishwasherSupport.pl"))
+	}
+	Goto waitCmd	
+	
+	State waitCmd{
+		println("&&& dishwasher waiting for command")
+	}
+	Transition t0	whenMsg showState -> showStateTask
+					whenMsg	put -> putTask		//da fare	per aggiungere piatti sporchi
+
+	State showStateTask{
+		printCurrentMessage
+		solve(showTableWareState(L))
+		ifSolved{
+			/* 
+			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
+			 * Parsing in questo modo perché il resto è lato frontend
+			 *
+			 * _____________
+			 * ho fatto la funzione per il parse ma non sono riuscito a provarla per il problema del prolog cursed che dà fail
+			 * se riesci a provarla tu e funziona fai pure copia incolla sugli altri actor
+			 *[" val DishwasherState = itunibo.prologUtils.prologUtils.parseState(myself, \"L\") "]
+			 */
+			["
+				val DishwasherState = getCurSol(\"L\").toString()
+			"]
+			emit  modelcontent: modelcontent(content( dishwasher( state( $DishwasherState ) ) ))
+   		}else{
+   			println("getTableware dishwasher FAIL")
+   		}
+	}
+	Goto waitCmd
+
+	State putTask{
+		printCurrentMessage
+		[" val list = payloadArg(0) "]
+		solve(put("$list"))
+		ifSolved {
+			[" replyToCaller(\"remove\", \"remove($list)\")"]
+		} else {
+			println("dishwasherPut FAIL")
+		}
+	}Goto showStateTask
+}
+
+QActor pantry context ctxRoom{
+	/*
+	 * pantry:
+	 * ->get, <-put
+	 */
+	 
+	State s0 initial{
+		println("&&& pantry STARTED")
+		solve(consult("pantryInit.pl")) //da controllare perch� non va con quel file
+	}
+	Goto waitCmd		
+	
+	State waitCmd{
+		println("&&& pantry waiting for command")
+	}
+	Transition t0	whenMsg showState -> showStateTask
+					whenMsg get -> getTask
+					//whenMsg add -> AddTask	per riaggiungere piatti puliti?
+					
+	State showStateTask{
+		printCurrentMessage
+		solve(showTableWareState(L))
+		ifSolved{
+			/* 
+			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
+			 * Parsing in questo modo perché il resto è lato frontend
+			 */
+			["
+				val PantryState = getCurSol(\"L\").toString()
+			"]
+			emit  modelcontent: modelcontent(content( pantry( state( $PantryState ) ) ))
+ 		}else{
+   			println("getPantryState FAIL")
+   		}
+	}
+	Goto waitCmd
+	
+	State getTask{
+		printCurrentMessage
+		//non credo vada bene cos�
+		["val tableware=payloadArg(0)"]
+		solve(getTableware("$tableware"))
+		ifSolved {
+			[" replyToCaller(\"put\", \"put($tableware)\" )" ]
+		} else {
+			println("pantryGet FAIL")
+		}
+	}
+	Goto showStateTask
+}
+
+
+
+QActor table context ctxRoom{
+	/*
+	 * table:
+	 * ->put, <-remove
+	 * ->clear, <-put
+	 */
+	 
+	State s0 initial{
+		println("&&& table STARTED")
+		solve(consult("tableSupport.pl")) 
+	}
+	Goto waitCmd	
+	
+	State waitCmd{
+		println("&&& pantry waiting for command")
+	}
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg clear -> clearTask
+				 	 whenMsg showState -> showStateTask
+					//whenMsg add -> AddTask	per riaggiungere piatti puliti?
+	
+	State putTask{
+		printCurrentMessage
+		 [" val list = payloadArg(0) "]
+		 //solve della lista di roba da mettere sulla tavola : come gestire la lista?
+		 solve(put("$list"))
+		 ifSolved {
+			[" replyToCaller(\"remove\", \"remove($list)\") "]
+		 } else {
+			println("putTableTask FAIL")
+			//invio messaggi al robot per gestione fallimenti?
+		 }
+	}Goto showStateTask
+	
+	State clearTask{		//da rivedere
+		printCurrentMessage
+		 solve(clear(L))
+		 ifSolved {
+			["
+			val list = getCurSol(\"L\").toString()
+			replyToCaller(\"put\", \"put($list)\")
+			"]
+		 } else {
+			println("clearTable FAIL")
+		 }
+	}Goto showStateTask
+	
+	State showStateTask{
+		printCurrentMessage
+		solve(showFoodState(F))
+			ifSolved{
+			["		
+				val FoodState = getCurSol(\"F\").toString()
+			"]
+  			emit  modelcontent: modelcontent(content(tableFood(state($FoodState) ) ))
+  			}else{
+   				println("showFoodState FAIL")
+   			}
+  		solve(showTableWareState(T))
+			ifSolved{
+			["
+				val TableWareState = getCurSol(\"T\").toString()
+			"]
+  			emit  modelcontent: modelcontent(content(tableTableware(state( $TableWareState) ) ))
+   		}else{
+   			println("getTableState FAIL")
+   		}
+	}Goto waitCmd
+	
+}
+
+QActor fridge context ctxRoom{	//<- il contesto?
+	/*
+	 *fridge:
+	 * ->get, <-put
+	 * ->isAvailable, <-yes/<-no
+	 * ->put, <-remove
+	 */
+
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		println("&&&  fridge STARTED")
+	}
+	Goto getTask //da modificare in waitcmd
+	
+	State waitCmd{
+		println("&&&  fridge waiting for command")
+	}
+	
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg showState -> showStateTask
+				 	 whenMsg get -> getTask
+				 	 whenMsg isAvailable -> checkTask
+
+	
+	
+	State showStateTask{
+		printCurrentMessage
+		//solve(showFridgeState)
+		solve(showFoodState(L))
+		ifSolved{
+			["
+				val FridgeStateString = getCurSol(\"L\").toString()
+			"]
+  			emit  modelcontent: modelcontent(content( fridge( state( $FridgeStateString) ) ))
+   		}else{
+   			println("getFridgeState FAIL")
+   		}
+	}Goto waitCmd
+	
+	State getTask{
+		printCurrentMessage
+		//onMsg(get: get(ARG)){
+			[" 
+				val Food=\"food(succoBuono,5)\"
+
+			"]
+			
+			solve(getFoodbyName($Food))
+			ifSolved {
+				//[" replyToCaller(\"put\", \"put($food)\" ) "]
+				
+			} else {
+				println("fridgeGet FAIL")
+			//}
+		}
+	}Goto showStateTask
+	
+	State putTask{
+		printCurrentMessage
+		[" val food = payloadArg(0) "]
+		solve(put("$food"))
+		ifSolved {
+			[" replyToCaller(\"remove\", \"remove($food)\") "]	//quindi i proxy gestiscono la replyToCaller?
+		} else {
+			println("fridgePut FAIL")
+		}
+	}Goto showStateTask
+	
+	State checkTask{
+		printCurrentMessage
+		[" val foodCode = payloadArg(0) "]
+		solve(isAvailable("$foodCode"))
+		ifSolved {
+			[" replyToCaller(\"yes\", \"yes\") "]
+		} else {
+			[" replyToCaller(\"no\", \"no\") "]
+		}
+	}Goto waitCmd
+}

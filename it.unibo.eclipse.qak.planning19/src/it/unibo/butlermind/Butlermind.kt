@@ -20,40 +20,118 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				state("s0") { //this:State
 					action { //it:State
 						println("&&&  butlermind STARTED ")
+						solve("consult('butlermindInit.pl')","") //set resVar	
+						solve("consult('prepare.pl')","") //set resVar	
 					}
-					 transition(edgeName="t00",targetState="doprepare",cond=whenDispatch("prepare"))
+					 transition( edgeName="goto",targetState="waitPrepare", cond=doswitch() )
 				}	 
-				state("doprepare") { //this:State
+				state("waitPrepare") { //this:State
 					action { //it:State
+						println("&&&  butlermind wait prepare")
+					}
+					 transition(edgeName="t00",targetState="doPrepare",cond=whenDispatch("prepare"))
+				}	 
+				state("doPrepare") { //this:State
+					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
 						println("&&&  butlermind doprepare")
+						solve("prepare","") //set resVar	
 						forward("execButlerPlan", "execButlerPlan(prepare)" ,"butlerplanexecutor" ) 
 					}
-					 transition(edgeName="t01",targetState="afterPrepare",cond=whenDispatch("targetReached"))
+					 transition(edgeName="t01",targetState="msgHandler",cond=whenDispatch("targetReached"))
 				}	 
-				state("afterPrepare") { //this:State
+				state("msgHandler") { //this:State
 					action { //it:State
-						println("&&&  butlermind afterPrepare")
+						println("$name in ${currentState.stateName} | $currentMsg")
+						solve("consumeMessage(A,B,C)","") //set resVar	
+						if(currentSolution.isSuccess()) { 	val dest = getCurSol("A").toString()   
+							    		val id = getCurSol("B").toString()	
+							    		val cont = getCurSol("C").toString()	    	
+							    		forward(id, cont ,dest )
+						 }
+						else
+						{ println("&& butlermind error")
+						 }
 					}
-					 transition(edgeName="t02",targetState="doclear",cond=whenDispatch("clear"))
-					transition(edgeName="t03",targetState="doadd",cond=whenDispatch("add"))
+					 transition(edgeName="t02",targetState="updateState",cond=whenDispatch("put"))
+					transition(edgeName="t03",targetState="updateState",cond=whenDispatch("remove"))
+					transition(edgeName="t04",targetState="msgHandler",cond=whenDispatch("targetReached"))
+					transition(edgeName="t05",targetState="waitCommandTask",cond=whenDispatch("waitCommand"))
+					transition(edgeName="t06",targetState="waitPrepare",cond=whenDispatch("end"))
 				}	 
-				state("doadd") { //this:State
+				state("updateState") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("add(ARG)"), Term.createTerm("add(C)"), 
+						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
+								val arg = payloadArg(0)
+								solve("put('$arg')","") //set resVar	
+						}
+						if( checkMsgContent( Term.createTerm("remove(ARG)"), Term.createTerm("remove(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								val arg = payloadArg(0)
+								solve("remove('$arg')","") //set resVar	
+						}
+						solve("showFoodState(F)","") //set resVar	
+						if(currentSolution.isSuccess()) { 
+										val FoodState = getCurSol("F").toString()
+						emit("modelcontent", "modelcontent(content(butlerFood(state($FoodState))))" ) 
+						 }
+						else
+						{ println("showFoodState FAIL")
+						 }
+						solve("showTableWareState(T)","") //set resVar	
+						if(currentSolution.isSuccess()) { 
+										val TableWareState = getCurSol("T").toString()
+						emit("modelcontent", "modelcontent(content(butlerTableWare(state($TableWareState))))" ) 
+						 }
+						else
+						{ println("showTableWareState FAIL")
+						 }
+					}
+					 transition( edgeName="goto",targetState="msgHandler", cond=doswitch() )
+				}	 
+				state("waitCommandTask") { //this:State
+					action { //it:State
+						println("&& butlermind wait cmd")
+					}
+					 transition(edgeName="t07",targetState="isAvaliable",cond=whenDispatch("add"))
+					transition(edgeName="t08",targetState="doClear",cond=whenDispatch("clear"))
+				}	 
+				state("isAvaliable") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("add(ARG)"), Term.createTerm("add(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								val code = payloadArg(0)
 								println("&&&  butlermind doadd")
-								var Code = payloadArg(0)
+								forward("isAvailable", "isAvalaible(code)" ,"butlerplanexecutor" ) 
+						}
+					}
+					 transition(edgeName="t09",targetState="doAdd",cond=whenDispatch("yes"))
+					transition(edgeName="t010",targetState="waitCommandTask",cond=whenDispatch("no"))
+				}	 
+				state("doAdd") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("add(ARG)"), Term.createTerm("add(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								val code = payloadArg(0)
+								println("&&&  butlermind doadd")
+								solve("add(code)","") //set resVar	
 								forward("execButlerPlan", "execButlerPlan(add)" ,"butlerplanexecutor" ) 
 						}
 					}
-					 transition(edgeName="t04",targetState="afterPrepare",cond=whenDispatch("targetReached"))
+					 transition( edgeName="goto",targetState="msgHandler", cond=doswitch() )
 				}	 
-				state("doclear") { //this:State
+				state("doClear") { //this:State
 					action { //it:State
-						println("&&&  butlermind doclear")
-						forward("execButlerPlan", "execButlerPlan(clearnofood)" ,"butlerplanexecutor" ) 
+						if( checkMsgContent( Term.createTerm("get(ARG)"), Term.createTerm("get(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								val state = payloadArg(0)
+								println("&&&  butlermind doadd")
+								solve("clear","") //set resVar	
+								forward("execButlerPlan", "execButlerPlan(clear)" ,"butlerplanexecutor" ) 
+						}
 					}
-					 transition( edgeName="goto",targetState="s0", cond=doswitch() )
+					 transition( edgeName="goto",targetState="msgHandler", cond=doswitch() )
 				}	 
 			}
 		}

@@ -8,20 +8,25 @@ mqttBroker "localhost" : 1883
 Dispatch modelChange  : modelChange( TARGET, VALUE )   
 Dispatch modelUpdate  : modelUpdate( TARGET, VALUE )
 
+
 Dispatch onestep       : onestep(DURATION)  
 Dispatch stepOk        : stepOk(V)		//TODO eliminate  V
 Dispatch stepFail      : stepFail(R,T) //R=ok | obstacle, T = time
 
 Dispatch execButlerPlan: execButlerPlan( ACTION )
 
-Dispatch prepare       : prepare(ARG)
-Dispatch clear         : clear(ARG)
-Dispatch add           : add(ARG)
+Dispatch prepare       	: prepare(ARG)
+Dispatch clear			: clear(ARG)
+Dispatch add			: add(ARG)
+Dispatch get			: get(ARG)
+Dispatch put         	: put(ARG)
+Dispatch remove         : remove(ARG)
+Dispatch waitCommand	: waitCommand(ARG)
+Dispatch end			: end(ARG)
 
-Dispatch showFridgeState	: showFridgeState() // per lo stato del frigo
-Dispatch showTableState		: showTableState() // per lo stato del tavolo
-Dispatch showDishwasherState	: showDishwasherState() // per lo stato del tavolo
-Dispatch isAvailable		: isAvalaible(CODE) // per il controllo presenza cibo nel frigo
+Dispatch isAvailable	: isAvalaible(CODE) // per il controllo presenza cibo nel frigo
+Dispatch yes			: yes()
+Dispatch no				: no()
 
 Dispatch moveButlerTo  : moveButlerTo(X,Y,D) 
 Dispatch goalReached   : goalReached(V)  	//V=ok | ko
@@ -32,69 +37,154 @@ Dispatch targetReached : targetReached(V)  	//V=ok | ko
 
 Dispatch robotCmd      : robotCmd( CMD )	
 
-Event  sonarRobot     : sonar( DISTANCE )	     //from  sonar on robot 
-Event  stopAppl       : stopAppl( CMD )  
-Event  reactivateAppl : reactivateAppl( CMD )  
- 
+Event  sonarRobot		: sonar( DISTANCE )	     //from  sonar on robot 
+Event  stopAppl			: stopAppl( CMD )  
+Event  reactivateAppl	: reactivateAppl( CMD )  
+Event modelcontent		: modelcontent(CONTENT)
 /*
  * 
  */ 
  
 Context ctxWorkInRoom     ip [host="localhost" port=8038]   -mqtt 
 Context ctxDummyForMind   ip [host="otherhost" port=8035]   -mqtt 
+Context ctxRoom			   ip [host="localhost" port=8035]   -mqtt 
 
 ExternalQActor resourcemodel context ctxDummyForMind 
 ExternalQActor onestepahead  context ctxDummyForMind
 ExternalQActor basicrobot    context ctxDummyForMind
 
 
+ExternalQActor dishwasher context ctxRoom
+ExternalQActor pantry context ctxRoom
+ExternalQActor fridge context ctxRoom
+ExternalQActor table context ctxRoom
+
+
 QActor butlermind context ctxWorkInRoom{     
 ["var ButlerStarted = false"]
 	State s0 initial {	
-		println("&&&  butlermind STARTED ")		 
+		println("&&&  butlermind STARTED ")	
+		solve( consult( "butlermindInit.pl" ) )	
+		solve(consult( "prepare.pl" ))
   	}
-  	Transition t0  
-  		whenMsg prepare  -> doprepare
+  	Goto waitPrepare
+  	
+  	
+  	State waitPrepare{		
+  		println("&&&  butlermind wait prepare")	
+  	}
+  	Transition t0 whenMsg prepare -> doPrepare
+  	
    	
-   	State doprepare{
+   	State doPrepare{
+   		printCurrentMessage
   		println("&&&  butlermind doprepare")
+  		//solve(consult(prepareList.pl)) file da fare
+  		solve(prepare)
   		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(prepare)
   	}
-  	Transition t0  whenMsg targetReached -> afterPrepare
+  	Transition t0  whenMsg targetReached -> msgHandler
      	
- 	State afterPrepare{
- 		println("&&&  butlermind afterPrepare")
- 	}  	
-  	Transition t0  
-     		whenMsg clear   -> doclear
-    		whenMsg add     -> doadd
-   	
-   	State doadd{
-   		onMsg(add: add(C)){
-  			println("&&&  butlermind doadd")
-  			["var Code = payloadArg(0)"]
-  			/*
-  		 	* Controllo della presenza del cibo da fare dato che il messaggio di
-  		 	* add deve arrivare qui
-  		 	* Da fare: 
-  		 	*    - invio messaggio al frigo per controllare presenza del cibo
-  		 	*      con foodCode
-  		 	*    - se risposta affermativa forward al butlerplanexecutor qui
-  		 	*      sotto, altrimenti risposta al frontend con warning
-  		 	*/
-  			forward butlerplanexecutor -m execButlerPlan : execButlerPlan(add)	
-  		}
+     	
+    State msgHandler{
+    	printCurrentMessage
+    	solve(consumeMessage(A,B,C))
+    	ifSolved{    		
+	    	["	val dest = getCurSol(\"A\").toString()   
+	    		val id = getCurSol(\"B\").toString()	
+	    		val cont = getCurSol(\"C\").toString()	    	
+	    		forward(id, cont ,dest )
+			 "]
+    	}
+    	else{
+    		println("&& butlermind error")
+    	}
+		
+    } 	
+     Transition t0  
+     	whenMsg put   			-> updateState
+    	whenMsg remove   		-> updateState
+    	whenMsg targetReached   -> msgHandler
+    	whenMsg waitCommand		-> waitCommandTask
+    	whenMsg end				-> waitPrepare
+     
+     State updateState{
+     	onMsg(put: put(ARG)) {
+     		["val arg = payloadArg(0)"]
+     		solve(put("$arg"))  		
+     	} 	 	
+     	onMsg(remove: remove(ARG)) {
+     		["val arg = payloadArg(0)"]
+     		solve(remove("$arg"))
+    	} 
+     	//usare il metodo utility
+     	//volendo da fare con una solve sola
+     	solve(showFoodState(F))
+			ifSolved{
+			["
+				val FoodState = getCurSol(\"F\").toString()
+			"]
+  			emit  modelcontent: modelcontent(content( butlerFood( state( $FoodState) ) ))
+  			}else{
+   				println("showFoodState FAIL")
+   			}
+  		solve(showTableWareState(T))
+			ifSolved{
+			["
+				val TableWareState = getCurSol(\"T\").toString()
+			"]
+  			emit  modelcontent: modelcontent(content( butlerTableWare( state( $TableWareState) ) ))
+  				
+   		}else{
+   			println("showTableWareState FAIL")
+   		}
+     }
+     Goto msgHandler
+     
+     
+     
+     State waitCommandTask{
+     	println("&& butlermind wait cmd")
+     	
+     }
+	Transition t0 
+    	 whenMsg add 				-> isAvaliable
+    	 whenMsg clear  			-> doClear
+     
+     
+      State isAvaliable{
+     	onMsg(add: add(ARG)){
+     		["val code = payloadArg(0)"]
+     		println("&&&  butlermind doadd")
+     		forward butlerplanexecutor -m isAvailable :isAvalaible(code)
+     	}	
   	}
-  	Transition t0  whenMsg targetReached -> afterPrepare
-    	
-   	State doclear{
-  		println("&&&  butlermind doclear")
-  		// cambiare in clear compreso il food
-  		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(clearnofood)
+  	Transition t0 
+  		whenMsg yes				-> doAdd
+   		whenMsg no	 			-> waitCommandTask
+     
+     
+     State doAdd{
+     	onMsg(add: add(ARG)){
+     		["val code = payloadArg(0)"]
+     		println("&&&  butlermind doadd")
+     		solve(add(code))
+     		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(add)
+     	}	
   	}
-  	Goto s0
-
-
+  	Goto msgHandler
+  	
+  	
+  	State doClear{
+  		onMsg(get: get(ARG)){
+     		["val state = payloadArg(0)"]
+     		println("&&&  butlermind doadd")
+     		solve(clear)	
+     		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(clear)
+     	}	
+  	}
+  	Goto msgHandler
+     
 }	
 
 
@@ -103,7 +193,6 @@ QActor butlerplanexecutor context ctxWorkInRoom{
 var PlanCompleted = false
 var CurTarget     = \"home\"
 var CurDirection  = \"south\"
-var globalAction = \"\"
 "]
 	State s0 initial {	
  		solve( consult(  "butlerplansapriori.pl"  ) ) 
@@ -111,16 +200,16 @@ var globalAction = \"\"
   	Goto doWork
   	
   	State doWork{
-  		println("&&&  butlerplanexecutor doWork")	
+  		println("&&& butlerplanexecutor doWork")	
   	}
   	Transition t0 whenMsg execButlerPlan -> doButlerPlan
 
   	State doButlerPlan{
-  		// modificato da var action generica a globalAction per renderlo visibile anche nello stato doTheButlerJob
+  		["var action =\"\" "]
   		onMsg( execButlerPlan : execButlerPlan(ACTION) ){
-  			["globalAction = payloadArg(0)"]
- 			println("&&&  butlerplanexecutor execButlerPlan $globalAction ")		 			
-  			solve( storePlan( "$globalAction"  ) )  			
+  			["action = payloadArg(0)"]
+ 			println("&&&  butlerplanexecutor execButlerPlan $action ")		 			
+  			solve( storePlan( "$action"  ) )  			
   		}
   	}
   	Goto execButlerPlan
@@ -134,7 +223,7 @@ CurDirection = getCurSol(\"D\").toString()
 val Target = \"Target=\" + CurTarget +  \" X=\" + getCurSol(\"X\") + \" Y=\" + getCurSol(\"Y\") + \" DIRECTION=\" + getCurSol(\"D\")  
 "]
   			println( "consume( $Target )"  ) 
-   			forward workerinroom -m moveButlerTo : moveButlerTo(#X,#Y,#D) 
+   			forward workerinroom -m moveButlerTo : moveButlerTo(#X,#Y,#D)
   		}else{ ["PlanCompleted = true"] }
   	}
   	Goto planExecuted if "PlanCompleted" else waitEndOfButlerPlanMove
@@ -143,29 +232,9 @@ val Target = \"Target=\" + CurTarget +  \" X=\" + getCurSol(\"X\") + \" Y=\" + g
   	Transition t0 whenMsg goalReached -> doTheButlerJob
 
   	State doTheButlerJob{
-		["
-		val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)
-		var lastTarget = \"\" // per gestire bene roba nel commento sotto
-		"]
+		["val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)"]
    		println("butlerplanexecutor has reached $CurTarget/direction=$CurDirection, ButlerDirection=$ButlerDirection" ) 
    		if "CurTarget==\"table\"" { println("butlerplanexecutor works on the table " ) }
-		/*
-   		 * Aggiunte successive gestiscono l'invio dei messaggi verso gli elementi
-   		 * appena raggiunti dal robot per far sì che questi compiano il loro lavoro
-   		 * nell'effettivo momento in cui il robot ci è davanti
-		 * Reminder che i pezzi di codice incasinati sono sempre ponibili in metodi 
-   		 * di utility
-   		 */
-		if "globalAction == \"prepare\" && CurTarget == \"fridge\""{
-			// da cambiare con coap (così come tutti gli invii al fridge)
-			forward fridge -m prepare: prepare()
-		}
-		if "globalAction == \"prepare\" && CurTarget == \"table\" && lastTarget == \"pantry\""{
-			forward centralstateserver -m prepare: prepare()
-		}
-		// ecc per il resto
-		["lastTarget = CurTarget"]
-		
   		//Rotate the butler to perform the job
   		run itunibo.applUtil.applUtil.changeDirection( myself, CurDirection )
   		forward  butlermind -m targetReached : targetReached(ok)  	
@@ -182,7 +251,6 @@ val Target = \"Target=\" + CurTarget +  \" X=\" + getCurSol(\"X\") + \" Y=\" + g
   	
 
 }
-
 
 /* 
  * =============================================
@@ -202,7 +270,7 @@ var curmoveIsForward = false
 //var PauseTime  = 500 
 
 //VIRTUAL ROBOT
-var StepTime   = 327	//for virtual // modificato era a 330
+var StepTime   = 360	//for virtual // modificato era a 330
 var PauseTime  = 500
 
 var PauseTimeL  = PauseTime.toLong()
@@ -355,513 +423,3 @@ var timeBack = -1 // tempo di backstep
 	}
 	Goto executePlannedActions
 }
-
-// chiaramente da spostare in un altro qak, contesto diverso
-QActor fridge context ctxWorkInRoom{
-	State s0 initial{
-		solve(consult("fridgeInit.pl"))
-		println("&&&  fridge STARTED")
-		//solve(showFridgeState)
-	}
-	Goto waitCmd
-	
-	State waitCmd{
-		println("&&&  fridge waiting for command")
-	}
-	Transition t0 whenMsg prepare -> prepareTask
-				  whenMsg add -> addTask
-				  whenMsg clear -> clearTask
-				  whenMsg showFridgeState -> showTask
-				  whenMsg isAvailable -> checkAvailability
-				  
-	State prepareTask{
-		solve(consult("prepareFoodList.pl"))
-		println("&&&  fridge received prepare, handing over food")
-		solve(prepareFood)
-		println("&&&  fridge state modified, now as follows")
-		solve(showFridgeState)
-	}
-	Goto waitCmd
-	
-	State addTask{
-		["var Code =\"\" "] // sono costretto all'iniziale maiuscola o non posso usarlo come argomento di un messaggio
-		onMsg(add : add(C)){
-			["Code = payloadArg(0)"]
-			println("&&& fridge received add, checking availability of food with code $Code")
-			solve(isThereFood("$Code"))
-			ifSolved{
-				solve(get("$Code",1)) // per il momento la add prende sempre 1 quantità
-				ifSolved{
-					println("Add possibile, fridge informa RBR")
-					/* 
-					 * Forward alla mind di un messaggio di add, dato che quello ricevuto qui
-					 * dal frigo è stato inviato dal frontend e voglio che il robot si muova 
-					 * solo se il cibo è disponibile
-					 * Seems like sta cosa andrà cambiata e si dovrà passare dal frontend al
-					 * robot e solo poi qui al frigo
-					 * Non ha importanza girare il foodCode al robot
-					 */
-					forward butlermind -m add : add()
-					// girare al centralstateserver l'add per aggiornamento stato tavolo
-					forward centralstateserver -m add : add($Code)
-				}else{
-					println("Add impossibile, quantita' insufficiente nel frigo")
-					/*
-					 * Se il check fallisce il robot in quanto intelligente non compie la 
-					 * add -> qui invio solo il warning al frontend
-					 * Seems like sta cosa andrà cambiata e si dovrà passare dal frontend al
-					 * robot e solo poi qui al frigo
-					 */
-					 forward resourcemodel -m modelUpdate : modelUpdate(fridge, addImpossibleWarning )
-				}
-			}else{
-				println("Add impossibile, code inesistente o cibo terminato")
-				forward resourcemodel -m modelUpdate : modelUpdate(fridge, addImpossibleWarning )
-			}
-		}
-	}
-	Goto waitCmd
-	
-	State clearTask{
-		onMsg(clear : clear(S)){
-			// da mettere in una funzione di supporto
-			["
-			val foodString = payloadArg(0)
-			val foodList = foodString.substring(1,foodString.length-1).split(\"@\")
-			for(food in foodList){
-				var f = food.split(\",\").get(0)
-				var n = food.split(\",\").get(1)
-				solve(\"putAfterClear($f,$n)\",\"\")
-			}
-			"]
-			println("fridge completed food left reacquisition after clear")
-		}
-	}
-	Goto waitCmd
-	
-	State showTask{
-		println("&&&  fridge received showFridgeState, executing")
-		solve(showFridgeState)
-		// invio al frontend dello stato, da sostituire con invio coap?
-		solve(getFridgeState(L))
-		ifSolved{
-			/* 
-			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
-			 * Parsing in questo modo perché il resto è lato frontend
-			 */
-			["
-		val str1 = getCurSol(\"L\").toString()
-		val str2 = str1.replace(\"],[\",\"@\")
-		val str3 = str2.replace(\"[\",\"\'\")
-		val str4 = str3.replace(\"]\",\"\'\")
-		val FridgeStateString = str4.substring(1,str4.length-1)
-			"]
-  			println("fridgeStateString = \\n$FridgeStateString")
-  			forward resourcemodel -m modelUpdate : modelUpdate(fridge, $FridgeStateString )
-   		}else{
-   			println("getFridgeState FAIL")
-   		}
-	}
-	Goto waitCmd
-	
-	State checkAvailability{
-		println("&&&  fridge received availability check, executing")
-		["var code = \"\" "]
-		onMsg(isAvailable : isAvailable(CODE)){
-			["code = payloadArg(0)"]
-			solve(isThereFood("$code"))
-			ifSolved{
-				println("Food available")
-				forward resourcemodel -m modelUpdate : modelUpdate(fridge, foodAvailable )
-			}else{
-				println("Food not found")
-				forward resourcemodel -m modelUpdate : modelUpdate(fridge, foodNotFound )
-			}
-		}
-	}
-	Goto waitCmd
-	
-}
-
-/*
- * Server centrale che gestisca gli stati degli enti non intelligenti 
- * Robe da ricordare:
- *    - per il momento non gestiamo i piatti ma non dovrebbe essere troppo diverso
- *      dai cibi
- *    - i cibi sul tavolo sono gli stessi che prendo dal frigo sulla prepare -> sfrutto
- *      lo stesso file
- *    - ad ogni richiesta dello stato del tavolo, prima di inviare lo stato al maitre (o 
- * 		dopo), simulare il consumo di una quantità randomica di cibo, una random per cibo 
- *		che vari da 0 a N, così alcuni cibi restano immutati (altrimenti creare un actor
- *		che autonomamente ogni delay x simuli consumazioni randomiche)
- *    - non si occupa di gestire il frigo che è una entità smart autonoma, maitre 
- *      chiede direttamente al frigo
- *    - lavastoviglie è libera finché non si fa la clear e clear è la fine del work,
- *      che senso ha gestirne lo stato?
- *    - Quando faccio la add non passo dalla credenza -> non prendo altri piatti,
- *      che senso ha gestire lo stato della credenza e dei piatti in generale se
- *      tanto questi sono messi nel tavolo, mai utilizzati esplicitamente e messi
- *      solo alla fine dell'applicazione nella lavastoviglie?
- */
-QActor centralstateserver context ctxWorkInRoom{
-	State s0 initial{
-		println("&&& centralStateServer STARTED")
-		solve(consult("prepareFoodList.pl")) // motivazione nel commento qui sopra
-		// gestione piatti (tableware)
-		solve(consult("pantryInit.pl"))
-		solve(consult("prepareTablewareList.pl"))
-		// preparazione futura gestione dishwasher
-		solve(consult("dishwasherSupport.pl"))
-	}
-	Goto waitCmd
-	
-	State waitCmd{
-		println("&&& centralStateServer waiting for command")
-	}
-	Transition t0 whenMsg showTableState -> showTableTask
-				  whenMsg prepare -> prepareTable
-				  whenMsg add -> addTable
-				  whenMsg clear -> clearTable
-				  whenMsg showDishwasherState -> showDishwasherTask
-				  // aggiungere le show del resto se richieste
-				
-	// modificare tutte le show perché inviino gli output al frontend  
-	State showTableTask{
-		println("&&& centralStateServer showTableState")
-		solve(showFoodTableState)
-		solve(getFoodTableState(L))
-		ifSolved{
-			/* 
-			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
-			 * Parsing in questo modo perché il resto è lato frontend
-			 */
-			["
-		val str1 = getCurSol(\"L\").toString()
-		val str2 = str1.replace(\"],[\",\"@\")
-		val str3 = str2.replace(\"[\",\"\'\")
-		val str4 = str3.replace(\"]\",\"\'\")
-		val FoodTableStateString = str4.substring(1,str4.length-1)
-			"]
-  			println("foodTableStateString = \\n$FoodTableStateString")
-  			forward resourcemodel -m modelUpdate : modelUpdate(foodTable, $FoodTableStateString)
-   		}else{
-   			println("getFoodTableState FAIL")
-   		}
-   		// show piatti (tableware)
-   		solve(showTablewareTableState)
-		solve(getTablewareTableState(L))
-		ifSolved{
-			/* 
-			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
-			 * Parsing in questo modo perché il resto è lato frontend
-			 */
-			["
-		val str5 = getCurSol(\"L\").toString()
-		val str6 = str5.replace(\"],[\",\"@\")
-		val str7 = str6.replace(\"[\",\"\'\")
-		val str8 = str7.replace(\"]\",\"\'\")
-		val TablewareTableStateString = str8.substring(1,str8.length-1)
-			"]
-  			println("tablewareTableStateString = \\n$TablewareTableStateString")
-  			forward resourcemodel -m modelUpdate : modelUpdate(tablewareTable, $TablewareTableStateString)
-   		}else{
-   			println("getTablewareTableState FAIL")
-   		}
-	}
-	Goto randomConsumption
-	
-	State randomConsumption{
-		println("&&& centralStateServer randomly consuming")
-		/*
-		 * Anche qui sarebbe nice se la radomConsumption dei tableware fosse
-		 * relativa ai cibi consumati -> ad esempio se consumo una bibita dovrò
-		 * consumare un bicchiere ecc -> implementarlo lato prolog con un unico
-		 * predicato randomConsumption?
-		 * Fatto, ora randomConsumption gestisce tutto
-		 */
-		solve(randomConsumption)
-		//solve(randomTablewareConsumption)
-		println("&&& centralStateServer randomConsumption executed, now table state as follows")
-		solve(showFoodTableState)
-		solve(showTablewareTableState)
-	}
-	Goto waitCmd
-	
-	State prepareTable{
-		println("&&& centralStateServer prepareTable, now table state as follows")
-		solve(assert(enabled(true))) // rende visibili i cibi e i piatti
-		solve(prepareTableware) // non c'è l'attore pantry, gestisco qui il ritiro piatti
-		solve(showFoodTableState)
-		solve(showTablewareTableState)
-	}
-	Goto waitCmd
-	
-	State addTable{
-		onMsg(add : add(CODE)){
-			println("&&& centralStateServer updating tableState after add")
-			["val code = payloadArg(0)"]
-			solve(addFoodTable("$code",1))
-			/*
-			 * Sarebbe cool se alla add di un cibo si aggiungesse anche il
-			 * corrispettivo tableware (anche se si tratta di una modifica alla
-			 * richiesta del comportamento della add, dovendo così passare anche
-			 * dalla pantry) -> ciò andrebbe in caso modificato direttamente nel
-			 * percorso descritto nel prolog che il robot attua alla add
-			 * In alternativa si può porre sul tavolo un numero gigante di tableware
-			 * così non ci sarà mai da rifornire
-			 */
-			// da porre in una funzione magari
-			["
-			// bevanda
-			if(code.startsWith(\"b\")){
-				solve(\"getTableware(bicchiere,1)\",\"\")
-				if(currentSolution.isSuccess()){ // ifSolved
-					solve(\"addTablewareTable(bicchiere,1)\",\"\")
-				}
-			}
-			// frutta e verdura
-			if(code.startsWith(\"f\") || code.startsWith(\"v\")){
-				solve(\"getTableware(ciotola,1)\",\"\")
-				if(currentSolution.isSuccess()){ // ifSolved
-					solve(\"addTablewareTable(ciotola,1)\",\"\")
-					solve(\"getTableware(coltello,1)\",\"\")
-					if(currentSolution.isSuccess()){ // ifSolved
-						solve(\"addTablewareTable(coltello,1)\",\"\")
-					}
-				}
-			}
-			// affettato e salato
-			if(code.startsWith(\"a\") || code.startsWith(\"s\")){
-				solve(\"getTableware(piattoPiano,1)\",\"\")
-				if(currentSolution.isSuccess()){ // ifSolved
-					solve(\"addTablewareTable(piattoPiano,1)\",\"\")
-					solve(\"getTableware(forchetta,1)\",\"\")
-					if(currentSolution.isSuccess()){ // ifSolved
-						solve(\"addTablewareTable(forchetta,1)\",\"\")
-					}
-				}
-			}
-			// dolci
-			if(code.startsWith(\"d\")){
-				solve(\"getTableware(piattoPiano,1)\",\"\")
-				if(currentSolution.isSuccess()){ // ifSolved
-					solve(\"addTablewareTable(piattoPiano,1)\",\"\")
-					solve(\"getTableware(cucchiaio,1)\",\"\")
-					if(currentSolution.isSuccess()){ // ifSolved
-						solve(\"addTablewareTable(cucchiaio,1)\",\"\")
-					}
-				}
-			}
-			"]
-			
-			// questo da mantenere che il comportamento descritto sopra venga fatto o meno
-			println("&&& centralStateServer updated table, now table state as follows")
-			solve(showFoodTableState)
-			solve(showTablewareTableState)
-		}
-	}
-	Goto waitCmd
-	
-	State clearTable{
-		println("&&& centralStateServer updating tableState after clear")
-		/*
-		 * Modificato da solve(retractAll(foodTable(F,C,N))) dato che è molto
-		 * più pulito fare una retract(enabled(true))
-		 * Inoltre ho bisogno che le info sugli item sul tavolo rimangano
-		 * dato che devo riportare tali item nei rispettivi contenitori
-		 * NB se devo effettivamente liberare il tavolo dai piatti dovrò 
-		 * passare dalla pantry -> modifica a parte del comportamento
-		 * richiesto alla clear -> è corretto?
-		 */ 
-		solve(retract(enabled(true)))
-		/*
-		 * Riconsegna tableware è semplice dato che lo stato della pantry è
-		 * mantenuto da questo stesso attore, ma non posso fare la clear
-		 * del cibo allo stesso modo -> ci dovrà essere uno scambio di 
-		 * messaggi verso il frigo (probabilmente implementabile come
-		 * ottenimento della stringa di stato del cibo, passaggio della stessa
-		 * al frigo, parsing lato kotlin di ogni cibo e put nel frigo dando
-		 * come argomento ognuno dei parametri ricavati) -> fatto qui sotto
-		 */
-		solve(getFoodTableState(L))
-		ifSolved{
-			/* 
-			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
-			 * Parsing in questo modo perché il resto è lato frontend
-			 */
-			["
-		val str1 = getCurSol(\"L\").toString()
-		val str2 = str1.replace(\"],[\",\"@\")
-		val str3 = str2.replace(\"[\",\"\'\")
-		val str4 = str3.replace(\"]\",\"\'\")
-		val FoodTableStateString = str4.substring(1,str4.length-1)
-			"]
-  			forward fridge -m clear : clear($FoodTableStateString)
-   		}else{
-   			println("getFoodTableState FAIL")
-   		}
-   		solve(retractall(foodTable(F,C,N))) // non necessario, per correttezza semantica
-		solve(clearTableware)
-		println("&&& centralStateServer updated table, now table state as follows")
-		solve(showFoodTableState)
-		solve(showTablewareTableState)
-		// rende visibili i tableware nella dishwasher
-		println("Updating dishwasher state")
-		solve(assert(dishwasherEnabled(true)))
-		println("Dishwasher state as follows")
-		solve(showDishwasherState)
-	}
-	Goto waitCmd
-	
-	State showDishwasherTask{
-		solve(getDishwasherState(L))
-		ifSolved{
-			/* 
-			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
-			 * Parsing in questo modo perché il resto è lato frontend
-			 */
-			["
-		val str1 = getCurSol(\"L\").toString()
-		val str2 = str1.replace(\"],[\",\"@\")
-		val str3 = str2.replace(\"[\",\"\'\")
-		val str4 = str3.replace(\"]\",\"\'\")
-		val DishwasherState = str4.substring(1,str4.length-1)
-			"]
-  			forward resourcemodel -m modelUpdate : modelUpdate(dishwasher, $DishwasherState)
-   		}else{
-   			println("getDishwasherState FAIL")
-   		}
-	}
-	Goto waitCmd
-	
-}
-
-
-// chiaramente da spostare in un altro qak, contesto diverso
-QActor proxyfridge context ctxWorkInRoom{
-	["
-	val actor=this
-	val serverAddr=\"coap://localhost:5683\"
-	"]
-	
-	State s0 initial{
-		println("&&&  proxyClientFridge STARTED")
-		["itunibo.coap.client.CoapClientControl.create(actor,serverAddr)"]	
-		//solve(showFridgeState)
-	}
-	Goto waitCmd
-	
-	State waitCmd{
-		println("&&&  fridge waiting for command")
-	}
-	Transition t0 whenMsg prepare -> prepareTask
-				  whenMsg add -> addTask
-				  whenMsg clear -> clearTask
-				  whenMsg showFridgeState -> showTask
-				  whenMsg isAvailable -> checkAvailability
-				  
-	State prepareTask{
-		["itunibo.coap.client.CoapClientControl.send(\"prepare\")"]	
-	}
-	Goto waitCmd
-	
-	State addTask{
-		["itunibo.coap.client.CoapClientControl.send(\"add\")"]	
-		}
-	Goto waitCmd
-	
-	State clearTask{
-		onMsg(clear : clear(S)){
-			["itunibo.coap.client.CoapClientControl.send(\"clear\")"]	
-		}
-	}
-	Goto waitCmd
-	
-	State showTask{
-		["itunibo.coap.client.CoapClientControl.send(\"showFridgeState\")"]
-	}
-	Goto waitCmd
-	
-	State checkAvailability{
-		["itunibo.coap.client.CoapClientControl.send(\"isAvailable\")"]
-	}
-	Goto waitCmd
-	
-}
-
-
-
-
-
-// commento la roba di seguito per usare il frontend
-/*  
-
-QActor frontenddummy context ctxWorkInRoom{
-	State s0 initial {
-		println("&&&  frontendDummy start")
-	}
-	Goto sendPrepare
-	
-	State sendPrepare{
-		println("&&&  frontenddummy will send prepare msg to butlermind in 5 seconds")
-		delay 5000
-		println("&&&  frontenddummy sends now prepare msg")
-		forward butlermind -m prepare : prepare()
-	}
-	Goto sendPause
-	
-	State sendPause{
-		println("&&&  frontenddummy will send pause event in 5 seconds")
-		delay 5000
-		println("&&&  frontenddummy sends now pause event")
-		emit stopAppl : stopAppl()
-	}
-	Goto sendReactivate
-	
-	State sendReactivate{
-		println("&&&  frontenddummy will send reactivate event in 5 seconds")
-		delay 5000
-		println("&&&  frontenddummy sends now reactivate event")
-		emit reactivateAppl : reactivateAppl()
-	}
-	Goto sendAdd
-	
-	State sendAdd{
-		println("&&&  frontenddummy will send add msg to addtask in 40 seconds")
-		delay 40000
-		println("&&&  frontenddummy sends now add msg")
-		forward butlermind -m add : add(foodCode)
-	}
-	Goto sendClear
-	
-	State sendClear{
-		println("&&&  frontenddummy will send clear msg to cleartask in 30 seconds")
-		delay 30000
-		println("&&&  frontenddummy sends now clear msg")
-		forward butlermind -m clear : clear()
-	}
-	Goto workDone
-	
-	State workDone{
-		println("&&&  frontenddummy workDone")
-	}
-	
-}
-
-QActor fridgeuserdummy context ctxWorkInRoom{
-	State s0 initial{
-		println("fridgeUserDummy, invio prepare al frigo tra 10 secondi")
-		delay 10000
-		forward fridge -m prepare : prepare()
-		
-		println("fridgeUserDummy, invio add al frigo tra 10 secondi")
-		delay 10000
-		forward fridge -m add : add(d) // d01 per testare success, d per testare failure
-		
-		println("fridgeUserDummy, invio showFridgeState al frigo tra 10 secondi")
-		delay 10000
-		forward fridge -m showFridgeState : showFridgeState()
-	}
-}
-
-*/

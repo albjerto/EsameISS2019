@@ -6,6 +6,7 @@ const coapFridge = require('./uniboSupports/coapClientToFridge')
 var appl   = require('./applCode');  //previously was app;
 var http   = require('http');
 var io              ; 	//Upgrade for socketIo;
+var mqtt = require('./uniboSupports/mqttUtils.js')
 
 var port = 8080;
 
@@ -47,7 +48,7 @@ function main() {
     const coapAddr = String(process.argv[2])
     coap.setcoapAddr( coapAddr )
 	coapFridge.setcoapAddr(coapAddr)
-	//coapFridge.observeFridge();
+	
     createServer( 8080 );     
 }
 
