@@ -46,14 +46,17 @@ class Pantry ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 				}	 
 				state("getTask") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-						val tableware=payloadArg(0)
-						solve("getTableware('$tableware')","") //set resVar	
-						if(currentSolution.isSuccess()) {  replyToCaller("put", "put($tableware)" )
-						 }
-						else
-						{ println("pantryGet FAIL")
-						 }
+						if( checkMsgContent( Term.createTerm("get(ARG)"), Term.createTerm("get(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("$name in ${currentState.stateName} | $currentMsg")
+								val tableware=payloadArg(0)
+								solve("getTableware('$tableware')","") //set resVar	
+								if(currentSolution.isSuccess()) {  replyToCaller("put", "put($tableware)" )
+								 }
+								else
+								{ println("pantryGet FAIL")
+								 }
+						}
 					}
 					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
 				}	 

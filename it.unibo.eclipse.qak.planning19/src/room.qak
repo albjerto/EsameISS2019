@@ -1,4 +1,4 @@
-System room 
+System room
  
 mqttBroker "localhost" : 1883   
 
@@ -16,6 +16,9 @@ Dispatch get			:	get(ARG)
 Dispatch put			:	put(ARG)
 
 Context ctxRoom    ip [host="localhost" port=8038]   -mqtt 
+Context ctxWorkInRoom     ip [host="localhost" port=8038]   -mqtt 
+
+ExternalQActor butlermind context ctxWorkInRoom 
 
 QActor dishwasher context ctxRoom{
 	/*
@@ -60,14 +63,17 @@ QActor dishwasher context ctxRoom{
 	Goto waitCmd
 
 	State putTask{
-		printCurrentMessage
-		[" val list = payloadArg(0) "]
-		solve(put("$list"))
-		ifSolved {
-			[" replyToCaller(\"remove\", \"remove($list)\")"]
-		} else {
-			println("dishwasherPut FAIL")
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			[" val list = payloadArg(0) "]
+			solve(put("$list"))
+			ifSolved {
+				[" replyToCaller(\"remove\", \"remove($list)\")"]
+			} else {
+				println("dishwasherPut FAIL")
+			}
 		}
+		
 	}Goto showStateTask
 }
 
@@ -109,14 +115,15 @@ QActor pantry context ctxRoom{
 	Goto waitCmd
 	
 	State getTask{
-		printCurrentMessage
-		//non credo vada bene così
-		["val tableware=payloadArg(0)"]
-		solve(getTableware("$tableware"))
-		ifSolved {
-			[" replyToCaller(\"put\", \"put($tableware)\" )" ]
-		} else {
-			println("pantryGet FAIL")
+		onMsg(get: get(ARG)){
+			printCurrentMessage
+			["val tableware=payloadArg(0)"]
+			solve(getTableware("$tableware"))
+			ifSolved {
+				[" replyToCaller(\"put\", \"put($tableware)\" )" ]
+			} else {
+				println("pantryGet FAIL")
+			}	
 		}
 	}
 	Goto showStateTask
@@ -146,15 +153,17 @@ QActor table context ctxRoom{
 					//whenMsg add -> AddTask	per riaggiungere piatti puliti?
 	
 	State putTask{
-		printCurrentMessage
-		 [" val list = payloadArg(0) "]
-		 //solve della lista di roba da mettere sulla tavola : come gestire la lista?
-		 solve(put("$list"))
-		 ifSolved {
-			[" replyToCaller(\"remove\", \"remove($list)\") "]
-		 } else {
-			println("putTableTask FAIL")
-			//invio messaggi al robot per gestione fallimenti?
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			 [" val list = payloadArg(0) "]
+			 //solve della lista di roba da mettere sulla tavola : come gestire la lista?
+			 solve(put("$list"))
+			 ifSolved {
+				[" replyToCaller(\"remove\", \"remove($list)\") "]
+			 } else {
+				println("putTableTask FAIL")
+				//invio messaggi al robot per gestione fallimenti?
+			 }		 
 		 }
 	}Goto showStateTask
 	
@@ -207,7 +216,7 @@ QActor fridge context ctxRoom{	//<- il contesto?
 		solve(consult("fridgeInit.pl"))
 		println("&&&  fridge STARTED")
 	}
-	Goto getTask //da modificare in waitcmd
+	Goto waitCmd //da modificare in waitcmd
 	
 	State waitCmd{
 		println("&&&  fridge waiting for command")
@@ -236,41 +245,44 @@ QActor fridge context ctxRoom{	//<- il contesto?
 	
 	State getTask{
 		printCurrentMessage
-		//onMsg(get: get(ARG)){
+		onMsg(get: get(ARG)){
 			[" 
-				val Food=\"food(succoBuono,5)\"
-
+				val Food=payloadArg(0)
 			"]
 			
-			solve(getFoodbyName($Food))
+			solve(getFood($Food))
 			ifSolved {
-				//[" replyToCaller(\"put\", \"put($food)\" ) "]
-				
+				forward butlermind -m put : put($Food)	
 			} else {
 				println("fridgeGet FAIL")
-			//}
+			}
 		}
-	}Goto showStateTask
+	}
+	Goto showStateTask
 	
 	State putTask{
-		printCurrentMessage
-		[" val food = payloadArg(0) "]
-		solve(put("$food"))
-		ifSolved {
-			[" replyToCaller(\"remove\", \"remove($food)\") "]	//quindi i proxy gestiscono la replyToCaller?
-		} else {
-			println("fridgePut FAIL")
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			[" val food = payloadArg(0) "]
+			solve(put("$food"))
+			ifSolved {
+				[" replyToCaller(\"remove\", \"remove($food)\") "]	//quindi i proxy gestiscono la replyToCaller?
+			} else {
+				println("fridgePut FAIL")
+			}		
 		}
 	}Goto showStateTask
 	
 	State checkTask{
-		printCurrentMessage
-		[" val foodCode = payloadArg(0) "]
-		solve(isAvailable("$foodCode"))
-		ifSolved {
-			[" replyToCaller(\"yes\", \"yes\") "]
-		} else {
-			[" replyToCaller(\"no\", \"no\") "]
+		onMsg(isAvailable: isAvailable(ARG)){
+			printCurrentMessage
+			[" val foodCode = payloadArg(0) "]
+			solve(isAvailable("$foodCode"))
+			ifSolved {
+				[" replyToCaller(\"yes\", \"yes\") "]
+			} else {
+				[" replyToCaller(\"no\", \"no\") "]
+			}	
 		}
 	}Goto waitCmd
 }

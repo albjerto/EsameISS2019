@@ -2,7 +2,7 @@
 * The robot plans a trip from home to the east part of the table
 * and executes it.
 */ 
-System workinroom  
+System workinroom 
 mqttBroker "localhost" : 1883   
    
 Dispatch modelChange  : modelChange( TARGET, VALUE )   
@@ -92,7 +92,8 @@ QActor butlermind context ctxWorkInRoom{
     	ifSolved{    		
 	    	["	val dest = getCurSol(\"A\").toString()   
 	    		val id = getCurSol(\"B\").toString()	
-	    		val cont = getCurSol(\"C\").toString()	    	
+	    		val cont = getCurSol(\"C\").toString()	
+				println(\"MESSAGGIO: id:$id dest:$dest cont:$cont \")    	
 	    		forward(id, cont ,dest )
 			 "]
     	}
@@ -109,6 +110,7 @@ QActor butlermind context ctxWorkInRoom{
     	whenMsg end				-> waitPrepare
      
      State updateState{
+     	printCurrentMessage
      	onMsg(put: put(ARG)) {
      		["val arg = payloadArg(0)"]
      		solve(put("$arg"))  		
@@ -125,6 +127,7 @@ QActor butlermind context ctxWorkInRoom{
 				val FoodState = getCurSol(\"F\").toString()
 			"]
   			emit  modelcontent: modelcontent(content( butlerFood( state( $FoodState) ) ))
+  			println("foodState emitted:$FoodState")
   			}else{
    				println("showFoodState FAIL")
    			}
@@ -133,8 +136,8 @@ QActor butlermind context ctxWorkInRoom{
 			["
 				val TableWareState = getCurSol(\"T\").toString()
 			"]
-  			emit  modelcontent: modelcontent(content( butlerTableWare( state( $TableWareState) ) ))
-  				
+  			emit  modelcontent: modelcontent(content( butlerTableWare( state( $TableWareState) ) ))	
+  			println("tableWare emitted:$TableWareState")		
    		}else{
    			println("showTableWareState FAIL")
    		}

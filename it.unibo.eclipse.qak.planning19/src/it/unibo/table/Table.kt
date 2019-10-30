@@ -33,14 +33,17 @@ class Table ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 				}	 
 				state("putTask") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-						 val list = payloadArg(0) 
-						solve("put('$list')","") //set resVar	
-						if(currentSolution.isSuccess()) {  replyToCaller("remove", "remove($list)") 
-						 }
-						else
-						{ println("putTableTask FAIL")
-						 }
+						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("$name in ${currentState.stateName} | $currentMsg")
+								 val list = payloadArg(0) 
+								solve("put('$list')","") //set resVar	
+								if(currentSolution.isSuccess()) {  replyToCaller("remove", "remove($list)") 
+								 }
+								else
+								{ println("putTableTask FAIL")
+								 }
+						}
 					}
 					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
 				}	 

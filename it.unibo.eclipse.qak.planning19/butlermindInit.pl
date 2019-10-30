@@ -1,15 +1,3 @@
-food(succoBuono,5).
-food(birraBella,5).
-food(acquaGelidaImbevibile,5).
-food(punchNeiDenti,5).
-tableware(piattoPiano,5).
-tableware(ciotola,5).
-tableware(bicchiere,5).
-tableware(forchetta,5).
-tableware(coltello,5).
-tableware(cucchiaio,5).
-
-
 showFoodState(F) :- findall(food(T,N),food(T,N),F).
 showTableWareState(F) :- findall(tableware(T,N),tableware(T,N),F).
 put([A|B]) :- assert(A), put(B).

@@ -46,7 +46,8 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						solve("consumeMessage(A,B,C)","") //set resVar	
 						if(currentSolution.isSuccess()) { 	val dest = getCurSol("A").toString()   
 							    		val id = getCurSol("B").toString()	
-							    		val cont = getCurSol("C").toString()	    	
+							    		val cont = getCurSol("C").toString()	
+										println("MESSAGGIO: id:$id dest:$dest cont:$cont ")    	
 							    		forward(id, cont ,dest )
 						 }
 						else
@@ -61,6 +62,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				}	 
 				state("updateState") { //this:State
 					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								val arg = payloadArg(0)
@@ -75,6 +77,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						if(currentSolution.isSuccess()) { 
 										val FoodState = getCurSol("F").toString()
 						emit("modelcontent", "modelcontent(content(butlerFood(state($FoodState))))" ) 
+						println("foodState emitted:$FoodState")
 						 }
 						else
 						{ println("showFoodState FAIL")
@@ -83,6 +86,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						if(currentSolution.isSuccess()) { 
 										val TableWareState = getCurSol("T").toString()
 						emit("modelcontent", "modelcontent(content(butlerTableWare(state($TableWareState))))" ) 
+						println("tableWare emitted:$TableWareState")
 						 }
 						else
 						{ println("showTableWareState FAIL")

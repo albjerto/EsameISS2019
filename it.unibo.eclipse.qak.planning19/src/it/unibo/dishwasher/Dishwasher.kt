@@ -46,14 +46,17 @@ class Dishwasher ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				}	 
 				state("putTask") { //this:State
 					action { //it:State
-						println("$name in ${currentState.stateName} | $currentMsg")
-						 val list = payloadArg(0) 
-						solve("put('$list')","") //set resVar	
-						if(currentSolution.isSuccess()) {  replyToCaller("remove", "remove($list)")
-						 }
-						else
-						{ println("dishwasherPut FAIL")
-						 }
+						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("$name in ${currentState.stateName} | $currentMsg")
+								 val list = payloadArg(0) 
+								solve("put('$list')","") //set resVar	
+								if(currentSolution.isSuccess()) {  replyToCaller("remove", "remove($list)")
+								 }
+								else
+								{ println("dishwasherPut FAIL")
+								 }
+						}
 					}
 					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
 				}	 
