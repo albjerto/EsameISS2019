@@ -1,6 +1,6 @@
-System room
+System roomelements
  
-mqttBroker "localhost" : 1883   
+mqttBroker "localhost" : 1883
 
 
 Dispatch showState	: showState()
@@ -15,12 +15,12 @@ Dispatch add			:	add(ARG)
 Dispatch get			:	get(ARG)
 Dispatch put			:	put(ARG)
 
-Context ctxRoom    ip [host="localhost" port=8038]   -mqtt 
-Context ctxWorkInRoom     ip [host="localhost" port=8038]   -mqtt 
+Context ctxRoomElements    	ip [host="localhost" port=8037]   -mqtt 
+Context ctxDummyWorkInRoom 	ip [host="workinroomhost" port=8038]   -mqtt
 
-ExternalQActor butlermind context ctxWorkInRoom 
+ExternalQActor butlermind context ctxDummyWorkInRoom
 
-QActor dishwasher context ctxRoom{
+QActor dishwasher context ctxRoomElements{
 	/*
 	 * dishawasher:
 	 * ->put, <-remove
@@ -41,14 +41,14 @@ QActor dishwasher context ctxRoom{
 
 	State showStateTask{
 		printCurrentMessage
-		solve(showTableWareState(L))
+		solve(getDishwasherState(L))
 		ifSolved{
 			/* 
-			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
-			 * Parsing in questo modo perché il resto è lato frontend
+			 * Porre il parsing in un metodo utility, tanto e' lo stesso per tutti
+			 * Parsing in questo modo perche' il resto e' lato frontend
 			 *
 			 * _____________
-			 * ho fatto la funzione per il parse ma non sono riuscito a provarla per il problema del prolog cursed che dà fail
+			 * ho fatto la funzione per il parse ma non sono riuscito a provarla per il problema del prolog cursed che da'  fail
 			 * se riesci a provarla tu e funziona fai pure copia incolla sugli altri actor
 			 *[" val DishwasherState = itunibo.prologUtils.prologUtils.parseState(myself, \"L\") "]
 			 */
@@ -66,7 +66,7 @@ QActor dishwasher context ctxRoom{
 		onMsg(put: put(ARG)){
 			printCurrentMessage
 			[" val list = payloadArg(0) "]
-			solve(put("$list"))
+			solve(addTablewareList("$list"))
 			ifSolved {
 				[" replyToCaller(\"remove\", \"remove($list)\")"]
 			} else {
@@ -77,7 +77,7 @@ QActor dishwasher context ctxRoom{
 	}Goto showStateTask
 }
 
-QActor pantry context ctxRoom{
+QActor pantry context ctxRoomElements{
 	/*
 	 * pantry:
 	 * ->get, <-put
@@ -85,7 +85,7 @@ QActor pantry context ctxRoom{
 	 
 	State s0 initial{
 		println("&&& pantry STARTED")
-		solve(consult("pantryInit.pl")) //da controllare perch� non va con quel file
+		solve(consult("pantryInit.pl")) //da controllare perchè non va con quel file
 	}
 	Goto waitCmd		
 	
@@ -94,15 +94,15 @@ QActor pantry context ctxRoom{
 	}
 	Transition t0	whenMsg showState -> showStateTask
 					whenMsg get -> getTask
-					//whenMsg add -> AddTask	per riaggiungere piatti puliti?
+					whenMsg put -> putTask	// per riaggiungere piatti puliti?
 					
 	State showStateTask{
 		printCurrentMessage
-		solve(showTableWareState(L))
+		solve(getPantryState(L))
 		ifSolved{
 			/* 
-			 * Porre il parsing in un metodo utility, tanto è lo stesso per tutti
-			 * Parsing in questo modo perché il resto è lato frontend
+			 * Porre il parsing in un metodo utility, tanto e' lo stesso per tutti
+			 * Parsing in questo modo perche' il resto e' lato frontend
 			 */
 			["
 				val PantryState = getCurSol(\"L\").toString()
@@ -117,8 +117,8 @@ QActor pantry context ctxRoom{
 	State getTask{
 		onMsg(get: get(ARG)){
 			printCurrentMessage
-			["val tableware=payloadArg(0)"]
-			solve(getTableware("$tableware"))
+			["val tableware = payloadArg(0)"]
+			solve(removeTablewareList("$tableware"))
 			ifSolved {
 				[" replyToCaller(\"put\", \"put($tableware)\" )" ]
 			} else {
@@ -127,11 +127,26 @@ QActor pantry context ctxRoom{
 		}
 	}
 	Goto showStateTask
+	
+	State putTask{
+		onMsg(get: get(ARG)){
+			printCurrentMessage
+			["val tableware = payloadArg(0)"]
+			solve(addTablewareList("$tableware"))
+			ifSolved {
+				[" replyToCaller(\"remove\", \"remove($tableware)\" )" ]
+			} else {
+				println("pantryPut FAIL")
+			}	
+		}
+	}
+	Goto showStateTask
+	
 }
 
 
 
-QActor table context ctxRoom{
+QActor table context ctxRoomElements{
 	/*
 	 * table:
 	 * ->put, <-remove
@@ -145,7 +160,7 @@ QActor table context ctxRoom{
 	Goto waitCmd	
 	
 	State waitCmd{
-		println("&&& pantry waiting for command")
+		println("&&& table waiting for command")
 	}
 	Transition t0	 whenMsg put -> putTask
 				 	 whenMsg clear -> clearTask
@@ -157,7 +172,7 @@ QActor table context ctxRoom{
 			printCurrentMessage
 			 [" val list = payloadArg(0) "]
 			 //solve della lista di roba da mettere sulla tavola : come gestire la lista?
-			 solve(put("$list"))
+			 solve(addGenericList("$list"))
 			 ifSolved {
 				[" replyToCaller(\"remove\", \"remove($list)\") "]
 			 } else {
@@ -182,29 +197,29 @@ QActor table context ctxRoom{
 	
 	State showStateTask{
 		printCurrentMessage
-		solve(showFoodState(F))
+		solve(getFoodTableState(F))
 			ifSolved{
 			["		
 				val FoodState = getCurSol(\"F\").toString()
 			"]
   			emit  modelcontent: modelcontent(content(tableFood(state($FoodState) ) ))
   			}else{
-   				println("showFoodState FAIL")
+   				println("getFoodTableState FAIL")
    			}
-  		solve(showTableWareState(T))
+  		solve(getTablewareTableState(T))
 			ifSolved{
 			["
 				val TableWareState = getCurSol(\"T\").toString()
 			"]
   			emit  modelcontent: modelcontent(content(tableTableware(state( $TableWareState) ) ))
    		}else{
-   			println("getTableState FAIL")
+   			println("getTablewareTableState FAIL")
    		}
 	}Goto waitCmd
 	
 }
 
-QActor fridge context ctxRoom{	//<- il contesto?
+QActor fridge context ctxRoomElements{	//<- il contesto?
 	/*
 	 *fridge:
 	 * ->get, <-put
@@ -216,7 +231,7 @@ QActor fridge context ctxRoom{	//<- il contesto?
 		solve(consult("fridgeInit.pl"))
 		println("&&&  fridge STARTED")
 	}
-	Goto waitCmd //da modificare in waitcmd
+	Goto waitCmd
 	
 	State waitCmd{
 		println("&&&  fridge waiting for command")
@@ -232,7 +247,7 @@ QActor fridge context ctxRoom{	//<- il contesto?
 	State showStateTask{
 		printCurrentMessage
 		//solve(showFridgeState)
-		solve(showFoodState(L))
+		solve(getFridgeState(L))
 		ifSolved{
 			["
 				val FridgeStateString = getCurSol(\"L\").toString()
@@ -247,11 +262,13 @@ QActor fridge context ctxRoom{	//<- il contesto?
 		printCurrentMessage
 		onMsg(get: get(ARG)){
 			[" 
-				val Food=payloadArg(0)
+				val Food = payloadArg(0)
 			"]
 			
-			solve(getFood($Food))
+			solve(removeFoodList($Food))
 			ifSolved {
+				println("Food = $Food")
+				// [" replyToCaller(\"put\", \"put($Food)\") "]
 				forward butlermind -m put : put($Food)	
 			} else {
 				println("fridgeGet FAIL")
@@ -263,10 +280,10 @@ QActor fridge context ctxRoom{	//<- il contesto?
 	State putTask{
 		onMsg(put: put(ARG)){
 			printCurrentMessage
-			[" val food = payloadArg(0) "]
-			solve(put("$food"))
+			[" val Food = payloadArg(0) "]
+			solve(addFoodList("$Food"))
 			ifSolved {
-				[" replyToCaller(\"remove\", \"remove($food)\") "]	//quindi i proxy gestiscono la replyToCaller?
+				[" replyToCaller(\"remove\", \"remove($Food)\") "]	//quindi i proxy gestiscono la replyToCaller?
 			} else {
 				println("fridgePut FAIL")
 			}		
@@ -277,7 +294,7 @@ QActor fridge context ctxRoom{	//<- il contesto?
 		onMsg(isAvailable: isAvailable(ARG)){
 			printCurrentMessage
 			[" val foodCode = payloadArg(0) "]
-			solve(isAvailable("$foodCode"))
+			solve(isThereFoodByCode("$foodCode"))
 			ifSolved {
 				[" replyToCaller(\"yes\", \"yes\") "]
 			} else {
