@@ -45,27 +45,28 @@ Event modelcontent		: modelcontent(CONTENT)
  * 
  */ 
  
-Context ctxWorkInRoom     ip [host="localhost" port=8038]   -mqtt 
-Context ctxDummyForMind   ip [host="otherhost" port=8035]   -mqtt 
-Context ctxRoom			   ip [host="localhost" port=8035]   -mqtt 
+Context ctxWorkInRoom     		ip [host="localhost" port=8038]   -mqtt 
+Context ctxDummyForMind   		ip [host="otherhost" port=8035]   -mqtt 
+Context ctxDummyRoomElements	ip [host="localhost" port=8037]   -mqtt 
 
 ExternalQActor resourcemodel context ctxDummyForMind 
 ExternalQActor onestepahead  context ctxDummyForMind
 ExternalQActor basicrobot    context ctxDummyForMind
 
 
-ExternalQActor dishwasher context ctxRoom
-ExternalQActor pantry context ctxRoom
-ExternalQActor fridge context ctxRoom
-ExternalQActor table context ctxRoom
+ExternalQActor dishwasher context ctxDummyRoomElements
+ExternalQActor pantry context ctxDummyRoomElements
+ExternalQActor fridge context ctxDummyRoomElements
+ExternalQActor table context ctxDummyRoomElements
 
 
 QActor butlermind context ctxWorkInRoom{     
 ["var ButlerStarted = false"]
 	State s0 initial {	
 		println("&&&  butlermind STARTED ")	
-		solve( consult( "butlermindInit.pl" ) )	
-		solve(consult( "prepare.pl" ))
+		solve(consult("butlermindInit.pl"))	
+		solve(consult("prepareFoodList.pl"))
+		solve(consult("prepareTablewareList.pl"))
   	}
   	Goto waitPrepare
   	
@@ -273,7 +274,7 @@ var curmoveIsForward = false
 //var PauseTime  = 500 
 
 //VIRTUAL ROBOT
-var StepTime   = 360	//for virtual // modificato era a 330
+var StepTime   = 345	//for virtual // modificato era a 330
 var PauseTime  = 500
 
 var PauseTimeL  = PauseTime.toLong()
@@ -397,7 +398,7 @@ var timeBack = -1 // tempo di backstep
 			["val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)"]
 			println("ButlerDirection = $ButlerDirection")
 		
-			println("Updating map with the found static obstacle")
+			println("Updating map with the static obstacle just found")
 			run itunibo.planner.moveUtils.setObstacleOnCurrentDirection(myself)
 			println("New map")
 			run itunibo.planner.moveUtils.showCurrentRobotState()
