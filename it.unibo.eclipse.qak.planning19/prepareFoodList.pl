@@ -1,57 +1,57 @@
 %% fatto da noi
 %% cibo da porre sul tavolo col comando prepare
-%% nome, codice, quantità disponibile di ogni cibo visibile in fridgeInit.pl
-%% (al momento presenti tutti i cibi, non in massima quantità)
-%% consigliabile modificare solo le quantità lasciando a 0 ciò che non si vuole prendere
+%% nome, codice, quantitÃ  disponibile di ogni cibo visibile in fridgeInit.pl
+%% (al momento presenti tutti i cibi, non in massima quantitÃ )
+%% consigliabile modificare solo le quantitÃ  lasciando a 0 ciÃ² che non si vuole prendere
 
 %% bevande
-foodPrepare(succoBuono,b01,3).
-foodPrepare(birraBella,b02,3).
-foodPrepare(acquaGelidaImbevibile,b03,3).
-foodPrepare(punchNeiDenti,b04,3).
+toPrepare(food(succoBuono,b01,3)).
+toPrepare(food(birraBella,b02,3)).
+toPrepare(food(acquaGelidaImbevibile,b03,3)).
+toPrepare(food(punchNeiDenti,b04,3)).
 
 %% frutta
-foodPrepare(meloneVerdeImmaturo,f01,3).
-foodPrepare(peschePescate,f02,3).
-foodPrepare(meleMlem,f03,3).
+toPrepare(food(meloneVerdeImmaturo,f01,3)).
+toPrepare(food(peschePescate,f02,3)).
+toPrepare(food(meleMlem,f03,3)).
 
 %% verdura
-foodPrepare(pomodoriComePatatine,v01,3).
-foodPrepare(caroteCheSuccedeAmico,v02,3).
-foodPrepare(ravanelliXtraSpicy,v03,3).
+toPrepare(food(pomodoriComePatatine,v01,3)).
+toPrepare(food(caroteCheSuccedeAmico,v02,3)).
+toPrepare(food(ravanelliXtraSpicy,v03,3)).
 
 %% affettato
-foodPrepare(salameGrassissimo,a01,3).
-foodPrepare(prosciuttoTroppoCostoso,a02,3).
-foodPrepare(coppaDeiCampioni,a03,3).
-foodPrepare(mortazzaDelVanish,a04,3).
+toPrepare(food(salameGrassissimo,a01,3)).
+toPrepare(food(prosciuttoTroppoCostoso,a02,3)).
+toPrepare(food(coppaDeiCampioni,a03,3)).
+toPrepare(food(mortazzaDelVanish,a04,3)).
 
 %% salato
-foodPrepare(pizzetteCompleanno,s01,3).
-foodPrepare(quelleRobePastaSfogliaEWurstel,s02,3).
-foodPrepare(piadaDelParco,s03,3).
+toPrepare(food(pizzetteCompleanno,s01,3)).
+toPrepare(food(quelleRobePastaSfogliaEWurstel,s02,3)).
+toPrepare(food(piadaDelParco,s03,3)).
 
 %% dolci
-foodPrepare(pannaCottaPoco,d01,3).
-foodPrepare(mascarponeDaMontagna,d02,3).
-foodPrepare(cheeseCakeHoFame,d03,3).
+toPrepare(food(pannaCottaPoco,d01,3)).
+toPrepare(food(mascarponeDaMontagna,d02,3)).
+toPrepare(food(cheeseCakeHoFame,d03,3)).
 
 %% print dei cibi nella prepareFoodList (NON stampa eventuali cibi che non si vogliono prendere)
-showPrepareFoodList :- foodPrepare(F,C,N), N > 0, outputFoodPrepare(F,N), fail.
+showPrepareFoodList :- food(F,C,N), N > 0, outputFood(F,N), fail.
 showPrepareFoodList.			
-outputFoodPrepare(F,N) :- stdout <- print(F), stdout <- print(' '), stdout <- println(N).
+outputFood(F,N) :- stdout <- print(F), stdout <- print(' '), stdout <- println(N).
 
-%% genera la lista con elementi [nome, quantità] dei cibi richiesti 
+%% genera la lista con elementi food(nome, quantitÃ ) dei cibi richiesti 
 %% (NON considera cibi che non si vogliono prendere) (da parsare lato kotlin)
-getPrepareFoodListByName(L) :- findall([F,N], multipleNameGoal(F,N), L).
-multipleNameGoal(F,N) :- foodPrepare(F,_,N), N > 0.
+getPrepareFoodListByName(L) :- findall(food(F,N), multipleNameGoal(F,N), L).
+multipleNameGoal(F,N) :- food(F,_,N), N > 0.
 
-%% genera la lista con elementi [codice, quantità] dei cibi richiesti 
+%% genera la lista con elementi food(codice, quantitÃ ) dei cibi richiesti 
 %% (NON considera cibi che non si vogliono prendere) (da parsare lato kotlin)
-getPrepareFoodListByCode(L) :- findall([C,N], multipleCodeGoal(C,N), L).
-multipleCodeGoal(C,N) :- foodPrepare(_,C,N), N > 0.
+getPrepareFoodListByCode(L) :- findall(food(C,N), multipleCodeGoal(C,N), L).
+multipleCodeGoal(C,N) :- food(_,C,N), N > 0.
 
-%% genera la lista con elementi [nome, codice, quantità] dei cibi richiesti 
+%% genera la lista con elementi food(nome, codice, quantitÃ ) dei cibi richiesti 
 %% (NON considera cibi che non si vogliono prendere) (da parsare lato kotlin)
-getPrepareFoodListByName(L) :- findall([F,C,N], multipleNameAndCodeGoal(F,C,N), L).
-multipleNameAndCodeGoal(F,C,N) :- foodPrepare(F,C,N), N > 0.
+getPrepareFoodListByNameAndCode(L) :- findall(food(F,C,N), multipleNameAndCodeGoal(F,C,N), L).
+multipleNameAndCodeGoal(F,C,N) :- food(F,C,N), N > 0.
