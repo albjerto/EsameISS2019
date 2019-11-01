@@ -57,22 +57,6 @@ QActor resourcemodel context ctxRobotMind{
 			println("modelUpdate roomMap  ")
 			run itunibo.robot.resourceModelSupport.updateRoomMapModel( myself, payloadArg(1) )
 		}
-		// è corretto che gli update del frigo e del tavolo siano gestiti da questo resourcemodel?
-		onMsg( modelUpdate : modelUpdate(fridge,V ) ) {
-			run itunibo.robot.resourceModelSupport.updateFridgeModel(myself,payloadArg(1))
-		}
-		onMsg( modelUpdate : modelUpdate(foodTable,V ) ) {
-			println("modelUpdate foodTable")
-			run itunibo.robot.resourceModelSupport.updateFoodTableModel(myself,payloadArg(1))
-		}
-		onMsg( modelUpdate : modelUpdate(tablewareTable,V ) ) {
-			println("modelUpdate tablewareTable")
-			run itunibo.robot.resourceModelSupport.updateTablewareTableModel(myself,payloadArg(1))
-		}
-		onMsg( modelUpdate : modelUpdate(dishwasher,V ) ) {
-			println("modelUpdate dishwasher")
-			run itunibo.robot.resourceModelSupport.updateDishwasherModel(myself,payloadArg(1))
-		}
 	} 
     Goto  waitModelChange
     
@@ -260,14 +244,18 @@ val logger           = itunibo.robot.Logger(\"logFiltered\")
      	
      	delay 1000
      	
-     	forward basicrobot -m robotCmd : robotCmd( r )
-     	delay 2000
-     	forward basicrobot -m robotCmd : robotCmd( l )
- //   		run itunibo.robot.robotSupport.move( "msg(a)" )
-//   		delay 700
-//   		run itunibo.robot.robotSupport.move( "msg(d)" )
-//   		delay 700
-//   		run itunibo.robot.robotSupport.move( "msg(h)" )
+     	// forward basicrobot -m robotCmd : robotCmd( r )
+     	// delay 2000
+     	// forward basicrobot -m robotCmd : robotCmd( l )
+	run itunibo.robot.robotSupport.move( "msg(a)" )
+	delay 700
+	run itunibo.robot.robotSupport.move( "msg(d)" )
+	delay 700
+	run itunibo.robot.robotSupport.move( "msg(d)" )
+	delay 700
+	run itunibo.robot.robotSupport.move( "msg(a)" )
+	delay 700
+	run itunibo.robot.robotSupport.move( "msg(h)" )
  	}  
 	Goto waitCmd   
  	 
