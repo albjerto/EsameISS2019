@@ -19,8 +19,7 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 				state("s0") { //this:State
 					action { //it:State
 						solve("consult('fridgeInit.pl')","") //set resVar	
-						println("&&&  fridge starting, initial state as follows")
-						solve("showFridgeState","") //set resVar	
+						println("&&&  fridge STARTED")
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
@@ -28,53 +27,18 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 					action { //it:State
 						println("&&&  fridge waiting for command")
 					}
-					 transition(edgeName="t06",targetState="prepareTask",cond=whenDispatch("prepare"))
-					transition(edgeName="t07",targetState="addTask",cond=whenDispatch("add"))
-					transition(edgeName="t08",targetState="showTask",cond=whenDispatch("showFridgeState"))
-					transition(edgeName="t09",targetState="checkAvailability",cond=whenDispatch("isAvailable"))
+					 transition(edgeName="t08",targetState="putTask",cond=whenDispatch("put"))
+					transition(edgeName="t09",targetState="showStateTask",cond=whenDispatch("showState"))
+					transition(edgeName="t010",targetState="getTask",cond=whenDispatch("get"))
+					transition(edgeName="t011",targetState="checkTask",cond=whenDispatch("isAvailable"))
 				}	 
-				state("prepareTask") { //this:State
+				state("showStateTask") { //this:State
 					action { //it:State
-						solve("consult('prepareFoodList.pl')","") //set resVar	
-						println("&&&  fridge received prepare, handing over food")
-						solve("prepareFood","") //set resVar	
-						println("&&&  fridge state modified, now as follows")
-						solve("showFridgeState","") //set resVar	
-					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
-				}	 
-				state("addTask") { //this:State
-					action { //it:State
-						var Code ="" 
-						if( checkMsgContent( Term.createTerm("add(ARG)"), Term.createTerm("add(C)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								Code = payloadArg(0)
-								solve("get('$Code',1)","") //set resVar	
-								if(currentSolution.isSuccess()) { println("Add possibile, fridge informa RBR")
-								emit("stateChanged", "stateChanged()" ) 
-								forward("modelUpdate", "modelUpdate(fridge,addCompleted)" ,"serverproxy" ) 
-								 }
-								else
-								{ println("Add impossibile, quantita' insufficiente nel frigo")
-								forward("modelUpdate", "modelUpdate(fridge,addImpossibleWarning)" ,"serverproxy" ) 
-								 }
-						}
-					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
-				}	 
-				state("showTask") { //this:State
-					action { //it:State
-						println("&&&  fridge received showFridgeState, executing")
-						solve("showFridgeState","") //set resVar	
+						println("$name in ${currentState.stateName} | $currentMsg")
 						solve("getFridgeState(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
-								val str1 = getCurSol("L").toString()
-								val str2 = str1.replace("],[","@")
-								val str3 = str2.replace("[","'")
-								val str4 = str3.replace("]","'")
-								val FridgeStateString = str4.substring(1,str4.length-1)
-						println("fridgeStateString = \n$FridgeStateString")
-						forward("modelUpdate", "modelUpdate(fridge,$FridgeStateString)" ,"serverproxy" ) 
+										val FridgeStateString = getCurSol("L").toString()
+						emit("modelcontent", "modelcontent(content(fridge(state($FridgeStateString))))" ) 
 						 }
 						else
 						{ println("getFridgeState FAIL")
@@ -82,20 +46,51 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
-				state("checkAvailability") { //this:State
+				state("getTask") { //this:State
 					action { //it:State
-						println("&&&  fridge received availability check, executing")
-						var code = "" 
-						if( checkMsgContent( Term.createTerm("isAvalaible(CODE)"), Term.createTerm("isAvailable(CODE)"), 
+						println("$name in ${currentState.stateName} | $currentMsg")
+						if( checkMsgContent( Term.createTerm("get(ARG)"), Term.createTerm("get(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								code = payloadArg(0)
-								solve("isThereFood('$code')","") //set resVar	
-								if(currentSolution.isSuccess()) { println("Food available")
-								forward("modelUpdate", "modelUpdate(fridge,foodAvailable)" ,"serverproxy" ) 
+								 
+												val Food = payloadArg(0)
+								solve("removeFoodList($Food)","") //set resVar	
+								if(currentSolution.isSuccess()) { println("Food = $Food")
+								forward("put", "put($Food)" ,"butlermind" ) 
 								 }
 								else
-								{ println("Food not found")
-								forward("modelUpdate", "modelUpdate(fridge,foodNotFound)" ,"serverproxy" ) 
+								{ println("fridgeGet FAIL")
+								 }
+						}
+					}
+					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
+				}	 
+				state("putTask") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("$name in ${currentState.stateName} | $currentMsg")
+								 val Food = payloadArg(0) 
+								solve("addFoodList('$Food')","") //set resVar	
+								if(currentSolution.isSuccess()) { forward("remove", "remove($Food)" ,"butlermind" ) 
+								 }
+								else
+								{ println("fridgePut FAIL")
+								 }
+						}
+					}
+					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
+				}	 
+				state("checkTask") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("isAvailable(ARG)"), Term.createTerm("isAvailable(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("$name in ${currentState.stateName} | $currentMsg")
+								 val foodCode = payloadArg(0) 
+								solve("isThereFoodByCode('$foodCode')","") //set resVar	
+								if(currentSolution.isSuccess()) { forward("yes", "yes()" ,"butlermind" ) 
+								 }
+								else
+								{ forward("no", "no()" ,"butlermind" ) 
 								 }
 						}
 					}

@@ -113,12 +113,12 @@ QActor butlermind context ctxWorkInRoom{
      State updateState{
      	printCurrentMessage
      	onMsg(put: put(ARG)) {
-     		["val arg = payloadArg(0)"]
-     		solve(put("$arg"))  		
+     		["val Arg = payloadArg(0)"]
+     		solve(addFoodList($Arg)) 	
      	} 	 	
      	onMsg(remove: remove(ARG)) {
-     		["val arg = payloadArg(0)"]
-     		solve(remove("$arg"))
+     		["val Arg = payloadArg(0)"]
+     		solve(remove($Arg))
     	} 
      	//usare il metodo utility
      	//volendo da fare con una solve sola
@@ -143,7 +143,8 @@ QActor butlermind context ctxWorkInRoom{
    			println("showTableWareState FAIL")
    		}
      }
-     Goto msgHandler
+     Transition t0
+     				whenMsg targetReached   -> msgHandler
      
      
      
@@ -274,7 +275,7 @@ var curmoveIsForward = false
 //var PauseTime  = 500 
 
 //VIRTUAL ROBOT
-var StepTime   = 345	//for virtual // modificato era a 330
+var StepTime   = 359	//for virtual // modificato era a 330
 var PauseTime  = 500
 
 var PauseTimeL  = PauseTime.toLong()

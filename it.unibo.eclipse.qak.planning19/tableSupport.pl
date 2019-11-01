@@ -21,7 +21,7 @@ removeGenericList([tableware(T,N)|T1]) :- getTableware(T,N), removeGenericList(T
 addGenericList([]).
 addGenericList([food(F,N)]) :- !, putFood(F,N).
 addGenericList([tableware(T,N)]) :- !, putTableware(T,N).
-addGenericList([food(F,N)|T]) :- !, putFood(F,N), addGenericList(T).
+addGenericList([food(F,N)|T]) :- putFood(F,N), addGenericList(T).
 addGenericList([tableware(T,N)|T1]) :- putTableware(T,N), addGenericList(T1).
 
 %% più elegante ma not sure che vada per il verso così

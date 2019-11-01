@@ -14,6 +14,9 @@ Dispatch clear			:	clear(ARG)
 Dispatch add			:	add(ARG)
 Dispatch get			:	get(ARG)
 Dispatch put			:	put(ARG)
+Dispatch remove			:	remove(ARG)
+Dispatch yes			:	yes()
+Dispatch no				: 	no()
 
 Context ctxRoomElements    	ip [host="localhost" port=8037]   -mqtt 
 Context ctxDummyWorkInRoom 	ip [host="workinroomhost" port=8038]   -mqtt
@@ -65,10 +68,10 @@ QActor dishwasher context ctxRoomElements{
 	State putTask{
 		onMsg(put: put(ARG)){
 			printCurrentMessage
-			[" val list = payloadArg(0) "]
-			solve(addTablewareList("$list"))
+			[" val List = payloadArg(0) "]
+			solve(addTablewareList("$List"))
 			ifSolved {
-				[" replyToCaller(\"remove\", \"remove($list)\")"]
+				forward butlermind -m remove : remove($List)
 			} else {
 				println("dishwasherPut FAIL")
 			}
@@ -117,10 +120,11 @@ QActor pantry context ctxRoomElements{
 	State getTask{
 		onMsg(get: get(ARG)){
 			printCurrentMessage
-			["val tableware = payloadArg(0)"]
-			solve(removeTablewareList("$tableware"))
+			["val Tableware = payloadArg(0)"]
+			solve(removeTablewareList($Tableware))
+			forward butlermind -m put : put($Tableware)
 			ifSolved {
-				[" replyToCaller(\"put\", \"put($tableware)\" )" ]
+				
 			} else {
 				println("pantryGet FAIL")
 			}	
@@ -131,10 +135,10 @@ QActor pantry context ctxRoomElements{
 	State putTask{
 		onMsg(get: get(ARG)){
 			printCurrentMessage
-			["val tableware = payloadArg(0)"]
-			solve(addTablewareList("$tableware"))
+			["val Tableware = payloadArg(0)"]
+			solve(addTablewareList($Tableware))
 			ifSolved {
-				[" replyToCaller(\"remove\", \"remove($tableware)\" )" ]
+				forward butlermind -m remove : remove($Tableware)
 			} else {
 				println("pantryPut FAIL")
 			}	
@@ -170,11 +174,11 @@ QActor table context ctxRoomElements{
 	State putTask{
 		onMsg(put: put(ARG)){
 			printCurrentMessage
-			 [" val list = payloadArg(0) "]
+			 [" val List = payloadArg(0) "]
 			 //solve della lista di roba da mettere sulla tavola : come gestire la lista?
-			 solve(addGenericList("$list"))
+			 solve(addGenericList($List))
 			 ifSolved {
-				[" replyToCaller(\"remove\", \"remove($list)\") "]
+				forward butlermind -m remove : remove($List)
 			 } else {
 				println("putTableTask FAIL")
 				//invio messaggi al robot per gestione fallimenti?
@@ -187,9 +191,9 @@ QActor table context ctxRoomElements{
 		 solve(clear(L))
 		 ifSolved {
 			["
-			val list = getCurSol(\"L\").toString()
-			replyToCaller(\"put\", \"put($list)\")
+			val List = getCurSol(\"L\").toString()
 			"]
+			forward butlermind -m put : put($List)
 		 } else {
 			println("clearTable FAIL")
 		 }
@@ -268,7 +272,6 @@ QActor fridge context ctxRoomElements{	//<- il contesto?
 			solve(removeFoodList($Food))
 			ifSolved {
 				println("Food = $Food")
-				// [" replyToCaller(\"put\", \"put($Food)\") "]
 				forward butlermind -m put : put($Food)	
 			} else {
 				println("fridgeGet FAIL")
@@ -283,7 +286,7 @@ QActor fridge context ctxRoomElements{	//<- il contesto?
 			[" val Food = payloadArg(0) "]
 			solve(addFoodList("$Food"))
 			ifSolved {
-				[" replyToCaller(\"remove\", \"remove($Food)\") "]	//quindi i proxy gestiscono la replyToCaller?
+				forward butlermind -m remove : remove($Food)
 			} else {
 				println("fridgePut FAIL")
 			}		
@@ -296,9 +299,9 @@ QActor fridge context ctxRoomElements{	//<- il contesto?
 			[" val foodCode = payloadArg(0) "]
 			solve(isThereFoodByCode("$foodCode"))
 			ifSolved {
-				[" replyToCaller(\"yes\", \"yes\") "]
+				forward butlermind -m yes : yes()
 			} else {
-				[" replyToCaller(\"no\", \"no\") "]
+				forward butlermind -m no : no()
 			}	
 		}
 	}Goto waitCmd

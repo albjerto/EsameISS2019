@@ -53,10 +53,10 @@ function escapeRegExp(str) {
 				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
 				document.getElementById('butlerFoodDisplay').innerHTML=v2; 
 			}
-			if( v.indexOf("butlerTableWare:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-				v1 = v.replace("butlerTableWare:state('", "").replace("')", "");
+			if( v.indexOf("butlerTableware:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
+				v1 = v.replace("butlerTableware:state('", "").replace("')", "");
 				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-				document.getElementById('butlerTableWareDisplay').innerHTML=v2; 
+				document.getElementById('butlerTablewareDisplay').innerHTML=v2; 
 			}
 			
        	});
@@ -224,7 +224,7 @@ The event is handled by robotCmdExec.py
 	<div>
   		<b>BUTLER STATE</b>: <br/>
 		<b>&nbsp&nbsp&nbsp&nbsp&nbspFOOD STATE</b>: <span id="butlerFoodDisplay"></span> <br/>
-		<b>&nbsp&nbsp&nbsp&nbsp&nbspTABLEWARE STATE</b>: <span id="butlerTableWareDisplay"></span>
+		<b>&nbsp&nbsp&nbsp&nbsp&nbspTABLEWARE STATE</b>: <span id="butlerTablewareDisplay"></span>
 	</div>
 	<div>
   		<b>FRIDGE STATE</b>: <span id="fridgeDisplay"></span>

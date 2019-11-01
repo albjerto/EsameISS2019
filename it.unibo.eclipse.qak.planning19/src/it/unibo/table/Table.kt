@@ -25,20 +25,20 @@ class Table ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 				}	 
 				state("waitCmd") { //this:State
 					action { //it:State
-						println("&&& pantry waiting for command")
+						println("&&& table waiting for command")
 					}
-					 transition(edgeName="t04",targetState="putTask",cond=whenDispatch("put"))
-					transition(edgeName="t05",targetState="clearTask",cond=whenDispatch("clear"))
-					transition(edgeName="t06",targetState="showStateTask",cond=whenDispatch("showState"))
+					 transition(edgeName="t05",targetState="putTask",cond=whenDispatch("put"))
+					transition(edgeName="t06",targetState="clearTask",cond=whenDispatch("clear"))
+					transition(edgeName="t07",targetState="showStateTask",cond=whenDispatch("showState"))
 				}	 
 				state("putTask") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("$name in ${currentState.stateName} | $currentMsg")
-								 val list = payloadArg(0) 
-								solve("put('$list')","") //set resVar	
-								if(currentSolution.isSuccess()) {  replyToCaller("remove", "remove($list)") 
+								 val List = payloadArg(0) 
+								solve("addGenericList($List)","") //set resVar	
+								if(currentSolution.isSuccess()) { forward("remove", "remove($List)" ,"butlermind" ) 
 								 }
 								else
 								{ println("putTableTask FAIL")
@@ -52,8 +52,8 @@ class Table ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 						println("$name in ${currentState.stateName} | $currentMsg")
 						solve("clear(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
-									val list = getCurSol("L").toString()
-									replyToCaller("put", "put($list)")
+									val List = getCurSol("L").toString()
+						forward("put", "put($List)" ,"butlermind" ) 
 						 }
 						else
 						{ println("clearTable FAIL")
@@ -64,21 +64,21 @@ class Table ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 				state("showStateTask") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
-						solve("showFoodState(F)","") //set resVar	
+						solve("getFoodTableState(F)","") //set resVar	
 						if(currentSolution.isSuccess()) { 		
 										val FoodState = getCurSol("F").toString()
 						emit("modelcontent", "modelcontent(content(tableFood(state($FoodState))))" ) 
 						 }
 						else
-						{ println("showFoodState FAIL")
+						{ println("getFoodTableState FAIL")
 						 }
-						solve("showTableWareState(T)","") //set resVar	
+						solve("getTablewareTableState(T)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
 										val TableWareState = getCurSol("T").toString()
 						emit("modelcontent", "modelcontent(content(tableTableware(state($TableWareState))))" ) 
 						 }
 						else
-						{ println("getTableState FAIL")
+						{ println("getTablewareTableState FAIL")
 						 }
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )

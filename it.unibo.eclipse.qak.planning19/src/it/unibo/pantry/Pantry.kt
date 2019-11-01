@@ -29,11 +29,12 @@ class Pantry ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 					}
 					 transition(edgeName="t02",targetState="showStateTask",cond=whenDispatch("showState"))
 					transition(edgeName="t03",targetState="getTask",cond=whenDispatch("get"))
+					transition(edgeName="t04",targetState="putTask",cond=whenDispatch("put"))
 				}	 
 				state("showStateTask") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
-						solve("showTableWareState(L)","") //set resVar	
+						solve("getPantryState(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
 										val PantryState = getCurSol("L").toString()
 						emit("modelcontent", "modelcontent(content(pantry(state($PantryState))))" ) 
@@ -49,12 +50,28 @@ class Pantry ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 						if( checkMsgContent( Term.createTerm("get(ARG)"), Term.createTerm("get(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("$name in ${currentState.stateName} | $currentMsg")
-								val tableware=payloadArg(0)
-								solve("getTableware('$tableware')","") //set resVar	
-								if(currentSolution.isSuccess()) {  replyToCaller("put", "put($tableware)" )
-								 }
+								val Tableware = payloadArg(0)
+								solve("removeTablewareList($Tableware)","") //set resVar	
+								forward("put", "put($Tableware)" ,"butlermind" ) 
+								if(currentSolution.isSuccess()) {  }
 								else
 								{ println("pantryGet FAIL")
+								 }
+						}
+					}
+					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
+				}	 
+				state("putTask") { //this:State
+					action { //it:State
+						if( checkMsgContent( Term.createTerm("get(ARG)"), Term.createTerm("get(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("$name in ${currentState.stateName} | $currentMsg")
+								val Tableware = payloadArg(0)
+								solve("addTablewareList($Tableware)","") //set resVar	
+								if(currentSolution.isSuccess()) { forward("remove", "remove($Tableware)" ,"butlermind" ) 
+								 }
+								else
+								{ println("pantryPut FAIL")
 								 }
 						}
 					}

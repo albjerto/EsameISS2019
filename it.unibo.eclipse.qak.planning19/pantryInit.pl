@@ -1,12 +1,12 @@
 %% fatto da noi
 %% set di piatti, bicchieri e posate inizialmente disponibili nella pantry
 
-tableware(piattoPiano,20)
-tableware(ciotola,20)
-tableware(bicchiere,20)
-tableware(forchetta,20)
-tableware(coltello,20)
-tableare(cucchiaio,20)
+tableware(piattoPiano,20).
+tableware(ciotola,20).
+tableware(bicchiere,20).
+tableware(forchetta,20).
+tableware(coltello,20).
+tableare(cucchiaio,20).
 
 %% print dello stato (stampa anche tableware terminati)
 showPantryState :- tableware(T,N), outputTableware(T,N), fail.

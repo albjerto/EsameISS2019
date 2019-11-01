@@ -27,7 +27,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 		//var PauseTime  = 500 
 		
 		//VIRTUAL ROBOT
-		var StepTime   = 345	//for virtual // modificato era a 330
+		var StepTime   = 359	//for virtual // modificato era a 330
 		var PauseTime  = 500
 		
 		var PauseTimeL  = PauseTime.toLong()
@@ -48,7 +48,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						forward("modelUpdate", "modelUpdate(roomMap,$MapStr)" ,"resourcemodel" ) 
 						println("&&&  workerinroom STARTED")
 					}
-					 transition(edgeName="t013",targetState="setGoalAndDo",cond=whenDispatch("moveButlerTo"))
+					 transition(edgeName="t014",targetState="setGoalAndDo",cond=whenDispatch("moveButlerTo"))
 				}	 
 				state("setGoalAndDo") { //this:State
 					action { //it:State
@@ -81,7 +81,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						forward("modelUpdate", "modelUpdate(roomMap,$MapStr)" ,"resourcemodel" ) 
 						replyToCaller("goalReached", "goalReached(ok)")
 					}
-					 transition(edgeName="t014",targetState="setGoalAndDo",cond=whenDispatch("moveButlerTo"))
+					 transition(edgeName="t015",targetState="setGoalAndDo",cond=whenDispatch("moveButlerTo"))
 				}	 
 				state("checkAndDoAction") { //this:State
 					action { //it:State
@@ -101,22 +101,22 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						itunibo.planner.moveUtils.attemptTomoveAhead(myself ,StepTime )
 						timePreStep = System.currentTimeMillis()
 					}
-					 transition(edgeName="t015",targetState="handleStopAppl",cond=whenEvent("stopAppl"))
-					transition(edgeName="t016",targetState="handleStepOk",cond=whenDispatch("stepOk"))
-					transition(edgeName="t017",targetState="hadleStepFail",cond=whenDispatch("stepFail"))
+					 transition(edgeName="t016",targetState="handleStopAppl",cond=whenEvent("stopAppl"))
+					transition(edgeName="t017",targetState="handleStepOk",cond=whenDispatch("stepOk"))
+					transition(edgeName="t018",targetState="hadleStepFail",cond=whenDispatch("stepFail"))
 				}	 
 				state("handleStopAppl") { //this:State
 					action { //it:State
 						println("APPLICATION STOPPED. Waiting for a reactivate")
 					}
-					 transition(edgeName="t018",targetState="handleReactivateAppl",cond=whenEvent("reactivateAppl"))
+					 transition(edgeName="t019",targetState="handleReactivateAppl",cond=whenEvent("reactivateAppl"))
 				}	 
 				state("handleReactivateAppl") { //this:State
 					action { //it:State
 						println("APPLICATION RESUMED")
 					}
-					 transition(edgeName="t019",targetState="handleStepOk",cond=whenDispatch("stepOk"))
-					transition(edgeName="t020",targetState="hadleStepFail",cond=whenDispatch("stepFail"))
+					 transition(edgeName="t020",targetState="handleStepOk",cond=whenDispatch("stepOk"))
+					transition(edgeName="t021",targetState="hadleStepFail",cond=whenDispatch("stepFail"))
 				}	 
 				state("handleStepOk") { //this:State
 					action { //it:State

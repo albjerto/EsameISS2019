@@ -33,7 +33,7 @@ class Dishwasher ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				state("showStateTask") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
-						solve("showTableWareState(L)","") //set resVar	
+						solve("getDishwasherState(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
 										val DishwasherState = getCurSol("L").toString()
 						emit("modelcontent", "modelcontent(content(dishwasher(state($DishwasherState))))" ) 
@@ -49,9 +49,9 @@ class Dishwasher ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("$name in ${currentState.stateName} | $currentMsg")
-								 val list = payloadArg(0) 
-								solve("put('$list')","") //set resVar	
-								if(currentSolution.isSuccess()) {  replyToCaller("remove", "remove($list)")
+								 val List = payloadArg(0) 
+								solve("addTablewareList('$List')","") //set resVar	
+								if(currentSolution.isSuccess()) { forward("remove", "remove($List)" ,"butlermind" ) 
 								 }
 								else
 								{ println("dishwasherPut FAIL")

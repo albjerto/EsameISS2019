@@ -66,13 +66,13 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						println("$name in ${currentState.stateName} | $currentMsg")
 						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								val arg = payloadArg(0)
-								solve("put('$arg')","") //set resVar	
+								val Arg = payloadArg(0)
+								solve("addFoodList($Arg)","") //set resVar	
 						}
 						if( checkMsgContent( Term.createTerm("remove(ARG)"), Term.createTerm("remove(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								val arg = payloadArg(0)
-								solve("remove('$arg')","") //set resVar	
+								val Arg = payloadArg(0)
+								solve("remove($Arg)","") //set resVar	
 						}
 						solve("showFoodState(F)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
@@ -93,14 +93,14 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						{ println("showTableWareState FAIL")
 						 }
 					}
-					 transition( edgeName="goto",targetState="msgHandler", cond=doswitch() )
+					 transition(edgeName="t07",targetState="msgHandler",cond=whenDispatch("targetReached"))
 				}	 
 				state("waitCommandTask") { //this:State
 					action { //it:State
 						println("&& butlermind wait cmd")
 					}
-					 transition(edgeName="t07",targetState="isAvaliable",cond=whenDispatch("add"))
-					transition(edgeName="t08",targetState="doClear",cond=whenDispatch("clear"))
+					 transition(edgeName="t08",targetState="isAvaliable",cond=whenDispatch("add"))
+					transition(edgeName="t09",targetState="doClear",cond=whenDispatch("clear"))
 				}	 
 				state("isAvaliable") { //this:State
 					action { //it:State
@@ -111,8 +111,8 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 								forward("isAvailable", "isAvalaible(code)" ,"butlerplanexecutor" ) 
 						}
 					}
-					 transition(edgeName="t09",targetState="doAdd",cond=whenDispatch("yes"))
-					transition(edgeName="t010",targetState="waitCommandTask",cond=whenDispatch("no"))
+					 transition(edgeName="t010",targetState="doAdd",cond=whenDispatch("yes"))
+					transition(edgeName="t011",targetState="waitCommandTask",cond=whenDispatch("no"))
 				}	 
 				state("doAdd") { //this:State
 					action { //it:State
