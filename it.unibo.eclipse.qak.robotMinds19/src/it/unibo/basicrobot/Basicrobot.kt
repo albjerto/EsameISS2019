@@ -41,9 +41,15 @@ class Basicrobot ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						{ println("no robot")
 						 }
 						delay(1000) 
-						forward("robotCmd", "robotCmd(r)" ,"basicrobot" ) 
-						delay(2000) 
-						forward("robotCmd", "robotCmd(l)" ,"basicrobot" ) 
+						itunibo.robot.robotSupport.move( "msg(a)"  )
+						delay(700) 
+						itunibo.robot.robotSupport.move( "msg(d)"  )
+						delay(700) 
+						itunibo.robot.robotSupport.move( "msg(d)"  )
+						delay(700) 
+						itunibo.robot.robotSupport.move( "msg(a)"  )
+						delay(700) 
+						itunibo.robot.robotSupport.move( "msg(h)"  )
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 

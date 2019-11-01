@@ -40,3 +40,4 @@ lateinit var resourcecoap : modelResourceCoap
  				resourcecoap.updateState( "roomMap( '$content' )" )
  			}	
 	}
+}

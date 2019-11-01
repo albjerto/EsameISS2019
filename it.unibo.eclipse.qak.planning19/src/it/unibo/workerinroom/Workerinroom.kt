@@ -27,7 +27,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 		//var PauseTime  = 500 
 		
 		//VIRTUAL ROBOT
-		var StepTime   = 360	//for virtual // modificato era a 330
+		var StepTime   = 345	//for virtual // modificato era a 330
 		var PauseTime  = 500
 		
 		var PauseTimeL  = PauseTime.toLong()
@@ -136,7 +136,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						if((crashCounter > 1)){ println("Static obstacle found!")
 						val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)
 						println("ButlerDirection = $ButlerDirection")
-						println("Updating map with the found static obstacle")
+						println("Updating map with the static obstacle just found")
 						itunibo.planner.moveUtils.setObstacleOnCurrentDirection(myself)
 						println("New map")
 						itunibo.planner.moveUtils.showCurrentRobotState(  )

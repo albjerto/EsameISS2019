@@ -21,7 +21,8 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 					action { //it:State
 						println("&&&  butlermind STARTED ")
 						solve("consult('butlermindInit.pl')","") //set resVar	
-						solve("consult('prepare.pl')","") //set resVar	
+						solve("consult('prepareFoodList.pl')","") //set resVar	
+						solve("consult('prepareTablewareList.pl')","") //set resVar	
 					}
 					 transition( edgeName="goto",targetState="waitPrepare", cond=doswitch() )
 				}	 
