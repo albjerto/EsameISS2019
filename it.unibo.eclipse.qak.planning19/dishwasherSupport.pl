@@ -1,14 +1,23 @@
-%% FUNZIONI TOMMY
-put([A|B]) :- assert(A), put(B).
-put([]).
-getFood([food(N,Q)|L]) :- getFoodByName(N,Q), getFood(L).
-getFood([]).
-getFoodByName(F,N) :- food(F,N1), N1 >= N, retract(food(F,N1)), N2 is N1 - N, assert(food(F,N2)).
+%% fatto da noi
+%% comprende le funzionalità della dishwasher
 
-getTableware([tableware(N,Q)|L]) :- getTablewareByName(N,Q), getTableware(L).
-getTableware([]).
-getTablewareByName(F,N) :- tableware(F,N1), N1 >= N, retract(tableware(F,N1)), N2 is N1 - N, assert(tableware(F,N2)).
-showFoodState(F) :- findall(food(T,N),food(T,N),F).
-showTableWareState(F) :- findall(tableware(T,N),tableware(T,N),F).
-remove([H|L]) :- retract(H), remove(L).
-remove([]).
+%% print dello stato
+showDishwasherState :- tableware(T,N), outputTableware(T,N), fail.
+showDishwasherState.			
+outputTableware(T,N) :- stdout <- print(T), stdout <- print(' '), stdout <- println(N).
+
+%% genera la stringa contenente lo stato della dishwasher (da parsare lato kotlin)
+getDishwasherState(L) :- findall(tableware(T,N), tableware(T,N), L).
+
+%% aggiunta alla dishwasher dei tableware specificati nella lista passata come argomento (per la clear)
+addTablewareList([]).
+addTablewareList([tableware(T,N)]) :- !, putTableware(T,N).
+addTablewareList([tableware(T,N)|T]) :- putTableware(T,N), addTablewareList(T).
+
+%% aggiunta di una quantità N del tableware T
+%% la prima put commentata non dovrebbe servire dato che l'aggiunta di tableware alla dishwasher è 
+%% una sola ed il suo stato è inizialmente vuoto
+%%putTableware(T,N) :- tableware(T,N1), !, retract(tableware(T,N1)), N2 is N1 + N, assert(tableware(T,N2)).
+putTableware(T,N) :- assert(tableware(T,N)).
+
+%% non dovrebbe servire alcuna operazione di removeTableware
