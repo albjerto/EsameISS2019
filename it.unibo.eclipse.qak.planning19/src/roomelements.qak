@@ -49,14 +49,9 @@ QActor dishwasher context ctxRoomElements{
 			/* 
 			 * Porre il parsing in un metodo utility, tanto e' lo stesso per tutti
 			 * Parsing in questo modo perche' il resto e' lato frontend
-			 *
-			 * _____________
-			 * ho fatto la funzione per il parse ma non sono riuscito a provarla per il problema del prolog cursed che da'  fail
-			 * se riesci a provarla tu e funziona fai pure copia incolla sugli altri actor
-			 *[" val DishwasherState = itunibo.prologUtils.prologUtils.parseState(myself, \"L\") "]
 			 */
 			["
-				val DishwasherState = getCurSol(\"L\").toString()
+				val DishwasherState = itunibo.prolog.prologUtils.parseTablewareState(myself, \"L\")
 			"]
 			emit  modelcontent: modelcontent(content( dishwasher( state( $DishwasherState ) ) ))
    		}else{
@@ -108,7 +103,7 @@ QActor pantry context ctxRoomElements{
 			 * Parsing in questo modo perche' il resto e' lato frontend
 			 */
 			["
-				val PantryState = getCurSol(\"L\").toString()
+				val PantryState = itunibo.prolog.prologUtils.parseTablewareState(myself, \"L\")
 			"]
 			emit  modelcontent: modelcontent(content( pantry( state( $PantryState ) ) ))
  		}else{
@@ -204,7 +199,7 @@ QActor table context ctxRoomElements{
 		solve(getFoodTableState(F))
 			ifSolved{
 			["		
-				val FoodState = getCurSol(\"F\").toString()
+				val FoodState = itunibo.prolog.prologUtils.parseFoodState(myself, \"F\")
 			"]
   			emit  modelcontent: modelcontent(content(tableFood(state($FoodState) ) ))
   			}else{
@@ -213,9 +208,9 @@ QActor table context ctxRoomElements{
   		solve(getTablewareTableState(T))
 			ifSolved{
 			["
-				val TableWareState = getCurSol(\"T\").toString()
+				val TablewareState = itunibo.prolog.prologUtils.parseTablewareState(myself, \"T\")
 			"]
-  			emit  modelcontent: modelcontent(content(tableTableware(state( $TableWareState) ) ))
+  			emit  modelcontent: modelcontent(content(tableTableware(state( $TablewareState) ) ))
    		}else{
    			println("getTablewareTableState FAIL")
    		}
@@ -254,9 +249,9 @@ QActor fridge context ctxRoomElements{	//<- il contesto?
 		solve(getFridgeState(L))
 		ifSolved{
 			["
-				val FridgeStateString = getCurSol(\"L\").toString()
+				val FridgeState = itunibo.prolog.prologUtils.parseFoodState(myself,\"L\")
 			"]
-  			emit  modelcontent: modelcontent(content( fridge( state( $FridgeStateString) ) ))
+  			emit  modelcontent: modelcontent(content( fridge( state( $FridgeState) ) ))
    		}else{
    			println("getFridgeState FAIL")
    		}
