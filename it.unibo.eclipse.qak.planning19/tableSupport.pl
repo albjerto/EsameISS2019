@@ -7,7 +7,7 @@
 removeGenericList([]).
 removeGenericList([food(F,N)]) :- !, getFood(F,N).
 removeGenericList([tableware(T,N)]) :- !, getTableware(T,N).
-removeGenericList([food(F,N)|T]) :- !, getFood(F,N), removeGenericList(T).
+removeGenericList([food(F,N)|T]) :- getFood(F,N), removeGenericList(T).
 removeGenericList([tableware(T,N)|T1]) :- getTableware(T,N), removeGenericList(T1).
 
 %% più elegante ma not sure che vada per il verso così
