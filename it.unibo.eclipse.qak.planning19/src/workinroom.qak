@@ -125,7 +125,7 @@ QActor butlermind context ctxWorkInRoom{
      	solve(showFoodState(F))
 			ifSolved{
 			["
-				val FoodState = getCurSol(\"F\").toString()
+				val FoodState = itunibo.prolog.prologUtils.parseFoodState(myself, \"F\")
 			"]
   			emit  modelcontent: modelcontent(content( butlerFood( state( $FoodState) ) ))
   			println("foodState emitted:$FoodState")
@@ -135,7 +135,7 @@ QActor butlermind context ctxWorkInRoom{
   		solve(showTablewareState(T))
 			ifSolved{
 			["
-				val TablewareState = getCurSol(\"T\").toString()
+				val TablewareState = itunibo.prolog.prologUtils.parseTablewareState(myself, \"T\")
 			"]
   			emit  modelcontent: modelcontent(content( butlerTableware( state( $TablewareState) ) ))	
   			println("tableware emitted:$TablewareState")		
