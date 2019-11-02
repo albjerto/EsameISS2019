@@ -132,15 +132,15 @@ QActor butlermind context ctxWorkInRoom{
   			}else{
    				println("showFoodState FAIL")
    			}
-  		solve(showTableWareState(T))
+  		solve(showTablewareState(T))
 			ifSolved{
 			["
-				val TableWareState = getCurSol(\"T\").toString()
+				val TablewareState = getCurSol(\"T\").toString()
 			"]
-  			emit  modelcontent: modelcontent(content( butlerTableWare( state( $TableWareState) ) ))	
-  			println("tableWare emitted:$TableWareState")		
+  			emit  modelcontent: modelcontent(content( butlerTableware( state( $TablewareState) ) ))	
+  			println("tableware emitted:$TablewareState")		
    		}else{
-   			println("showTableWareState FAIL")
+   			println("showTablewareState FAIL")
    		}
      }
      Transition t0
