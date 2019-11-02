@@ -117,9 +117,8 @@ QActor pantry context ctxRoomElements{
 			printCurrentMessage
 			["val Tableware = payloadArg(0)"]
 			solve(removeTablewareList($Tableware))
-			forward butlermind -m put : put($Tableware)
 			ifSolved {
-				
+				forward butlermind -m put : put($Tableware)
 			} else {
 				println("pantryGet FAIL")
 			}	
