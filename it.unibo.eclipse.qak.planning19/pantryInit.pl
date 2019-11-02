@@ -6,7 +6,7 @@ tableware(ciotola,20).
 tableware(bicchiere,20).
 tableware(forchetta,20).
 tableware(coltello,20).
-tableare(cucchiaio,20).
+tableware(cucchiaio,20).
 
 %% print dello stato (stampa anche tableware terminati)
 showPantryState :- tableware(T,N), outputTableware(T,N), fail.
