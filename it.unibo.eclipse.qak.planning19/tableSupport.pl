@@ -41,7 +41,7 @@ showFoodTableState.
 outputFood(F,N) :- stdout <- print(F), stdout <- print(' '), stdout <- println(N).
 
 %% genera la stringa contenente lo stato dei cibi sul tavolo (comprende anche eventuali cibi terminati) (da parsare lato kotlin)
-getFoodTableState(L) :- findall([F,N], food(F,N), L).
+getFoodTableState(L) :- findall(food(F,N), food(F,N), L).
 
 %% rimozione dal tavolo dei cibi specificati nella lista passata come argomento (per il consumo random?)
 removeFoodList([]).
