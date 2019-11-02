@@ -1,5 +1,5 @@
 showFoodState(F) :- findall(food(T,N),food(T,N),F).
-showTableWareState(F) :- findall(tableware(T,N),tableware(T,N),F).
+showTablewareState(F) :- findall(tableware(T,N),tableware(T,N),F).
 
 
 %% aggiunta nel frigo dei cibi specificati nella lista passata come argomento (per la clear)
