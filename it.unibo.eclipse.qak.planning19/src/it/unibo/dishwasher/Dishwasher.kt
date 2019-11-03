@@ -35,7 +35,7 @@ class Dishwasher ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						println("$name in ${currentState.stateName} | $currentMsg")
 						solve("getDishwasherState(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
-										val DishwasherState = getCurSol("L").toString()
+										val DishwasherState = itunibo.prolog.prologUtils.parseTablewareState(myself, "L")
 						emit("modelcontent", "modelcontent(content(dishwasher(state($DishwasherState))))" ) 
 						 }
 						else

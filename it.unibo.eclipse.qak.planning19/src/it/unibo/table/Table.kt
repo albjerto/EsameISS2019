@@ -66,7 +66,7 @@ class Table ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 						println("$name in ${currentState.stateName} | $currentMsg")
 						solve("getFoodTableState(F)","") //set resVar	
 						if(currentSolution.isSuccess()) { 		
-										val FoodState = getCurSol("F").toString()
+										val FoodState = itunibo.prolog.prologUtils.parseFoodState(myself, "F")
 						emit("modelcontent", "modelcontent(content(tableFood(state($FoodState))))" ) 
 						 }
 						else
@@ -74,8 +74,8 @@ class Table ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 						 }
 						solve("getTablewareTableState(T)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
-										val TableWareState = getCurSol("T").toString()
-						emit("modelcontent", "modelcontent(content(tableTableware(state($TableWareState))))" ) 
+										val TablewareState = itunibo.prolog.prologUtils.parseTablewareState(myself, "T")
+						emit("modelcontent", "modelcontent(content(tableTableware(state($TablewareState))))" ) 
 						 }
 						else
 						{ println("getTablewareTableState FAIL")

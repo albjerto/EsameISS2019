@@ -217,7 +217,7 @@ QActor table context ctxRoomElements{
 	
 }
 
-QActor fridge context ctxRoomElements{	//<- il contesto?
+QActor fridge context ctxRoomElements{
 	/*
 	 *fridge:
 	 * ->get, <-put

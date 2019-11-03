@@ -27,18 +27,18 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 					action { //it:State
 						println("&&&  fridge waiting for command")
 					}
-					 transition(edgeName="t08",targetState="putTask",cond=whenDispatch("put"))
-					transition(edgeName="t09",targetState="showStateTask",cond=whenDispatch("showState"))
-					transition(edgeName="t010",targetState="getTask",cond=whenDispatch("get"))
-					transition(edgeName="t011",targetState="checkTask",cond=whenDispatch("isAvailable"))
+					 transition(edgeName="t09",targetState="putTask",cond=whenDispatch("put"))
+					transition(edgeName="t010",targetState="showStateTask",cond=whenDispatch("showState"))
+					transition(edgeName="t011",targetState="getTask",cond=whenDispatch("get"))
+					transition(edgeName="t012",targetState="checkTask",cond=whenDispatch("isAvailable"))
 				}	 
 				state("showStateTask") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
 						solve("getFridgeState(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
-										val FridgeStateString = getCurSol("L").toString()
-						emit("modelcontent", "modelcontent(content(fridge(state($FridgeStateString))))" ) 
+										val FridgeState = itunibo.prolog.prologUtils.parseFoodState(myself,"L")
+						emit("modelcontent", "modelcontent(content(fridge(state($FridgeState))))" ) 
 						 }
 						else
 						{ println("getFridgeState FAIL")
@@ -55,7 +55,7 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 												val Food = payloadArg(0)
 								solve("removeFoodList($Food)","") //set resVar	
 								if(currentSolution.isSuccess()) { println("Food = $Food")
-								forward("put", "put($Food)" ,"butlermind" ) 
+								forward("put", "put($Food)" ,"serverproxy" ) 
 								 }
 								else
 								{ println("fridgeGet FAIL")
@@ -71,7 +71,7 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 								println("$name in ${currentState.stateName} | $currentMsg")
 								 val Food = payloadArg(0) 
 								solve("addFoodList('$Food')","") //set resVar	
-								if(currentSolution.isSuccess()) { forward("remove", "remove($Food)" ,"butlermind" ) 
+								if(currentSolution.isSuccess()) { forward("remove", "remove($Food)" ,"serverproxy" ) 
 								 }
 								else
 								{ println("fridgePut FAIL")
@@ -87,10 +87,10 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 								println("$name in ${currentState.stateName} | $currentMsg")
 								 val foodCode = payloadArg(0) 
 								solve("isThereFoodByCode('$foodCode')","") //set resVar	
-								if(currentSolution.isSuccess()) { forward("yes", "yes()" ,"butlermind" ) 
+								if(currentSolution.isSuccess()) { forward("yes", "yes()" ,"serverproxy" ) 
 								 }
 								else
-								{ forward("no", "no()" ,"butlermind" ) 
+								{ forward("no", "no()" ,"serverproxy" ) 
 								 }
 						}
 					}

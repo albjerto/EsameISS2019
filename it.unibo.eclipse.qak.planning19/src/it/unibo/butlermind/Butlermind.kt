@@ -76,21 +76,21 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						}
 						solve("showFoodState(F)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
-										val FoodState = getCurSol("F").toString()
+										val FoodState = itunibo.prolog.prologUtils.parseFoodState(myself, "F")
 						emit("modelcontent", "modelcontent(content(butlerFood(state($FoodState))))" ) 
 						println("foodState emitted:$FoodState")
 						 }
 						else
 						{ println("showFoodState FAIL")
 						 }
-						solve("showTableWareState(T)","") //set resVar	
+						solve("showTablewareState(T)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
-										val TableWareState = getCurSol("T").toString()
-						emit("modelcontent", "modelcontent(content(butlerTableWare(state($TableWareState))))" ) 
-						println("tableWare emitted:$TableWareState")
+										val TablewareState = itunibo.prolog.prologUtils.parseTablewareState(myself, "T")
+						emit("modelcontent", "modelcontent(content(butlerTableware(state($TablewareState))))" ) 
+						println("tableware emitted:$TablewareState")
 						 }
 						else
-						{ println("showTableWareState FAIL")
+						{ println("showTablewareState FAIL")
 						 }
 					}
 					 transition(edgeName="t07",targetState="msgHandler",cond=whenDispatch("targetReached"))

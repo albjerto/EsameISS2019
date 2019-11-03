@@ -36,7 +36,7 @@ class Pantry ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 						println("$name in ${currentState.stateName} | $currentMsg")
 						solve("getPantryState(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
-										val PantryState = getCurSol("L").toString()
+										val PantryState = itunibo.prolog.prologUtils.parseTablewareState(myself, "L")
 						emit("modelcontent", "modelcontent(content(pantry(state($PantryState))))" ) 
 						 }
 						else
@@ -52,8 +52,8 @@ class Pantry ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 								println("$name in ${currentState.stateName} | $currentMsg")
 								val Tableware = payloadArg(0)
 								solve("removeTablewareList($Tableware)","") //set resVar	
-								forward("put", "put($Tableware)" ,"butlermind" ) 
-								if(currentSolution.isSuccess()) {  }
+								if(currentSolution.isSuccess()) { forward("put", "put($Tableware)" ,"butlermind" ) 
+								 }
 								else
 								{ println("pantryGet FAIL")
 								 }
