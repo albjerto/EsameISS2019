@@ -49,7 +49,8 @@ QActor serverproxy context ctxFridge{
 	
 	State removeTask{
 		onMsg(remove : remove(C)){
-			["val responce=\"remove($payloadArg(0))\""]
+			["val payload=payloadArg(0)"]
+			["val responce=\"remove($payload)\""]
 			["itunibo.coap.server.CoapServerControl.coapRespond(responce)"]
 		}
 	}
@@ -67,7 +68,8 @@ QActor serverproxy context ctxFridge{
 			
 	State putTask{		
 		onMsg(put : put(C)){
-			["val responce=\"put($payloadArg(0))\""]
+			["val payload=payloadArg(0)"]
+			["val responce=\"put($payload)\""]
 			["itunibo.coap.server.CoapServerControl.coapRespond(responce)"]
 		}
 	}		
@@ -107,7 +109,7 @@ QActor serverproxy context ctxFridge{
 	
 	State modelcontentTask{
 		onMsg(modelcontent : modelcontent(ARG)){
-			["val responce=\"$payloadArg(0)\""]
+			["val responce=payloadArg(0)"]
 			["itunibo.coap.server.CoapServerControl.coapNotify()"]
 			["itunibo.coap.server.CoapServerControl.coapRespond(payloadArg(0))"]		
 		}	

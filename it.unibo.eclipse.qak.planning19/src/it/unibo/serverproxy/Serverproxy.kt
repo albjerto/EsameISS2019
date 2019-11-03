@@ -47,7 +47,8 @@ class Serverproxy ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("remove(ARG)"), Term.createTerm("remove(C)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								val responce="remove($payloadArg(0))"
+								val payload=payloadArg(0)
+								val responce="remove($payload)"
 								itunibo.coap.server.CoapServerControl.coapRespond(responce)
 						}
 					}
@@ -66,7 +67,8 @@ class Serverproxy ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(C)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								val responce="put($payloadArg(0))"
+								val payload=payloadArg(0)
+								val responce="put($payload)"
 								itunibo.coap.server.CoapServerControl.coapRespond(responce)
 						}
 					}
@@ -107,7 +109,7 @@ class Serverproxy ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("modelcontent(CONTENT)"), Term.createTerm("modelcontent(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								val responce="$payloadArg(0)"
+								val responce=payloadArg(0)
 								itunibo.coap.server.CoapServerControl.coapNotify()
 								itunibo.coap.server.CoapServerControl.coapRespond(payloadArg(0))
 						}
