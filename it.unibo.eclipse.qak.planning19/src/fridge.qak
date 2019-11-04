@@ -20,6 +20,104 @@ Dispatch remove			:	remove(ARG)
 Context ctxFridge     ip [host="localhost" port=8038]   -mqtt 
 
 
+//funziona senza proxy
+QActor fridgecoap context ctxFridge{	
+	/*
+	 *fridge:
+	 * ->get, <-put
+	 * ->isAvailable, <-yes/<-no
+	 * ->put, <-remove
+	 */
+	
+	 ["val actor=this"]
+
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		["itunibo.coap.server.CoapServerControl.create(actor,\"fridge\")"]
+		println("&&&  coap fridge STARTED")
+	}
+	Goto waitCmd
+	
+	State waitCmd{
+		println("&&&  fridge waiting for command")
+	}
+	
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg showState -> showStateTask
+				 	 whenMsg get -> getTask
+				 	 whenMsg isAvailable -> checkTask
+
+	
+	
+	State showStateTask{
+		printCurrentMessage
+		solve(getFridgeState(L))
+		ifSolved{
+			["
+				val FridgeState = itunibo.prolog.prologUtils.parseFoodState(myself,\"L\")
+			"]
+			["itunibo.coap.server.CoapServerControl.coapRespond(FridgeState)"]
+  			
+   		}else{
+   			println("getFridgeState FAIL")
+   		}
+	}Goto waitCmd
+	
+	
+	
+	State getTask{
+		printCurrentMessage
+		onMsg(get: get(ARG)){
+			[" 
+				val Food = payloadArg(0)
+			"]
+			
+			solve(removeFoodList($Food))
+			ifSolved {
+				println("Food = $Food")
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"put($Food)\")"]
+				["itunibo.coap.server.CoapServerControl.coapNotify()"]		
+			} else {
+				println("fridgeGet FAIL")
+			}
+		}
+	}
+	Goto waitCmd
+	
+	
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			[" val Food = payloadArg(0) "]
+			solve(addFoodList("$Food"))
+			ifSolved {
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"remove($Food)\")"]
+				["itunibo.coap.server.CoapServerControl.coapNotify()"]		
+			} else {
+				println("fridgePut FAIL")
+			}		
+		}
+	}Goto waitCmd
+	
+	State checkTask{
+		onMsg(isAvailable: isAvailable(ARG)){
+			printCurrentMessage
+			[" val foodCode = payloadArg(0) "]
+			solve(isThereFoodByCode("$foodCode"))
+			ifSolved {
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"yes()\")"]
+			} else {
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"no()\")"]
+			}	
+		}
+	}Goto waitCmd
+}
+
+
+
+
+/* 
+
 QActor serverproxy context ctxFridge{
 	["val actor=this"]	
 	State s0 initial{
@@ -114,20 +212,11 @@ QActor serverproxy context ctxFridge{
 			["itunibo.coap.server.CoapServerControl.coapRespond(payloadArg(0))"]		
 		}	
 	}
-	Goto waitCmd
-	
-	
-		  
+	Goto waitCmd	  
 }
 
 
 QActor fridge context ctxFridge{	//<- il contesto?
-	/*
-	 *fridge:
-	 * ->get, <-put
-	 * ->isAvailable, <-yes/<-no
-	 * ->put, <-remove
-	 */
 
 	State s0 initial{
 		solve(consult("fridgeInit.pl"))
@@ -204,3 +293,15 @@ QActor fridge context ctxFridge{	//<- il contesto?
 		}
 	}Goto waitCmd
 }
+
+*/
+
+
+
+
+
+
+
+
+
+

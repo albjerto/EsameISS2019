@@ -40,7 +40,7 @@ class CoapServerControl (name : String ) : CoapResource(name) {
 	}
 		
 		fun coapRespond(msg :String){
-			println("imposto risposto coap: $msg");
+			println("imposto risposta coap: $msg");
 			GlobalScope.launch{
 				channel.send(msg)
 			}	

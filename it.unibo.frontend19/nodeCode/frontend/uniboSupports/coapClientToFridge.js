@@ -75,7 +75,7 @@ exports.observeFridge= function(){
 	    	console.log("coap event:  " + response.payload); //.toString(); TODO non credo di dover stampar il payload ma l'id
 			io.sockets.send("fridge:" + response.payload);		
 		},
-		new Buffer("showFridgeState()")
+		new Buffer("showState()")
 		
     )
     .then(() => { console.log("coap: observing"+ coapResourceAddr);})
