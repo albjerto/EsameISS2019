@@ -93,7 +93,7 @@ app.get('/appl', function(req, res) {
   		next();
  	});		
 	app.post("/add", function(req, res,next) {
-  		publishMsgToFridgeWithCode(  "add", req.param('foodCode')  );	//aggiunto foodCode --> la add viene mandata al robot o al frigo?? al frigo
+  		publishMsgToButlerapplicationWithCode(  "add", req.param('foodCode')  );	//aggiunto foodCode --> la add viene mandata al robot o al frigo?? al robot
   		next();
  	});		
 	app.post("/stopappl", function(req, res,next) {
@@ -253,7 +253,11 @@ var publishMsgToButlerapplication = function (cmd){
    	mqttUtils.publish( msgstr, "unibo/qak/butlermind" );
 }
 
-
+var publishMsgToButlerapplicationWithCode = function (cmd, foodCode){
+   	var msgstr = "msg("+ cmd + ",dispatch,js,butlermind,"+ cmd +"("+ foodCode +"),1)"  ;  //TODO: replace 1 with counter
+  	console.log("publishMsgToButlerapplicationWithCode forward> "+ msgstr);
+   	mqttUtils.publish( msgstr, "unibo/qak/butlermind" );
+}
 
 //--------------------------------------------------------------
 
