@@ -7,12 +7,14 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry
 import it.unibo.kactor.ActorBasic
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import it.unibo.kactor.ApplMessage
 
 object CoapClientControl: CoapHandler {
 	
 		private lateinit var client: CoapClient
 		private lateinit var proxyActor :ActorBasic
-	
+		private lateinit var sender :String
+		
 		fun create(actor :ActorBasic , serverAddr : String ){
 			println("ProxyClientFridge create serverAddr = $serverAddr")
 			client   = CoapClient( serverAddr )
@@ -20,8 +22,9 @@ object CoapClientControl: CoapHandler {
 		}
 	
 	
-		fun send(msg :String){
-			client.put(this, msg, MediaTypeRegistry.TEXT_PLAIN);	
+		fun send(msg :ApplMessage){
+			sender= msg.msgSender();
+			client.put(this, msg.msgContent(), MediaTypeRegistry.TEXT_PLAIN);	
 		}
 	
 	
@@ -30,7 +33,7 @@ object CoapClientControl: CoapHandler {
 				val id = message.substringBefore("(")
 				GlobalScope.launch{
 					println("Messaggio ottenuto: $message")
-					proxyActor.autoMsg(id,message)
+					proxyActor.forward(sender,id,message)
 				}
 			
 			

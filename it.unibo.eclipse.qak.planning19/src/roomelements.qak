@@ -300,3 +300,70 @@ QActor fridge context ctxRoomElements{
 		}
 	}Goto waitCmd
 }
+
+
+
+QActor proxyfridge context ctxRoomElements{
+	/*
+	 *fridge:
+	 * ->get, <-put
+	 * ->isAvailable, <-yes/<-no
+	 * ->put, <-remove
+	 */
+	["val actor=this"]
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		["itunibo.coap.client.CoapClientControl.create(actor,\"fridge\")"]
+		println("&&&  fridge STARTED")
+	}
+	Goto waitCmd
+	
+	State waitCmd{
+		println("&&&  fridge waiting for command")
+	}
+	
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg showState -> showStateTask
+				 	 whenMsg get -> getTask
+				 	 whenMsg isAvailable -> checkTask
+
+	
+	
+	State showStateTask{
+		printCurrentMessage
+		//solve(showFridgeState)
+		["itunibo.coap.client.CoapClientControl.send(\"showState()\")"]
+	}Goto waitCmd
+	
+	State getTask{
+		printCurrentMessage
+		onMsg(get: get(ARG)){
+			[" 
+				val Food = payloadArg(0)
+			"]
+			
+			["itunibo.coap.client.CoapClientControl.send(\"get($Food)\")"]
+		}
+	}
+	Goto waitCmd
+	
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			[" val Food = payloadArg(0) "]
+			["itunibo.coap.client.CoapClientControl.send(\"put($Food)\")"]
+		}
+	}Goto waitCmd
+	
+	State checkTask{
+		onMsg(isAvailable: isAvailable(ARG)){
+			printCurrentMessage
+			[" val foodCode = payloadArg(0) "]
+			["itunibo.coap.client.CoapClientControl.send(\"isAvailable($foodCode)\")"]
+			
+		}
+	}Goto waitCmd
+}
+
+
+
