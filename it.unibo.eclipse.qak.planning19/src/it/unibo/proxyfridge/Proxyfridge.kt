@@ -15,14 +15,13 @@ class Proxyfridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 	}
 		
 	override fun getBody() : (ActorBasicFsm.() -> Unit){
-		
-			val actor=this
-			val serverAddr="coap://localhost:5683"
+		val actor=this
 		return { //this:ActionBasciFsm
 				state("s0") { //this:State
 					action { //it:State
-						println("&&&  proxyClientFridge STARTED")
-						itunibo.coap.client.CoapClientControl.create(actor,serverAddr)
+						solve("consult('fridgeInit.pl')","") //set resVar	
+						itunibo.coap.client.CoapClientControl.create(actor,"fridge")
+						println("&&&  fridge STARTED")
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
@@ -30,42 +29,49 @@ class Proxyfridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 					action { //it:State
 						println("&&&  fridge waiting for command")
 					}
-					 transition(edgeName="t029",targetState="prepareTask",cond=whenDispatch("prepare"))
-					transition(edgeName="t030",targetState="addTask",cond=whenDispatch("add"))
-					transition(edgeName="t031",targetState="clearTask",cond=whenDispatch("clear"))
-					transition(edgeName="t032",targetState="showTask",cond=whenDispatch("showFridgeState"))
-					transition(edgeName="t033",targetState="checkAvailability",cond=whenDispatch("isAvailable"))
+					 transition(edgeName="t012",targetState="putTask",cond=whenDispatch("put"))
+					transition(edgeName="t013",targetState="showStateTask",cond=whenDispatch("showState"))
+					transition(edgeName="t014",targetState="getTask",cond=whenDispatch("get"))
+					transition(edgeName="t015",targetState="checkTask",cond=whenDispatch("isAvailable"))
 				}	 
-				state("prepareTask") { //this:State
+				state("showStateTask") { //this:State
 					action { //it:State
-						itunibo.coap.client.CoapClientControl.send("prepare")
+						println("$name in ${currentState.stateName} | $currentMsg")
+						itunibo.coap.client.CoapClientControl.send(currentMsg)
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
-				state("addTask") { //this:State
+				state("getTask") { //this:State
 					action { //it:State
-						itunibo.coap.client.CoapClientControl.send("add")
-					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
-				}	 
-				state("clearTask") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("clear(ARG)"), Term.createTerm("clear(S)"), 
+						println("$name in ${currentState.stateName} | $currentMsg")
+						if( checkMsgContent( Term.createTerm("get(ARG)"), Term.createTerm("get(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								itunibo.coap.client.CoapClientControl.send("clear")
+								 
+												val Food = payloadArg(0)
+								itunibo.coap.client.CoapClientControl.send(currentMsg)
 						}
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
-				state("showTask") { //this:State
+				state("putTask") { //this:State
 					action { //it:State
-						itunibo.coap.client.CoapClientControl.send("showFridgeState")
+						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("$name in ${currentState.stateName} | $currentMsg")
+								 val Food = payloadArg(0) 
+								itunibo.coap.client.CoapClientControl.send(currentMsg)
+						}
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
-				state("checkAvailability") { //this:State
+				state("checkTask") { //this:State
 					action { //it:State
-						itunibo.coap.client.CoapClientControl.send("isAvailable")
+						if( checkMsgContent( Term.createTerm("isAvailable(ARG)"), Term.createTerm("isAvailable(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								println("$name in ${currentState.stateName} | $currentMsg")
+								 val foodCode = payloadArg(0) 
+								itunibo.coap.client.CoapClientControl.send(currentMsg)
+						}
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
