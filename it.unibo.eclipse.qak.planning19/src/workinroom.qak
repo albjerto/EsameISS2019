@@ -16,17 +16,17 @@ Dispatch stepFail      : stepFail(R,T) //R=ok | obstacle, T = time
 Dispatch execButlerPlan: execButlerPlan( ACTION )
 
 Dispatch prepare       	: prepare(ARG)
-Dispatch clear			: clear(ARG)
-Dispatch add			: add(ARG)
-Dispatch get			: get(ARG)
+Dispatch clear		: clear(ARG)
+Dispatch add		: add(ARG)
+Dispatch get		: get(ARG)
 Dispatch put         	: put(ARG)
 Dispatch remove         : remove(ARG)
 Dispatch waitCommand	: waitCommand(ARG)
-Dispatch end			: end(ARG)
+Dispatch end		: end(ARG)
 
-Dispatch isAvailable	: isAvalaible(CODE) // per il controllo presenza cibo nel frigo
-Dispatch yes			: yes()
-Dispatch no				: no()
+Dispatch isAvailable	: isAvailable(CODE) // per il controllo presenza cibo nel frigo
+Dispatch yes		: yes(ARG)
+Dispatch no		: no(ARG)
 
 Dispatch moveButlerTo  : moveButlerTo(X,Y,D) 
 Dispatch goalReached   : goalReached(V)  	//V=ok | ko
@@ -67,6 +67,7 @@ QActor butlermind context ctxWorkInRoom{
 		solve(consult("butlermindInit.pl"))	
 		solve(consult("prepareFoodList.pl"))
 		solve(consult("prepareTablewareList.pl"))
+		solve(consult("foodCodePairs.pl"))
   	}
   	Goto waitPrepare
   	
@@ -153,15 +154,15 @@ QActor butlermind context ctxWorkInRoom{
      	
      }
 	Transition t0 
-    	 whenMsg add 				-> isAvaliable
+    	 whenMsg add 				-> isAvailableTask
     	 whenMsg clear  			-> doClear
      
      
-      State isAvaliable{
+      State isAvailableTask{
      	onMsg(add: add(ARG)){
-     		["val code = payloadArg(0)"]
-     		println("&&&  butlermind doadd")
-     		forward butlerplanexecutor -m isAvailable :isAvalaible(code)
+     		["val Code = payloadArg(0)"]
+     		println("&&& butlermind isAvailableTask")
+     		forward fridge -m isAvailable :isAvailable($Code)
      	}	
   	}
   	Transition t0 
@@ -170,10 +171,10 @@ QActor butlermind context ctxWorkInRoom{
      
      
      State doAdd{
-     	onMsg(add: add(ARG)){
-     		["val code = payloadArg(0)"]
-     		println("&&&  butlermind doadd")
-     		solve(add(code))
+     	onMsg(yes: yes(ARG)){
+     		["val Code = payloadArg(0)"]
+     		println("&&&  butlermind doAdd")
+     		solve(add($Code))
      		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(add)
      	}	
   	}
@@ -183,7 +184,7 @@ QActor butlermind context ctxWorkInRoom{
   	State doClear{
   		onMsg(get: get(ARG)){
      		["val state = payloadArg(0)"]
-     		println("&&&  butlermind doadd")
+     		println("&&& butlermind doClear")
      		solve(clear)	
      		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(clear)
      	}	
