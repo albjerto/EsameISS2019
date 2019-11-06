@@ -15,8 +15,8 @@ Dispatch add			:	add(ARG)
 Dispatch get			:	get(ARG)
 Dispatch put			:	put(ARG)
 Dispatch remove			:	remove(ARG)
-Dispatch yes			:	yes()
-Dispatch no				: 	no()
+Dispatch yes			:	yes(ARG)
+Dispatch no			: 	no(ARG)
 
 Context ctxRoomElements    	ip [host="localhost" port=8037]   -mqtt 
 Context ctxDummyWorkInRoom 	ip [host="workinroomhost" port=8038]   -mqtt
@@ -290,12 +290,12 @@ QActor fridge context ctxRoomElements{
 	State checkTask{
 		onMsg(isAvailable: isAvailable(ARG)){
 			printCurrentMessage
-			[" val foodCode = payloadArg(0) "]
-			solve(isThereFoodByCode("$foodCode"))
+			[" val FoodCode = payloadArg(0) "]
+			solve(isThereFoodByCode($FoodCode))
 			ifSolved {
-				forward butlermind -m yes : yes()
+				forward butlermind -m yes : yes($FoodCode)
 			} else {
-				forward butlermind -m no : no()
+				forward butlermind -m no : no($FoodCode)
 			}	
 		}
 	}Goto waitCmd
