@@ -30,19 +30,14 @@ prepare	 :- 	getPrepareFood(F), assert(msg(fridge,get, get(F))),
     			assert(msg(table,put, put(F))),
     			getPrepareTableware(T) , assert(msg(pantry,get, get(T))),
     			assert(msg(table,put, put(T))),
-				assert(msg(butlermind,waitcmd,waitcmd(ok))).
+				assert(msg(butlermind,waitCommand,waitCommand(ok))).
     
-add(F)	:- 		assert(msg(fridge,get, get(F))),
-    			assert(msg(table,put, put(F))),
-				assert(msg(butlermind,waitcmd,waitcmd(ok))).
+add(C)	:- 		pair(F,C),
+				assert(msg(fridge,get,get([food(F,1)]))),
+    			assert(msg(table,put,put([food(F,1)]))),
+				assert(msg(butlermind,waitCommand,waitCommand(ok))).
     
 clear	:-		assert(msg(table,clear,clear([]))),
-    		   	assert(msg(frigo,put, put(F)):- getFood(F)),
+    		   	assert(msg(fridge,put, put(F)):- getFood(F)),
     			assert(msg(dishwasher,put, put(T)):- getTableware(T)),
 				assert(msg(butlermind,end,end(ok))).
-    
-    
-    
-    
-    
-    
