@@ -1,5 +1,6 @@
 # buonNatali
 Ancora da fare (aggiornare se ci ricordiamo altro):
+- capire come mai (ma chi sarai) dopo un tot dall'ultimo messaggio inviato, il frontend lo ri-invia -> crea problemi con la add se non faccio niente per un po' dato che la ripete
 - discutere su se/come realizzare la randomConsumption (renderla pluggable con un attore a sè stante che all'avvio fa un check nella kb per una regola del tipo randomConsumption(true) e trovandola si avvia per inviare un messaggio di randomConsumption al table ogni tot secondi? -> così siamo noi a configurare se vogliamo o meno la randomConsumption scrivendolo in un file prolog di cui faccio il consult all'avvio dell'attore -> attore starebbe nello stesso contesto del table e nel file roomelements.qak)
 - decidere come gestire i cibi del frigo dopo la clear (se prevediamo che si possa fare <b>prepare</b> dopo <b>clear</b>, bisogna decidere se mantenere nel frigo il cibo inserito dalla clear alla fine del party o se cassare via tutto e ri-inizializzare il frigo)
 - rendere il frigo funzionante con coap 
