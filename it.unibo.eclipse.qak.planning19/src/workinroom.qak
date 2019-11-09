@@ -178,7 +178,8 @@ QActor butlermind context ctxWorkInRoom{
      		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(add)
      	}	
   	}
-  	Goto msgHandler
+  	Transition t0 
+  			whenMsg targetReached   -> msgHandler
   	
   	
   	State doClear{
