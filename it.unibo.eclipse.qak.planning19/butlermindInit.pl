@@ -39,7 +39,8 @@ add(C)	:- 		pair(F,C),
     			assert(msg(table,put,put([food(F,1)]))),
 				assert(msg(butlermind,waitCommand,waitCommand(ok))).
     
-clear	:-		assert(msg(table,clear,clear([]))),
+clear	:-		assert(msg(table,getfood,getfood())),
     		   	assert(msg(fridge,put, put(F)):- getFood(F)),
+				assert(msg(table,gettableware, gettableware()),
     			assert(msg(dishwasher,put, put(T)):- getTableware(T)),
 				assert(msg(butlermind,end,end(ok))).
