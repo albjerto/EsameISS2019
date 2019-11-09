@@ -48,7 +48,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						forward("modelUpdate", "modelUpdate(roomMap,$MapStr)" ,"resourcemodel" ) 
 						println("&&&  workerinroom STARTED")
 					}
-					 transition(edgeName="t014",targetState="setGoalAndDo",cond=whenDispatch("moveButlerTo"))
+					 transition(edgeName="t016",targetState="setGoalAndDo",cond=whenDispatch("moveButlerTo"))
 				}	 
 				state("setGoalAndDo") { //this:State
 					action { //it:State
@@ -81,7 +81,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						forward("modelUpdate", "modelUpdate(roomMap,$MapStr)" ,"resourcemodel" ) 
 						replyToCaller("goalReached", "goalReached(ok)")
 					}
-					 transition(edgeName="t015",targetState="setGoalAndDo",cond=whenDispatch("moveButlerTo"))
+					 transition(edgeName="t017",targetState="setGoalAndDo",cond=whenDispatch("moveButlerTo"))
 				}	 
 				state("checkAndDoAction") { //this:State
 					action { //it:State
@@ -101,22 +101,22 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 						itunibo.planner.moveUtils.attemptTomoveAhead(myself ,StepTime )
 						timePreStep = System.currentTimeMillis()
 					}
-					 transition(edgeName="t016",targetState="handleStopAppl",cond=whenEvent("stopAppl"))
-					transition(edgeName="t017",targetState="handleStepOk",cond=whenDispatch("stepOk"))
-					transition(edgeName="t018",targetState="hadleStepFail",cond=whenDispatch("stepFail"))
+					 transition(edgeName="t018",targetState="handleStopAppl",cond=whenEvent("stopAppl"))
+					transition(edgeName="t019",targetState="handleStepOk",cond=whenDispatch("stepOk"))
+					transition(edgeName="t020",targetState="hadleStepFail",cond=whenDispatch("stepFail"))
 				}	 
 				state("handleStopAppl") { //this:State
 					action { //it:State
 						println("APPLICATION STOPPED. Waiting for a reactivate")
 					}
-					 transition(edgeName="t019",targetState="handleReactivateAppl",cond=whenEvent("reactivateAppl"))
+					 transition(edgeName="t021",targetState="handleReactivateAppl",cond=whenEvent("reactivateAppl"))
 				}	 
 				state("handleReactivateAppl") { //this:State
 					action { //it:State
 						println("APPLICATION RESUMED")
 					}
-					 transition(edgeName="t020",targetState="handleStepOk",cond=whenDispatch("stepOk"))
-					transition(edgeName="t021",targetState="hadleStepFail",cond=whenDispatch("stepFail"))
+					 transition(edgeName="t022",targetState="handleStepOk",cond=whenDispatch("stepOk"))
+					transition(edgeName="t023",targetState="hadleStepFail",cond=whenDispatch("stepFail"))
 				}	 
 				state("handleStepOk") { //this:State
 					action { //it:State

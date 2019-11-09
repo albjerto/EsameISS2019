@@ -23,6 +23,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						solve("consult('butlermindInit.pl')","") //set resVar	
 						solve("consult('prepareFoodList.pl')","") //set resVar	
 						solve("consult('prepareTablewareList.pl')","") //set resVar	
+						solve("consult('foodCodePairs.pl')","") //set resVar	
 					}
 					 transition( edgeName="goto",targetState="waitPrepare", cond=doswitch() )
 				}	 
@@ -67,7 +68,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								val Arg = payloadArg(0)
-								solve("addFoodList($Arg)","") //set resVar	
+								solve("addList($Arg)","") //set resVar	
 						}
 						if( checkMsgContent( Term.createTerm("remove(ARG)"), Term.createTerm("remove(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
@@ -99,16 +100,16 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 					action { //it:State
 						println("&& butlermind wait cmd")
 					}
-					 transition(edgeName="t08",targetState="isAvaliable",cond=whenDispatch("add"))
+					 transition(edgeName="t08",targetState="isAvailableTask",cond=whenDispatch("add"))
 					transition(edgeName="t09",targetState="doClear",cond=whenDispatch("clear"))
 				}	 
-				state("isAvaliable") { //this:State
+				state("isAvailableTask") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("add(ARG)"), Term.createTerm("add(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								val code = payloadArg(0)
-								println("&&&  butlermind doadd")
-								forward("isAvailable", "isAvalaible(code)" ,"butlerplanexecutor" ) 
+								val Code = payloadArg(0)
+								println("&&& butlermind isAvailableTask")
+								forward("isAvailable", "isAvailable($Code)" ,"fridge" ) 
 						}
 					}
 					 transition(edgeName="t010",targetState="doAdd",cond=whenDispatch("yes"))
@@ -116,27 +117,23 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				}	 
 				state("doAdd") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("add(ARG)"), Term.createTerm("add(ARG)"), 
+						if( checkMsgContent( Term.createTerm("yes(ARG)"), Term.createTerm("yes(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								val code = payloadArg(0)
-								println("&&&  butlermind doadd")
-								solve("add(code)","") //set resVar	
+								val Code = payloadArg(0)
+								println("&&&  butlermind doAdd")
+								solve("add($Code)","") //set resVar	
 								forward("execButlerPlan", "execButlerPlan(add)" ,"butlerplanexecutor" ) 
 						}
 					}
-					 transition( edgeName="goto",targetState="msgHandler", cond=doswitch() )
+					 transition(edgeName="t012",targetState="msgHandler",cond=whenDispatch("targetReached"))
 				}	 
 				state("doClear") { //this:State
 					action { //it:State
-						if( checkMsgContent( Term.createTerm("get(ARG)"), Term.createTerm("get(ARG)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								val state = payloadArg(0)
-								println("&&&  butlermind doadd")
-								solve("clear","") //set resVar	
-								forward("execButlerPlan", "execButlerPlan(clear)" ,"butlerplanexecutor" ) 
-						}
+						println("&&& butlermind doClear")
+						solve("clear","") //set resVar	
+						forward("execButlerPlan", "execButlerPlan(clear)" ,"butlerplanexecutor" ) 
 					}
-					 transition( edgeName="goto",targetState="msgHandler", cond=doswitch() )
+					 transition(edgeName="t013",targetState="msgHandler",cond=whenDispatch("targetReached"))
 				}	 
 			}
 		}

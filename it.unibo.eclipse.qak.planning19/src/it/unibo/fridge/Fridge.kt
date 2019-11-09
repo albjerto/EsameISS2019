@@ -85,12 +85,12 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 						if( checkMsgContent( Term.createTerm("isAvailable(ARG)"), Term.createTerm("isAvailable(ARG)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("$name in ${currentState.stateName} | $currentMsg")
-								 val foodCode = payloadArg(0) 
-								solve("isThereFoodByCode('$foodCode')","") //set resVar	
-								if(currentSolution.isSuccess()) { forward("yes", "yes()" ,"butlermind" ) 
+								 val FoodCode = payloadArg(0) 
+								solve("isThereFoodByCode($FoodCode)","") //set resVar	
+								if(currentSolution.isSuccess()) { forward("yes", "yes($FoodCode)" ,"butlermind" ) 
 								 }
 								else
-								{ forward("no", "no()" ,"butlermind" ) 
+								{ forward("no", "no($FoodCode)" ,"butlermind" ) 
 								 }
 						}
 					}

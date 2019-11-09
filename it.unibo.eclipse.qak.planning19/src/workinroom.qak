@@ -115,7 +115,7 @@ QActor butlermind context ctxWorkInRoom{
      	printCurrentMessage
      	onMsg(put: put(ARG)) {
      		["val Arg = payloadArg(0)"]
-     		solve(addFoodList($Arg)) 	
+     		solve(addList($Arg)) 	
      	} 	 	
      	onMsg(remove: remove(ARG)) {
      		["val Arg = payloadArg(0)"]
@@ -182,15 +182,14 @@ QActor butlermind context ctxWorkInRoom{
   			whenMsg targetReached   -> msgHandler
   	
   	
-  	State doClear{
-  		onMsg(get: get(ARG)){
-     		["val state = payloadArg(0)"]
-     		println("&&& butlermind doClear")
-     		solve(clear)	
-     		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(clear)
-     	}	
+  	State doClear{    	
+     	println("&&& butlermind doClear")
+     	solve(clear)	
+     	forward butlerplanexecutor -m execButlerPlan : execButlerPlan(clear)
+     		
   	}
-  	Goto msgHandler
+  	Transition t0 
+  			whenMsg targetReached   -> msgHandler
      
 }	
 

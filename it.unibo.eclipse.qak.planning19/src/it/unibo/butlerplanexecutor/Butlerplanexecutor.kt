@@ -30,7 +30,7 @@ class Butlerplanexecutor ( name: String, scope: CoroutineScope ) : ActorBasicFsm
 					action { //it:State
 						println("&&& butlerplanexecutor doWork")
 					}
-					 transition(edgeName="t012",targetState="doButlerPlan",cond=whenDispatch("execButlerPlan"))
+					 transition(edgeName="t014",targetState="doButlerPlan",cond=whenDispatch("execButlerPlan"))
 				}	 
 				state("doButlerPlan") { //this:State
 					action { //it:State
@@ -64,7 +64,7 @@ class Butlerplanexecutor ( name: String, scope: CoroutineScope ) : ActorBasicFsm
 				state("waitEndOfButlerPlanMove") { //this:State
 					action { //it:State
 					}
-					 transition(edgeName="t013",targetState="doTheButlerJob",cond=whenDispatch("goalReached"))
+					 transition(edgeName="t015",targetState="doTheButlerJob",cond=whenDispatch("goalReached"))
 				}	 
 				state("doTheButlerJob") { //this:State
 					action { //it:State

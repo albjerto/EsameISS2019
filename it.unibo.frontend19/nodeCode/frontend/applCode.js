@@ -240,9 +240,9 @@ var publishMsgToFridge= function (cmd){
 var observeRoom = function(){
 	 publishMsgToDishwasher("showState");
 	 publishMsgToPantry("showState");
-	 //publishMsgToFridge("showState");
+	 publishMsgToFridge("showState");
 	 publishMsgToTable("showState");
-	 coapFridge.observeFridge();
+	 //coapFridge.observeFridge();
 }
 
 
