@@ -22,7 +22,9 @@ remove([H|L]) :- retract(H), remove(L).
 getPrepareTableware(F) :- findall(tableware(T,N),toPrepare(tableware(T,N)),F).
 
 
-consumeMessage(A,B,C) :- msg(A,B,C),clause(msg(A,B,C),BODY),retract(msg(A,B,C):-BODY2).
+consumeMessage(A,B,C) :- msg(A,B,C), clause(msg(_,_,_),BODY), handleBody(BODY).
+handleBody(true) :- retract(msg(_,_,_)).
+handleBody(BODY) :- retract(msg(_,_,_):- BODY).
 
 
 
