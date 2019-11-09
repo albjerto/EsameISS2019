@@ -3,9 +3,9 @@ showTablewareState(F) :- findall(tableware(T,N),tableware(T,N),F).
 
 
 %% aggiunta nel frigo dei cibi specificati nella lista passata come argomento (per la clear)
-addFoodList([]).
-addFoodList([A]) :- !, assert(A).
-addFoodList([H|T]) :- assert(H), addFoodList(T).
+addList([]).
+addList([A]) :- !, assert(A).
+addList([H|T]) :- assert(H), addList(T).
 
 
 getPrepareFood(F) :- findall(food(T,N),toPrepare(food(T,C,N)),F).

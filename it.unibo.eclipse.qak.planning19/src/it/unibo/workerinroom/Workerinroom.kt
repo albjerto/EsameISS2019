@@ -27,7 +27,7 @@ class Workerinroom ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name
 		//var PauseTime  = 500 
 		
 		//VIRTUAL ROBOT
-		var StepTime   = 369	//for virtual // modificato era a 330
+		var StepTime   = 595		//for virtual // modificato era a 330
 		var PauseTime  = 500
 		
 		var PauseTimeL  = PauseTime.toLong()
