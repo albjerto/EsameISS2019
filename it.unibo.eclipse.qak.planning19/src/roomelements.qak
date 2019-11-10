@@ -161,7 +161,8 @@ QActor table context ctxRoomElements{
 		println("&&& table waiting for command")
 	}
 	Transition t0	 whenMsg put -> putTask
-				 	 whenMsg clear -> clearTask
+				 	 whenMsg clearFood -> clearFoodTask
+				 	 whenMsg clearTableware -> clearTablewareTask
 				 	 whenMsg showState -> showStateTask
 					//whenMsg add -> AddTask	per riaggiungere piatti puliti?
 	
@@ -180,16 +181,29 @@ QActor table context ctxRoomElements{
 		 }
 	}Goto showStateTask
 	
-	State clearTask{		//da rivedere
+	State clearFoodTask{
 		printCurrentMessage
-		 solve(clear(L))
+		 solve(clearFood(L))
 		 ifSolved {
 			["
 			val List = getCurSol(\"L\").toString()
 			"]
 			forward butlermind -m put : put($List)
 		 } else {
-			println("clearTable FAIL")
+			println("clearFoodTable FAIL")
+		 }
+	}Goto showStateTask
+	
+	State clearTablewareTask{
+		printCurrentMessage
+		 solve(clearTableware(L))
+		 ifSolved {
+			["
+			val List = getCurSol(\"L\").toString()
+			"]
+			forward butlermind -m put : put($List)
+		 } else {
+			println("clearTablewareTable FAIL")
 		 }
 	}Goto showStateTask
 	
