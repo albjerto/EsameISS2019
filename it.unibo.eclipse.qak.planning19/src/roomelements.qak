@@ -17,6 +17,8 @@ Dispatch put			:	put(ARG)
 Dispatch remove			:	remove(ARG)
 Dispatch yes			:	yes(ARG)
 Dispatch no			: 	no(ARG)
+Dispatch clearFood		:	clearFood(ARG)
+Dispatch clearTableware		:	clearTableware(ARG)
 
 Context ctxRoomElements    	ip [host="localhost" port=8037]   -mqtt 
 Context ctxDummyWorkInRoom 	ip [host="workinroomhost" port=8038]   -mqtt
