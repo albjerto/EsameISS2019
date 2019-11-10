@@ -12,7 +12,7 @@ getDishwasherState(L) :- findall(tableware(T,N), tableware(T,N), L).
 %% aggiunta alla dishwasher dei tableware specificati nella lista passata come argomento (per la clear)
 addTablewareList([]).
 addTablewareList([tableware(T,N)]) :- !, putTableware(T,N).
-addTablewareList([tableware(T,N)|T]) :- putTableware(T,N), addTablewareList(T).
+addTablewareList([tableware(T,N)|T1]) :- putTableware(T,N), addTablewareList(T1).
 
 %% aggiunta di una quantità N del tableware T
 %% la prima put commentata non dovrebbe servire dato che l'aggiunta di tableware alla dishwasher è 
