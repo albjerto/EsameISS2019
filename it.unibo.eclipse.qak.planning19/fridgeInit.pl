@@ -4,34 +4,34 @@
 
 %% bevande
 food(succoBuono,b01,5).
-food(birraBella,b02,5).
+%% food(birraBella,b02,5).
 food(acquaGelidaImbevibile,b03,5).
-food(punchNeiDenti,b04,5).
+%% food(punchNeiDenti,b04,5).
 
 %% frutta
-food(meloneVerdeImmaturo,f01,5).
+%% food(meloneVerdeImmaturo,f01,5).
 food(peschePescate,f02,5).
 food(meleMlem,f03,5).
 
 %% verdura
 food(pomodoriComePatatine,v01,5).
 food(caroteCheSuccedeAmico,v02,5).
-food(ravanelliXtraSpicy,v03,5).
+%% food(ravanelliXtraSpicy,v03,5).
 
 %% affettato
-food(salameGrassissimo,a01,5).
-food(prosciuttoTroppoCostoso,a02,5).
+%% food(salameGrassissimo,a01,5).
+%% food(prosciuttoTroppoCostoso,a02,5).
 food(coppaDeiCampioni,a03,5).
 food(mortazzaDelVanish,a04,5).
 
 %% salato
-food(pizzetteCompleanno,s01,5).
+%% food(pizzetteCompleanno,s01,5).
 food(quelleRobePastaSfogliaEWurstel,s02,5).
 food(piadaDelParco,s03,5).
 
 %% dolci
 food(pannaCottaPoco,d01,5).
-food(mascarponeDaMontagna,d02,5).
+%% food(mascarponeDaMontagna,d02,5).
 food(cheeseCakeHoFame,d03,5).
 
 %% print dello stato (stampa anche cibi terminati)
