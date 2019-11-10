@@ -10,26 +10,12 @@ removeGenericList([tableware(T,N)]) :- !, getTableware(T,N).
 removeGenericList([food(F,N)|T]) :- getFood(F,N), removeGenericList(T).
 removeGenericList([tableware(T,N)|T1]) :- getTableware(T,N), removeGenericList(T1).
 
-%% più elegante ma not sure che vada per il verso così
-%%removeGenericList([]).
-%%removeGenericList([H]) :- removeFoodList(H).
-%%removeGenericList([H]) :- removeTablewareList(H).
-%%removeGenericList([H|T]) :- removeFoodList(H), !, removeGenericList(T).
-%%removeGenericList([H|T]) :- removeTablewareList(H), removeGenericList(T).
-
 %% aggiunge al tavolo tutti gli item specificati, che siano food o tableware
 addGenericList([]).
 addGenericList([food(F,N)]) :- !, putFood(F,N).
 addGenericList([tableware(T,N)]) :- !, putTableware(T,N).
 addGenericList([food(F,N)|T]) :- putFood(F,N), addGenericList(T).
 addGenericList([tableware(T,N)|T1]) :- putTableware(T,N), addGenericList(T1).
-
-%% più elegante ma not sure che vada per il verso così
-%%addGenericList([]).
-%%addGenericList([H]) :- addFoodList(H).
-%%addGenericList([H]) :- addTablewareList(H).
-%%addGenericList([H|T]) :- addFoodList(H), !, addGenericList(T).
-%%addGenericList([H|T]) :- addTablewareList(H), addGenericList(T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -62,6 +48,9 @@ addFoodList([food(F,N)|T]) :- putFood(F,N), addFoodList(T).
 putFood(F,N) :- food(F,N1), !, retract(food(F,N1)), N2 is N1 + N, assert(food(F,N2)).
 putFood(F,N) :- assert(food(F,N)).
 
+%% rimozione di tutti i cibi dal tavolo e ottenimento loro lista
+clearFood(L) :- getFoodTableState(L), retractall(food(_,_)).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%% roba relativa ai tableware %%%%%%%%%%%%%%%%%%%%%
@@ -92,6 +81,9 @@ addTablewareList([tableware(T,N)|T]) :- putTableware(T,N), addTablewareList(T).
 %% di cancellare elementi dalla prepareTablewareList anzichè aggiornare solo le quantità)
 putTableware(T,N) :- tableware(T,N1), !, retract(tableware(T,N1)), N2 is N1 + N, assert(tableware(T,N2)).
 putTableware(T,N) :- assert(tableware(T,N)).
+
+%% rimozione di tutti i tableware dal tavolo e ottenimento loro lista
+clearTableware(L) :- getTablewareTableState(L), retractall(tableware(_,_)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
