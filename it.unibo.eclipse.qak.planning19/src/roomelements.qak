@@ -64,7 +64,7 @@ QActor dishwasher context ctxRoomElements{
 		onMsg(put: put(ARG)){
 			printCurrentMessage
 			[" val List = payloadArg(0) "]
-			solve(addTablewareList("$List"))
+			solve(addTablewareList($List))
 			ifSolved {
 				forward butlermind -m remove : remove($List)
 			} else {
@@ -278,7 +278,7 @@ QActor fridge context ctxRoomElements{
 		onMsg(put: put(ARG)){
 			printCurrentMessage
 			[" val Food = payloadArg(0) "]
-			solve(addFoodList("$Food"))
+			solve(addFoodList($Food))
 			ifSolved {
 				forward butlermind -m remove : remove($Food)
 			} else {
