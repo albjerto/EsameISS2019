@@ -6,9 +6,16 @@
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <script>
+
 function escapeRegExp(str) {
     return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
+
+function parseMessage(msg, type){
+	m = msg.replace(type + ":state('", "").replace("')", "");
+	return "<br/><pre>"+ m.replace(/@/g, "<br/>")+"</pre>";
+}
+
        var socket  = io.connect();
        socket.on('connect', function(){ 
         		console.log("socket connected");
@@ -17,25 +24,26 @@ function escapeRegExp(str) {
        		console.log("RECEIVED " + v);
         	if( v.indexOf("robotState:") >= 0 ){document.getElementById('robotDisplay').innerHTML=v; }
         	if( v.indexOf("sonarRobot:") >= 0 ){document.getElementById('sonarRobotDisplay').innerHTML=v; }
-			if( v.indexOf("fridge:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-				v1 = v.replace("fridge:state('", "").replace("')", "");
-				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-				document.getElementById('fridgeDisplay').innerHTML=v2; 
+			if( v.indexOf("fridge:") >= 0 ){
+				document.getElementById('fridgeDisplay').innerHTML = parseMessage(v,"fridge"); 
 			}
-			if( v.indexOf("tableFood:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-				v1 = v.replace("tableFood:state('", "").replace("')", "");
-				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-				document.getElementById('foodTableDisplay').innerHTML=v2; 
+			if( v.indexOf("tableFood:") >= 0 ){
+				document.getElementById('foodTableDisplay').innerHTML = parseMessage(v,"tableFood"); 
 			}
-			if( v.indexOf("tableTableware:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-				v1 = v.replace("tableTableware:state('", "").replace("')", "");
-				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-				document.getElementById('tablewareTableDisplay').innerHTML=v2; 
+			if( v.indexOf("tableTableware:") >= 0 ){
+				document.getElementById('tablewareTableDisplay').innerHTML = parseMessage(v,"tableTableware"); 
 			}
-			if( v.indexOf("dishwasher:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-				v1 = v.replace("dishwasher:state('", "").replace("')", "");
-				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-				document.getElementById('dishwasherDisplay').innerHTML=v2; 
+			if( v.indexOf("dishwasher:") >= 0 ){
+				document.getElementById('dishwasherDisplay').innerHTML = parseMessage(v,"dishwasher"); 
+			}
+			if( v.indexOf("pantry:") >= 0 ){
+				document.getElementById('pantryDisplay').innerHTML = parseMessage(v,"pantry"); 
+			}
+			if( v.indexOf("butlerFood:") >= 0 ){
+				document.getElementById('butlerFoodDisplay').innerHTML = parseMessage(v,"butlerFood"); 
+			}
+			if( v.indexOf("butlerTableware:") >= 0 ){
+				document.getElementById('butlerTablewareDisplay').innerHTML = parseMessage(v,"butlerTableware"); 
 			}
 			if( v.indexOf("roomMap:") >= 0 ){
 				v1 = v.replace("roomMap:state('", "").replace("')", "");
@@ -43,23 +51,8 @@ function escapeRegExp(str) {
 				console.log("v2= " + v2);
 				document.getElementById('mapDisplay').innerHTML=v2; 
 			}
-			if( v.indexOf("pantry:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-				v1 = v.replace("pantry:state('", "").replace("')", "");
-				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-				document.getElementById('pantryDisplay').innerHTML=v2; 
-			}
-			if( v.indexOf("butlerFood:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-				v1 = v.replace("butlerFood:state('", "").replace("')", "");
-				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-				document.getElementById('butlerFoodDisplay').innerHTML=v2; 
-			}
-			if( v.indexOf("butlerTableware:") >= 0 ){ // parsing della stringa qua perché non sembra reggere il \n altrimenti
-				v1 = v.replace("butlerTableware:state('", "").replace("')", "");
-				v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
-				document.getElementById('butlerTablewareDisplay').innerHTML=v2; 
-			}
-			
        	});
+
 </script>
  
 </head>
@@ -157,7 +150,9 @@ The event is handled by robotCmdExec.py
 
 	</table>
 </center>
---> 
+-->
+
+<!--
 <h2>Application console</h2>   
 <center>
 			<table >	
@@ -179,6 +174,7 @@ The event is handled by robotCmdExec.py
 						</td>
 				</table>
 </center> 
+-->
 
 <h2>Maitre console</h2>   
 <center>
