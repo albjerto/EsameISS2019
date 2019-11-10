@@ -1,5 +1,5 @@
-showFoodState(F) :- findall(food(T,N),food(T,N),F).
-showTablewareState(F) :- findall(tableware(T,N),tableware(T,N),F).
+showFoodState(L) :- findall(food(F,N),food(F,N),L).
+showTablewareState(L) :- findall(tableware(T,N),tableware(T,N),L).
 
 
 %% aggiunta nel frigo dei cibi specificati nella lista passata come argomento (per la clear)
@@ -8,23 +8,23 @@ addList([A]) :- !, assert(A).
 addList([H|T]) :- assert(H), addList(T).
 
 
-getPrepareFood(F) :- findall(food(T,N),toPrepare(food(T,C,N)),F).
+getPrepareFood(L) :- findall(food(F,N),toPrepare(food(F,C,N)),L).
 
 
-getFood(F) :- findall(food(T,N),food(T,N),F),remove(F).
-getTableware(F) :- findall(tableware(T,N),tableware(T,N),F), remove(F).
+getFood(L) :- findall(food(F,N),food(F,N),L),remove(L).
+getTableware(L) :- findall(tableware(T,N),tableware(T,N),L), remove(L).
 
 remove([]).
 remove([H]) :- !,retract(H) .
 remove([H|L]) :- retract(H), remove(L).
 
 
-getPrepareTableware(F) :- findall(tableware(T,N),toPrepare(tableware(T,N)),F).
+getPrepareTableware(L) :- findall(tableware(T,N),toPrepare(tableware(T,N)),L).
 
 
-consumeMessage(A,B,C) :- msg(A,B,C), clause(msg(_,_,_),BODY), handleBody(BODY).
-handleBody(true) :- retract(msg(_,_,_)).
-handleBody(BODY) :- retract(msg(_,_,_):- BODY).
+consumeMessage(A,B,C) :- msg(A,B,C), clause(msg(_,_,_), BODY), handleBody(BODY).
+handleBody(true) :- retract( msg(_,_,_) ).
+handleBody(BODY) :- retract( msg(_,_,_) :- BODY ).
 
 
 
@@ -39,8 +39,8 @@ add(C)	:- 		pair(F,C),
     			assert(msg(table,put,put([food(F,1)]))),
 				assert(msg(butlermind,waitCommand,waitCommand(ok))).
     
-clear	:-		assert(msg(table,getfood,getfood())),
+clear	:-		assert(msg(table,clearFood,clearFood(go))),
     		   	assert(msg(fridge,put, put(F)):- getFood(F)),
-				assert(msg(table,gettableware, gettableware())),
+				assert(msg(table,clearTableware, clearTableware(go))),
     			assert(msg(dishwasher,put, put(T)):- getTableware(T)),
 				assert(msg(butlermind,end,end(ok))).
