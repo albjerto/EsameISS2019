@@ -63,6 +63,6 @@ addFoodList([food(F,N)]) :- !, putFoodByName(F,N).
 addFoodList([food(F,N)|T]) :- putFoodByName(F,N), addFoodList(T).
 
 %% aggiunta di una quantità N del cibo con code C
-putFoodByName(C,N) :- food(F,C,N1), retract(food(F,C,N1)), N2 is N1 + N, assert(food(F,C,N2)).
+putFoodByName(F,N) :- food(F,C,N1), retract(food(F,C,N1)), N2 is N1 + N, assert(food(F,C,N2)).
 %% aggiunta di una quantità N del cibo con code C
 putFoodByCode(C,N) :- food(F,C,N1), retract(food(F,C,N1)), N2 is N1 + N, assert(food(F,C,N2)).
