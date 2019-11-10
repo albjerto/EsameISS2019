@@ -6,34 +6,34 @@
 
 %% bevande
 toPrepare(food(succoBuono,b01,3)).
-toPrepare(food(birraBella,b02,3)).
+%% toPrepare(food(birraBella,b02,3)).
 toPrepare(food(acquaGelidaImbevibile,b03,3)).
-toPrepare(food(punchNeiDenti,b04,3)).
+%% toPrepare(food(punchNeiDenti,b04,3)).
 
 %% frutta
-toPrepare(food(meloneVerdeImmaturo,f01,3)).
+%% toPrepare(food(meloneVerdeImmaturo,f01,3)).
 toPrepare(food(peschePescate,f02,3)).
 toPrepare(food(meleMlem,f03,3)).
 
 %% verdura
 toPrepare(food(pomodoriComePatatine,v01,3)).
 toPrepare(food(caroteCheSuccedeAmico,v02,3)).
-toPrepare(food(ravanelliXtraSpicy,v03,3)).
+%% toPrepare(food(ravanelliXtraSpicy,v03,3)).
 
 %% affettato
-toPrepare(food(salameGrassissimo,a01,3)).
-toPrepare(food(prosciuttoTroppoCostoso,a02,3)).
+%% toPrepare(food(salameGrassissimo,a01,3)).
+%% toPrepare(food(prosciuttoTroppoCostoso,a02,3)).
 toPrepare(food(coppaDeiCampioni,a03,3)).
 toPrepare(food(mortazzaDelVanish,a04,3)).
 
 %% salato
-toPrepare(food(pizzetteCompleanno,s01,3)).
+%% toPrepare(food(pizzetteCompleanno,s01,3)).
 toPrepare(food(quelleRobePastaSfogliaEWurstel,s02,3)).
 toPrepare(food(piadaDelParco,s03,3)).
 
 %% dolci
 toPrepare(food(pannaCottaPoco,d01,3)).
-toPrepare(food(mascarponeDaMontagna,d02,3)).
+%% toPrepare(food(mascarponeDaMontagna,d02,3)).
 toPrepare(food(cheeseCakeHoFame,d03,3)).
 
 %% print dei cibi nella prepareFoodList (NON stampa eventuali cibi che non si vogliono prendere)
