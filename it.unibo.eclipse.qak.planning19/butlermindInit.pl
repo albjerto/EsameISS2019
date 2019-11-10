@@ -41,6 +41,6 @@ add(C)	:- 		pair(F,C),
     
 clear	:-		assert(msg(table,getfood,getfood())),
     		   	assert(msg(fridge,put, put(F)):- getFood(F)),
-				assert(msg(table,gettableware, gettableware()),
+				assert(msg(table,gettableware, gettableware())),
     			assert(msg(dishwasher,put, put(T)):- getTableware(T)),
 				assert(msg(butlermind,end,end(ok))).
