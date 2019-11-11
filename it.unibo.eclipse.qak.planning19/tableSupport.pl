@@ -35,7 +35,7 @@ removeFoodList([food(F,N)]) :- !, getFood(F,N).
 removeFoodList([food(F,N)|T]) :- getFood(F,N), removeFoodList(T).
 
 %% rimozione di una quantità N del cibo F
-getFood(F,N) :- food(F,N1), retract(food(F,N1)), N2 is N1 - N, assert(food(F,N2)).
+getFood(F,N) :- food(F,N1), N1 >= N, retract(food(F,N1)), N2 is N1 - N, assert(food(F,N2)).
 
 %% aggiunta sul tavolo dei cibi specificati nella lista passata come argomento (per la prepare)
 addFoodList([]).
@@ -69,7 +69,7 @@ removeTablewareList([tableware(T,N)]) :- !, getTableware(T,N).
 removeTablewareList([tableware(T,N)|T1]) :- getTableware(T,N), removeTablewareList(T1).
 
 %% rimozione di una quantità N del tableware T
-getTableware(T,N) :- tableware(T,N1), retract(tableware(T,N1)), N2 is N1 - N, assert(tableware(T,N2)).
+getTableware(T,N) :- tableware(T,N1), N1 >= N, retract(tableware(T,N1)), N2 is N1 - N, assert(tableware(T,N2)).
 
 %% aggiunta sul tavolo dei tableware specificati nella lista passata come argomento (per la prepare)
 addTablewareList([]).
