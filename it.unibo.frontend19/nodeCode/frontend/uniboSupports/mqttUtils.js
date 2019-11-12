@@ -15,11 +15,13 @@ var io  ; 	//Upgrade for socketIo;
 var robotModel    = "none";
 var sonarModel    = "none";
 var roomMapModel  = "none";
-var fridgeModel = "none"; // per show contenuto del fridge sul frontend
-var tableFoodModel = "none"; // per show contenuto del cibo sul tavolo sul frontend
-var tableTablewareModel = "none"; // per show contenuto del tableware sul tavolo sul frontend
-var dishwasherModel = "none"; // per show contenuto della dishwasher sul frontend
-var pantryModel = "none"
+var fridgeModel = "none";
+var tableFoodModel = "none";
+var tableTablewareModel = "none";
+var dishwasherModel = "none";
+var pantryModel = "none";
+var butlerFoodModel = "none";
+var butlerTablewareModel = "none";
 
 console.log("mqtt client= " + client );
 
@@ -46,11 +48,11 @@ client.on('message', function (topic, message){
   var spRobot			= msgStr.indexOf("robot");
   var spSonarRobot		= msgStr.indexOf("sonarRobot");
   var spRoomMap			= msgStr.indexOf("roomMap");
-  var spFridge			= msgStr.indexOf("fridge"); // elaborazione relativa al fridge
-  var spTableFood		= msgStr.indexOf("tableFood"); // elaborazione relativa al cibo sul tavolo
-  var spTableTableware	= msgStr.indexOf("tableTableware"); // elaborazione relativa al tableware sul tavolo
-  var spDishwasher		= msgStr.indexOf("dishwasher"); // elaborazione relativa alla dishwasher
-  var spPantry			= msgStr.indexOf("pantry"); // elaborazione relativa alla dishwasher
+  var spFridge			= msgStr.indexOf("fridge");
+  var spTableFood		= msgStr.indexOf("tableFood");
+  var spTableTableware	= msgStr.indexOf("tableTableware");
+  var spDishwasher		= msgStr.indexOf("dishwasher");
+  var spPantry			= msgStr.indexOf("pantry");
   var spButlerFood		= msgStr.indexOf("butlerFood"); 
   var spButlerTableware	= msgStr.indexOf("butlerTableware");
    
@@ -63,10 +65,10 @@ client.on('message', function (topic, message){
 	  if( spRobot > 0      ) { msg = msg + "robotState:"; robotModel   = msg+content ;   };
 	  if( spSonarRobot > 0 ) { msg = msg + "sonarRobot:"; sonarModel   = msg+content ; };
 	  if( spRoomMap > 0 )    { msg = msg + "roomMap:";    roomMapModel = msg+content ; };
-	  if( spFridge > 0 )     { msg = msg + "fridge:";     fridgeModel  = msg+content ; }; // elaborazione relativa al fridge
-	  if( spTableFood > 0 )     { msg = msg + "tableFood:";     tableFoodModel  = msg+content ; }; // elaborazione relativa al cibo sul tavolo
-	  if( spTableTableware > 0 )     { msg = msg + "tableTableware:"; tableTablewareModel  = msg+content ; }; // elaborazione relativa al tableware sul tavolo
-	  if( spDishwasher > 0 )     { msg = msg + "dishwasher:";     dishwasherModel  = msg+content ; }; // elaborazione relativa alla dishwasher
+	  if( spFridge > 0 )     { msg = msg + "fridge:";     fridgeModel  = msg+content ; };
+	  if( spTableFood > 0 )     { msg = msg + "tableFood:";     tableFoodModel  = msg+content ; };
+	  if( spTableTableware > 0 )     { msg = msg + "tableTableware:"; tableTablewareModel  = msg+content ; };
+	  if( spDishwasher > 0 )     { msg = msg + "dishwasher:";     dishwasherModel  = msg+content ; };
 	  if( spPantry > 0 )     { msg = msg + "pantry:";     pantryModel  = msg+content ; };
 	  if( spButlerFood > 0 )     { msg = msg + "butlerFood:";     butlerFoodModel  = msg+content ; }; 
 	  if( spButlerTableware > 0 )     { msg = msg + "butlerTableware:";     butlerTablewareModel  = msg+content ; };
