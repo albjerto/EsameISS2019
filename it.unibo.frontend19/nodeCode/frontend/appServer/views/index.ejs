@@ -24,6 +24,10 @@ function parseMessage(msg, type){
        		console.log("RECEIVED " + v);
         	if( v.indexOf("robotState:") >= 0 ){document.getElementById('robotDisplay').innerHTML=v; }
         	if( v.indexOf("sonarRobot:") >= 0 ){document.getElementById('sonarRobotDisplay').innerHTML=v; }
+		if( v.indexOf("info:") >= 0 ){
+				v1 = v.replace("info:state(", "").replace(")", "");
+				// v2 = "<br/><pre>"+ v1.replace(/@/g, "<br/>")+"</pre>";
+				document.getElementById('infoDisplay').innerHTML=v1;
 			if( v.indexOf("fridge:") >= 0 ){
 				document.getElementById('fridgeDisplay').innerHTML = parseMessage(v,"fridge"); 
 			}
@@ -217,6 +221,9 @@ The event is handled by robotCmdExec.py
 </center> 										
 </div>
 <div style="background-color: #FAF19C">
+	<div>
+  		<b>INFO</b>: <span id="infoDisplay"></span>
+	</div>
 	<div>
   		<b>BUTLER STATE</b>: <br/>
 		<b>&nbsp&nbsp&nbsp&nbsp&nbspFOOD STATE</b>: <span id="butlerFoodDisplay"></span> <br/>
