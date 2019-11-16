@@ -79,6 +79,7 @@ QActor resourcemodel context ctxRobotMind{
  * MIND
  * reacts to changes in the model
  */
+ 
 QActor robotmind context ctxRobotMind{   
 ["var goingForward = false"] 
 	State s0 initial {	  

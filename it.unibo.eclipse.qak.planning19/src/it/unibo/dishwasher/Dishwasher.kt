@@ -21,7 +21,7 @@ class Dishwasher ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						println("&&& dishwasher STARTED")
 						solve("consult('dishwasherSupport.pl')","") //set resVar	
 					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
 				}	 
 				state("waitCmd") { //this:State
 					action { //it:State

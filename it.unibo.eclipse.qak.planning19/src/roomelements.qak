@@ -36,7 +36,7 @@ QActor dishwasher context ctxRoomElements{
 		// preparazione futura gestione dishwasher
 		solve(consult("dishwasherSupport.pl"))
 	}
-	Goto waitCmd	
+	Goto showStateTask	
 	
 	State waitCmd{
 		println("&&& dishwasher waiting for command")
@@ -87,7 +87,7 @@ QActor pantry context ctxRoomElements{
 		println("&&& pantry STARTED")
 		solve(consult("pantryInit.pl")) //da controllare perchè non va con quel file
 	}
-	Goto waitCmd		
+	Goto showStateTask		
 	
 	State waitCmd{
 		println("&&& pantry waiting for command")
@@ -157,7 +157,7 @@ QActor table context ctxRoomElements{
 		println("&&& table STARTED")
 		solve(consult("tableSupport.pl")) 
 	}
-	Goto waitCmd	
+	Goto showStateTask	
 	
 	State waitCmd{
 		println("&&& table waiting for command")
@@ -166,7 +166,6 @@ QActor table context ctxRoomElements{
 				 	 whenMsg clearFood -> clearFoodTask
 				 	 whenMsg clearTableware -> clearTablewareTask
 				 	 whenMsg showState -> showStateTask
-					//whenMsg add -> AddTask	per riaggiungere piatti puliti?
 	
 	State putTask{
 		onMsg(put: put(ARG)){
@@ -241,7 +240,7 @@ QActor fridge context ctxRoomElements{
 		solve(consult("fridgeInit.pl"))
 		println("&&&  fridge STARTED")
 	}
-	Goto waitCmd
+	Goto showStateTask
 	
 	State waitCmd{
 		println("&&&  fridge waiting for command")

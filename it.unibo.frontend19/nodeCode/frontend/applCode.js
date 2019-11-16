@@ -237,14 +237,6 @@ var publishMsgToFridge= function (cmd){
 }
 
 
-var observeRoom = function(){
-	 publishMsgToDishwasher("showState");
-	 publishMsgToPantry("showState");
-	 publishMsgToFridge("showState");
-	 publishMsgToTable("showState");
-	 //coapFridge.observeFridge();
-}
-
 
 //Towards the butler application => send to butlermind
 var publishMsgToButlerapplication = function (cmd){
@@ -273,7 +265,6 @@ var publishEmitEvent = function( ev, evContent ){
 */
 app.use( function(req,res){
 	console.info("SENDING THE ANSWER " + result + " json:" + req.accepts('json') );
-	observeRoom();
 	
 	try{
 	    console.log("answer> "+ result  );

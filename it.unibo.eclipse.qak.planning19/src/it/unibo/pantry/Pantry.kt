@@ -21,7 +21,7 @@ class Pantry ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 						println("&&& pantry STARTED")
 						solve("consult('pantryInit.pl')","") //set resVar	
 					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
 				}	 
 				state("waitCmd") { //this:State
 					action { //it:State

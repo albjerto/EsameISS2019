@@ -21,7 +21,7 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 						solve("consult('fridgeInit.pl')","") //set resVar	
 						println("&&&  fridge STARTED")
 					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
 				}	 
 				state("waitCmd") { //this:State
 					action { //it:State
