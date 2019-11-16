@@ -28,8 +28,9 @@ class Table ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 						println("&&& table waiting for command")
 					}
 					 transition(edgeName="t05",targetState="putTask",cond=whenDispatch("put"))
-					transition(edgeName="t06",targetState="clearTask",cond=whenDispatch("clear"))
-					transition(edgeName="t07",targetState="showStateTask",cond=whenDispatch("showState"))
+					transition(edgeName="t06",targetState="clearFoodTask",cond=whenDispatch("clearFood"))
+					transition(edgeName="t07",targetState="clearTablewareTask",cond=whenDispatch("clearTableware"))
+					transition(edgeName="t08",targetState="showStateTask",cond=whenDispatch("showState"))
 				}	 
 				state("putTask") { //this:State
 					action { //it:State
@@ -47,16 +48,30 @@ class Table ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scope
 					}
 					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
 				}	 
-				state("clearTask") { //this:State
+				state("clearFoodTask") { //this:State
 					action { //it:State
 						println("$name in ${currentState.stateName} | $currentMsg")
-						solve("clear(L)","") //set resVar	
+						solve("clearFood(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
 									val List = getCurSol("L").toString()
 						forward("put", "put($List)" ,"butlermind" ) 
 						 }
 						else
-						{ println("clearTable FAIL")
+						{ println("clearFoodTable FAIL")
+						 }
+					}
+					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
+				}	 
+				state("clearTablewareTask") { //this:State
+					action { //it:State
+						println("$name in ${currentState.stateName} | $currentMsg")
+						solve("clearTableware(L)","") //set resVar	
+						if(currentSolution.isSuccess()) { 
+									val List = getCurSol("L").toString()
+						forward("put", "put($List)" ,"butlermind" ) 
+						 }
+						else
+						{ println("clearTablewareTable FAIL")
 						 }
 					}
 					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )

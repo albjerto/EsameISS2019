@@ -58,7 +58,6 @@ class Fridgecoap ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 								solve("removeFoodList($Food)","") //set resVar	
 								if(currentSolution.isSuccess()) { println("Food = $Food")
 								itunibo.coap.server.CoapServerControl.coapRespond("put($Food)")
-								itunibo.coap.server.CoapServerControl.coapNotify()
 								 }
 								else
 								{ println("fridgeGet FAIL")
@@ -73,9 +72,8 @@ class Fridgecoap ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("$name in ${currentState.stateName} | $currentMsg")
 								 val Food = payloadArg(0) 
-								solve("addFoodList('$Food')","") //set resVar	
+								solve("addFoodList($Food)","") //set resVar	
 								if(currentSolution.isSuccess()) { itunibo.coap.server.CoapServerControl.coapRespond("remove($Food)")
-								itunibo.coap.server.CoapServerControl.coapNotify()
 								 }
 								else
 								{ println("fridgePut FAIL")
@@ -91,10 +89,10 @@ class Fridgecoap ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 								println("$name in ${currentState.stateName} | $currentMsg")
 								 val foodCode = payloadArg(0) 
 								solve("isThereFoodByCode('$foodCode')","") //set resVar	
-								if(currentSolution.isSuccess()) { itunibo.coap.server.CoapServerControl.coapRespond("yes()")
+								if(currentSolution.isSuccess()) { itunibo.coap.server.CoapServerControl.coapRespond("yes($foodCode)")
 								 }
 								else
-								{ itunibo.coap.server.CoapServerControl.coapRespond("no()")
+								{ itunibo.coap.server.CoapServerControl.coapRespond("no($foodCode)")
 								 }
 						}
 					}

@@ -233,13 +233,9 @@ QActor table context ctxRoomElements{
 	
 }
 
+
 QActor fridge context ctxRoomElements{
-	/*
-	 *fridge:
-	 * ->get, <-put
-	 * ->isAvailable, <-yes/<-no
-	 * ->put, <-remove
-	 */
+	
 
 	State s0 initial{
 		solve(consult("fridgeInit.pl"))
@@ -318,7 +314,6 @@ QActor fridge context ctxRoomElements{
 }
 
 
-
 QActor proxyfridge context ctxRoomElements{
 	/*
 	 *fridge:
@@ -330,12 +325,12 @@ QActor proxyfridge context ctxRoomElements{
 	State s0 initial{
 		solve(consult("fridgeInit.pl"))
 		["itunibo.coap.client.CoapClientControl.create(actor,\"fridge\")"]
-		println("&&&  fridge STARTED")
+		println("&&&  proxyfridge STARTED")
 	}
 	Goto waitCmd
 	
 	State waitCmd{
-		println("&&&  fridge waiting for command")
+		println("&&&  proxyfridge waiting for command")
 	}
 	
 	Transition t0	 whenMsg put -> putTask
@@ -348,35 +343,48 @@ QActor proxyfridge context ctxRoomElements{
 	State showStateTask{
 		printCurrentMessage
 		//solve(showFridgeState)
-		["itunibo.coap.client.CoapClientControl.send(currentMsg)"]
+		["	val response = itunibo.coap.client.CoapClientControl.send(\"showState()\")
+			val FridgeState=response!!.getResponseText()
+		"]
+		emit  modelcontent: modelcontent(content( fridge( state( $FridgeState) ) ))
+		
+		
 	}Goto waitCmd
 	
 	State getTask{
 		printCurrentMessage
 		onMsg(get: get(ARG)){
-			[" 
-				val Food = payloadArg(0)
-			"]
 			
-			["itunibo.coap.client.CoapClientControl.send(currentMsg)"]
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+			"]
+			forward butlermind -m put : $Message
+			
 		}
 	}
-	Goto waitCmd
+	Goto showStateTask
 	
 	State putTask{
 		onMsg(put: put(ARG)){
 			printCurrentMessage
-			[" val Food = payloadArg(0) "]
-			["itunibo.coap.client.CoapClientControl.send(currentMsg)"]
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+			"]
+			forward butlermind -m remove : $Message
 		}
-	}Goto waitCmd
+	}Goto showStateTask
+	
 	
 	State checkTask{
 		onMsg(isAvailable: isAvailable(ARG)){
 			printCurrentMessage
 			[" val foodCode = payloadArg(0) "]
-			["itunibo.coap.client.CoapClientControl.send(currentMsg)"]
-			
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+				val Id = Message.substringBefore(\"(\")
+				forward(Id, Message ,\"butlermind\" ) 
+				println(\"id:$Id Message:$Message\")
+			"]
 		}
 	}Goto waitCmd
 }

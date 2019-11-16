@@ -50,7 +50,7 @@ class Dishwasher ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								println("$name in ${currentState.stateName} | $currentMsg")
 								 val List = payloadArg(0) 
-								solve("addTablewareList('$List')","") //set resVar	
+								solve("addTablewareList($List)","") //set resVar	
 								if(currentSolution.isSuccess()) { forward("remove", "remove($List)" ,"butlermind" ) 
 								 }
 								else

@@ -10,7 +10,7 @@ context(ctxdummyroomelements, "localhost",  "MQTT", "0" ).
   qactor( basicrobot, ctxdummyformind, "external").
   qactor( dishwasher, ctxdummyroomelements, "external").
   qactor( pantry, ctxdummyroomelements, "external").
-  qactor( fridge, ctxdummyroomelements, "external").
+  qactor( proxyfridge, ctxdummyroomelements, "external").
   qactor( table, ctxdummyroomelements, "external").
   qactor( butlermind, ctxworkinroom, "it.unibo.butlermind.Butlermind").
   qactor( butlerplanexecutor, ctxworkinroom, "it.unibo.butlerplanexecutor.Butlerplanexecutor").

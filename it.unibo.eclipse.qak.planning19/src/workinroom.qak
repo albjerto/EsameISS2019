@@ -56,13 +56,14 @@ ExternalQActor basicrobot    context ctxDummyForMind
 
 ExternalQActor dishwasher context ctxDummyRoomElements
 ExternalQActor pantry context ctxDummyRoomElements
-ExternalQActor fridge context ctxDummyRoomElements
+ExternalQActor proxyfridge context ctxDummyRoomElements
 ExternalQActor table context ctxDummyRoomElements
 
 
 QActor butlermind context ctxWorkInRoom{     
 ["var ButlerStarted = false"]
 	State s0 initial {	
+		
 		println("&&&  butlermind STARTED ")	
 		solve(consult("butlermindInit.pl"))	
 		solve(consult("prepareFoodList.pl"))
@@ -162,7 +163,7 @@ QActor butlermind context ctxWorkInRoom{
      	onMsg(add: add(ARG)){
      		["val Code = payloadArg(0)"]
      		println("&&& butlermind isAvailableTask")
-     		forward fridge -m isAvailable :isAvailable($Code)
+     		forward proxyfridge -m isAvailable :isAvailable($Code)
      	}	
   	}
   	Transition t0 
@@ -276,7 +277,7 @@ var curmoveIsForward = false
 //var PauseTime  = 500 
 
 //VIRTUAL ROBOT
-var StepTime   = 595		//for virtual // modificato era a 330
+var StepTime   = 360		//for virtual // modificato era a 330
 var PauseTime  = 500
 
 var PauseTimeL  = PauseTime.toLong()

@@ -9,37 +9,27 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import it.unibo.kactor.ApplMessage
 
-object CoapClientControl: CoapHandler {
+object CoapClientControl {
 	
 		private lateinit var client: CoapClient
 		private lateinit var proxyActor :ActorBasic
-		private lateinit var sender :String
 		
 		fun create(actor :ActorBasic , serverAddr : String ){
 			println("ProxyClientFridge create serverAddr = $serverAddr")
-			client   = CoapClient( serverAddr )
+			client   = CoapClient( "coap://localhost:5684/" +serverAddr )
 			proxyActor=actor;
 		}
 	
 	
-		fun send(msg :ApplMessage){
-			sender= msg.msgSender();
-			client.put(this, msg.msgContent(), MediaTypeRegistry.TEXT_PLAIN);	
-		}
-	
-	
-		override fun onLoad(response: CoapResponse?) {
-				val message = response!!.getResponseText()//new String(payload, "UTF-8");
-				val id = message.substringBefore("(")
-				GlobalScope.launch{
-					println("Messaggio ottenuto: $message")
-					proxyActor.forward(sender,id,message)
-				}
+		fun send(msg :String):CoapResponse{
+			var response= client.put( msg, MediaTypeRegistry.TEXT_PLAIN);
+			/*val message = response!!.getResponseText()//new String(payload, "UTF-8");
+			val id = message.substringBefore("(")
+			println("ricevuto messaggio $message da $id per $sender")
+			GlobalScope.launch{
+				proxyActor.forward(id,message,sender)
+			}*/
+			return response
 			
-			
-		
-		}
-		override fun onError() {
-			println("ProxyClientFridge ERROR")
 		}
 }

@@ -24,7 +24,7 @@ class CoapServerControl (name : String ) : CoapResource(name) {
 		
 		fun create(a: ActorBasic,name: String){
 			actor = a;
-			val server   = CoapServer(5683);		//COAP SERVER
+			val server   = CoapServer(5684);		//COAP SERVER
 			coapProxyServer = CoapServerControl(name)
 			server.add(coapProxyServer);
 			println("--------------------------------------------------")

@@ -109,7 +109,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						                        currentMsg.msgContent()) ) { //set msgArgList
 								val Code = payloadArg(0)
 								println("&&& butlermind isAvailableTask")
-								forward("isAvailable", "isAvailable($Code)" ,"fridge" ) 
+								forward("isAvailable", "isAvailable($Code)" ,"proxyfridge" ) 
 						}
 					}
 					 transition(edgeName="t010",targetState="doAdd",cond=whenDispatch("yes"))

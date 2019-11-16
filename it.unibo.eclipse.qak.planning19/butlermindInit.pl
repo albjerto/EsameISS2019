@@ -28,19 +28,19 @@ handleBody(BODY) :- retract( msg(_,_,_) :- BODY ).
 
 
 
-prepare	 :- 	getPrepareFood(F), assert(msg(fridge,get, get(F))),
+prepare	 :- 	getPrepareFood(F), assert(msg(proxyfridge,get, get(F))),
     			assert(msg(table,put, put(F))),
     			getPrepareTableware(T) , assert(msg(pantry,get, get(T))),
     			assert(msg(table,put, put(T))),
 				assert(msg(butlermind,waitCommand,waitCommand(ok))).
     
 add(C)	:- 		pair(F,C),
-				assert(msg(fridge,get,get([food(F,1)]))),
+				assert(msg(proxyfridge,get,get([food(F,1)]))),
     			assert(msg(table,put,put([food(F,1)]))),
 				assert(msg(butlermind,waitCommand,waitCommand(ok))).
     
 clear	:-		assert(msg(table,clearFood,clearFood(go))),
-    		   	assert(msg(fridge,put, put(F)):- getFood(F)),
+    		   	assert(msg(proxyfridge,put, put(F)):- getFood(F)),
 				assert(msg(table,clearTableware, clearTableware(go))),
     			assert(msg(dishwasher,put, put(T)):- getTableware(T)),
 				assert(msg(butlermind,end,end(ok))).

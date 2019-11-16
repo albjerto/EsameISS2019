@@ -233,7 +233,7 @@ var publishMsgToTable= function (cmd){
 var publishMsgToFridge= function (cmd){
    	var msgstr = "msg(" + cmd + ",dispatch,js,fridge,"+ cmd +",1)"  ;  //TODO: replace 1 with counter
   	console.log("publishMsgToCentralStateServer forward> "+ msgstr);
-   	mqttUtils.publish( msgstr, "unibo/qak/fridge" );
+   	mqttUtils.publish( msgstr, "unibo/qak/proxyfridge" );
 }
 
 

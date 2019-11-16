@@ -76,7 +76,7 @@ QActor fridgecoap context ctxFridge{
 			ifSolved {
 				println("Food = $Food")
 				["itunibo.coap.server.CoapServerControl.coapRespond(\"put($Food)\")"]
-				["itunibo.coap.server.CoapServerControl.coapNotify()"]		
+				//["itunibo.coap.server.CoapServerControl.coapNotify()"]		
 			} else {
 				println("fridgeGet FAIL")
 			}
@@ -89,10 +89,10 @@ QActor fridgecoap context ctxFridge{
 		onMsg(put: put(ARG)){
 			printCurrentMessage
 			[" val Food = payloadArg(0) "]
-			solve(addFoodList("$Food"))
+			solve(addFoodList($Food))
 			ifSolved {
 				["itunibo.coap.server.CoapServerControl.coapRespond(\"remove($Food)\")"]
-				["itunibo.coap.server.CoapServerControl.coapNotify()"]		
+				//["itunibo.coap.server.CoapServerControl.coapNotify()"]		
 			} else {
 				println("fridgePut FAIL")
 			}		
@@ -105,9 +105,9 @@ QActor fridgecoap context ctxFridge{
 			[" val foodCode = payloadArg(0) "]
 			solve(isThereFoodByCode("$foodCode"))
 			ifSolved {
-				["itunibo.coap.server.CoapServerControl.coapRespond(\"yes()\")"]
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"yes($foodCode)\")"]
 			} else {
-				["itunibo.coap.server.CoapServerControl.coapRespond(\"no()\")"]
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"no($foodCode)\")"]
 			}	
 		}
 	}Goto waitCmd
