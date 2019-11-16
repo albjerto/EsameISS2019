@@ -22,6 +22,7 @@ var dishwasherModel = "none";
 var pantryModel = "none";
 var butlerFoodModel = "none";
 var butlerTablewareModel = "none";
+var infoModel = "none";
 
 console.log("mqtt client= " + client );
 
@@ -55,6 +56,7 @@ client.on('message', function (topic, message){
   var spPantry			= msgStr.indexOf("pantry");
   var spButlerFood		= msgStr.indexOf("butlerFood"); 
   var spButlerTableware	= msgStr.indexOf("butlerTableware");
+  var spInfo			= msgStr.indexOf("info");
    
    
   var sp1				= msgStr.indexOf("state");
@@ -72,6 +74,7 @@ client.on('message', function (topic, message){
 	  if( spPantry > 0 )     { msg = msg + "pantry:";     pantryModel  = msg+content ; };
 	  if( spButlerFood > 0 )     { msg = msg + "butlerFood:";     butlerFoodModel  = msg+content ; }; 
 	  if( spButlerTableware > 0 )     { msg = msg + "butlerTableware:";     butlerTablewareModel  = msg+content ; };
+	  if( spInfo > 0 )	{ msg = msg + "info:";     infoModel  = msg+content ; }
 	  
 	  msg = msg + content  ;	
 	  
