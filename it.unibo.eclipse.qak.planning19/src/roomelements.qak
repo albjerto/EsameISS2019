@@ -8,7 +8,7 @@ Dispatch showState	: showState()
 
 Event modelcontent: modelcontent(CONTENT)
 
-//Dispatch prepare		:	prepare(ARG)
+Dispatch prepare		:	prepare(ARG)
 Dispatch isAvailable	:	isAvailable(ARG)
 Dispatch clear			:	clear(ARG)
 Dispatch add			:	add(ARG)
@@ -19,6 +19,7 @@ Dispatch yes			:	yes(ARG)
 Dispatch no			: 	no(ARG)
 Dispatch clearFood		:	clearFood(ARG)
 Dispatch clearTableware		:	clearTableware(ARG)
+Dispatch repeat			:	repeat()
 
 Context ctxRoomElements    	ip [host="localhost" port=8037]   -mqtt 
 Context ctxDummyWorkInRoom 	ip [host="workinroomhost" port=8038]   -mqtt
@@ -232,7 +233,129 @@ QActor table context ctxRoomElements{
 	
 }
 
+QActor proxyfridge context ctxRoomElements{
+	/*
+	 *fridge:
+	 * ->get, <-put
+	 * ->isAvailable, <-yes/<-no
+	 * ->put, <-remove
+	 */
+	["val actor=this"]
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		["itunibo.coap.client.CoapClientControl.create(actor,\"fridge\")"]
+		println("&&&  proxyfridge STARTED")
+	}
+	Goto showStateTask
+	
+	State waitCmd{
+		println("&&&  proxyfridge waiting for command")
+	}
+	
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg showState -> showStateTask
+				 	 whenMsg get -> getTask
+				 	 whenMsg isAvailable -> checkTask
 
+	
+	
+	State showStateTask{
+		printCurrentMessage
+		//solve(showFridgeState)
+		["	val response = itunibo.coap.client.CoapClientControl.send(\"showState()\")
+			val FridgeState=response!!.getResponseText()
+		"]
+		emit  modelcontent: modelcontent(content( fridge( state( $FridgeState) ) ))
+		
+		
+	}Goto waitCmd
+	
+	State getTask{
+		printCurrentMessage
+		onMsg(get: get(ARG)){
+			
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+			"]
+			forward butlermind -m put : $Message
+			
+		}
+	}
+	Goto showStateTask
+	
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+			"]
+			forward butlermind -m remove : $Message
+		}
+	}Goto showStateTask
+	
+	
+	State checkTask{
+		onMsg(isAvailable: isAvailable(ARG)){
+			printCurrentMessage
+			[" val foodCode = payloadArg(0) "]
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+				val Id = Message.substringBefore(\"(\")
+				forward(Id, Message ,\"butlermind\" ) 
+				println(\"id:$Id Message:$Message\")
+			"]
+		}
+	}Goto waitCmd
+}
+
+QActor randomconsumptionactor context ctxRoomElements{
+	
+	["var enabled = false"]
+	
+	State s0 initial{
+		println("&&& randomconsumptionactor STARTED")
+		solve(consult("randomConsumptionActorSupport.pl"))
+		solve(randomConsumptionEnabled(true))
+		ifSolved{
+			["enabled = true"]
+		}
+	}
+	Goto waitCmd if "enabled" else doNothing
+	
+	State waitCmd{
+		println("&&& radomconsumptionactor waiting for command")
+	}
+	Transition t0 whenMsg prepare -> timerStart 
+	
+	State timerStart{
+		println("&&& randomconsumptionactor starting timer")
+		solve(getRandomDelay(R))
+		ifSolved{
+			["
+			var randomDelay = getCurSol(\"R\").toString().toLong()
+			delay(randomDelay)
+			"]
+			solve(produceRandomFoodMessage(F))
+			ifSolved{
+				["var Food = getCurSol(\"F\").toString()"]
+				forward table -m get : get($Food)
+			}else{
+				println("chooseRandomFood FAIL")
+			}
+		}else{
+			println("randomDelay FAIL")
+		}
+		
+	}
+	Transition t0 	whenMsg repeat -> timerStart
+					whenMsg clear -> waitCmd
+					
+	State doNothing{
+		println("&&& randomconsumptionactor disabled")
+	}
+}
+
+/*
 QActor fridge context ctxRoomElements{
 	
 
@@ -311,82 +434,4 @@ QActor fridge context ctxRoomElements{
 		}
 	}Goto waitCmd
 }
-
-
-QActor proxyfridge context ctxRoomElements{
-	/*
-	 *fridge:
-	 * ->get, <-put
-	 * ->isAvailable, <-yes/<-no
-	 * ->put, <-remove
-	 */
-	["val actor=this"]
-	State s0 initial{
-		solve(consult("fridgeInit.pl"))
-		["itunibo.coap.client.CoapClientControl.create(actor,\"fridge\")"]
-		println("&&&  proxyfridge STARTED")
-	}
-	Goto waitCmd
-	
-	State waitCmd{
-		println("&&&  proxyfridge waiting for command")
-	}
-	
-	Transition t0	 whenMsg put -> putTask
-				 	 whenMsg showState -> showStateTask
-				 	 whenMsg get -> getTask
-				 	 whenMsg isAvailable -> checkTask
-
-	
-	
-	State showStateTask{
-		printCurrentMessage
-		//solve(showFridgeState)
-		["	val response = itunibo.coap.client.CoapClientControl.send(\"showState()\")
-			val FridgeState=response!!.getResponseText()
-		"]
-		emit  modelcontent: modelcontent(content( fridge( state( $FridgeState) ) ))
-		
-		
-	}Goto waitCmd
-	
-	State getTask{
-		printCurrentMessage
-		onMsg(get: get(ARG)){
-			
-			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
-				val Message = response!!.getResponseText()
-			"]
-			forward butlermind -m put : $Message
-			
-		}
-	}
-	Goto showStateTask
-	
-	State putTask{
-		onMsg(put: put(ARG)){
-			printCurrentMessage
-			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
-				val Message = response!!.getResponseText()
-			"]
-			forward butlermind -m remove : $Message
-		}
-	}Goto showStateTask
-	
-	
-	State checkTask{
-		onMsg(isAvailable: isAvailable(ARG)){
-			printCurrentMessage
-			[" val foodCode = payloadArg(0) "]
-			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
-				val Message = response!!.getResponseText()
-				val Id = Message.substringBefore(\"(\")
-				forward(Id, Message ,\"butlermind\" ) 
-				println(\"id:$Id Message:$Message\")
-			"]
-		}
-	}Goto waitCmd
-}
-
-
-
+*/
