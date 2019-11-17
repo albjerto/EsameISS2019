@@ -74,7 +74,7 @@ client.on('message', function (topic, message){
 	  if( spPantry > 0 )     { msg = msg + "pantry:";     pantryModel  = msg+content ; };
 	  if( spButlerFood > 0 )     { msg = msg + "butlerFood:";     butlerFoodModel  = msg+content ; }; 
 	  if( spButlerTableware > 0 )     { msg = msg + "butlerTableware:";     butlerTablewareModel  = msg+content ; };
-	  if( spInfo > 0 )	{ msg = msg + "info:";     infoModel  = msg+content ; }
+	  if( spInfo > 0 )	{ msg = msg + "info:";     infoModel  = msg+content ; };
 	  
 	  msg = msg + content  ;	
 	  
