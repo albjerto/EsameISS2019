@@ -23,16 +23,16 @@ class Proxyfridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 						itunibo.coap.client.CoapClientControl.create(actor,"fridge")
 						println("&&&  proxyfridge STARTED")
 					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
 				}	 
 				state("waitCmd") { //this:State
 					action { //it:State
 						println("&&&  proxyfridge waiting for command")
 					}
-					 transition(edgeName="t013",targetState="putTask",cond=whenDispatch("put"))
-					transition(edgeName="t014",targetState="showStateTask",cond=whenDispatch("showState"))
-					transition(edgeName="t015",targetState="getTask",cond=whenDispatch("get"))
-					transition(edgeName="t016",targetState="checkTask",cond=whenDispatch("isAvailable"))
+					 transition(edgeName="t09",targetState="putTask",cond=whenDispatch("put"))
+					transition(edgeName="t010",targetState="showStateTask",cond=whenDispatch("showState"))
+					transition(edgeName="t011",targetState="getTask",cond=whenDispatch("get"))
+					transition(edgeName="t012",targetState="checkTask",cond=whenDispatch("isAvailable"))
 				}	 
 				state("showStateTask") { //this:State
 					action { //it:State
