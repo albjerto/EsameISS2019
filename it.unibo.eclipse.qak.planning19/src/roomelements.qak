@@ -333,19 +333,22 @@ QActor randomconsumptionactor context ctxRoomElements{
 		ifSolved{
 			["
 			var randomDelay = getCurSol(\"R\").toString().toLong()
-			delay(randomDelay)
+			println(\"randomDelay = $randomDelay\")
+			delay(randomDelay * 1000)
 			"]
 			solve(produceRandomFoodMessage(F))
 			ifSolved{
 				["var Food = getCurSol(\"F\").toString()"]
+				println("Food = $Food")
 				forward table -m get : get($Food)
+				emit  modelcontent: modelcontent(content(info(state(sent_random_consumption))))
+				forward randomconsumptionactor -m repeat: repeat()
 			}else{
-				println("chooseRandomFood FAIL")
+				println("produceRandomFoodMessage FAIL")
 			}
 		}else{
 			println("randomDelay FAIL")
 		}
-		
 	}
 	Transition t0 	whenMsg repeat -> timerStart
 					whenMsg clear -> waitCmd
@@ -353,6 +356,7 @@ QActor randomconsumptionactor context ctxRoomElements{
 	State doNothing{
 		println("&&& randomconsumptionactor disabled")
 	}
+	
 }
 
 /*
