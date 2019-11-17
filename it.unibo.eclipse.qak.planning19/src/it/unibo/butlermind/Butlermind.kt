@@ -30,6 +30,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				state("waitPrepare") { //this:State
 					action { //it:State
 						println("&&&  butlermind wait prepare")
+						emit("modelcontent", "modelcontent(content(info(state(waiting))))" ) 
 					}
 					 transition(edgeName="t00",targetState="doPrepare",cond=whenDispatch("prepare"))
 				}	 
@@ -38,6 +39,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 						println("$name in ${currentState.stateName} | $currentMsg")
 						println("&&&  butlermind doprepare")
 						solve("prepare","") //set resVar	
+						emit("modelcontent", "modelcontent(content(info(state(preparing))))" ) 
 						forward("execButlerPlan", "execButlerPlan(prepare)" ,"butlerplanexecutor" ) 
 					}
 					 transition(edgeName="t01",targetState="msgHandler",cond=whenDispatch("targetReached"))
@@ -98,6 +100,11 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 				}	 
 				state("waitCommandTask") { //this:State
 					action { //it:State
+						emit("modelcontent", "modelcontent(content(info(state(waiting))))" ) 
+						if( checkMsgContent( Term.createTerm("no(ARG)"), Term.createTerm("no(ARG)"), 
+						                        currentMsg.msgContent()) ) { //set msgArgList
+								emit("modelcontent", "modelcontent(content(info(state(food_not_present))))" ) 
+						}
 						println("&& butlermind wait cmd")
 					}
 					 transition(edgeName="t08",targetState="isAvailableTask",cond=whenDispatch("add"))
@@ -122,6 +129,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 								val Code = payloadArg(0)
 								println("&&&  butlermind doAdd")
 								solve("add($Code)","") //set resVar	
+								emit("modelcontent", "modelcontent(content(info(state(Adding))))" ) 
 								forward("execButlerPlan", "execButlerPlan(add)" ,"butlerplanexecutor" ) 
 						}
 					}
@@ -131,6 +139,7 @@ class Butlermind ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, 
 					action { //it:State
 						println("&&& butlermind doClear")
 						solve("clear","") //set resVar	
+						emit("modelcontent", "modelcontent(content(info(state(cleaning))))" ) 
 						forward("execButlerPlan", "execButlerPlan(clear)" ,"butlerplanexecutor" ) 
 					}
 					 transition(edgeName="t013",targetState="msgHandler",cond=whenDispatch("targetReached"))

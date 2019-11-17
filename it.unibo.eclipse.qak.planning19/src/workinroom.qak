@@ -75,6 +75,7 @@ QActor butlermind context ctxWorkInRoom{
   	
   	State waitPrepare{		
   		println("&&&  butlermind wait prepare")	
+  		emit  modelcontent: modelcontent(content( info( state(waiting) ) ))	
   	}
   	Transition t0 whenMsg prepare -> doPrepare
   	
@@ -84,6 +85,7 @@ QActor butlermind context ctxWorkInRoom{
   		println("&&&  butlermind doprepare")
   		//solve(consult(prepareList.pl)) file da fare
   		solve(prepare)
+  		emit  modelcontent: modelcontent(content( info( state(preparing) ) ))	
   		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(prepare)
   	}
   	Transition t0  whenMsg targetReached -> msgHandler
@@ -151,8 +153,11 @@ QActor butlermind context ctxWorkInRoom{
      
      
      State waitCommandTask{
-     	println("&& butlermind wait cmd")
-     	
+     	emit  modelcontent: modelcontent(content( info( state(waiting) ) ))
+     	onMsg(no: no(ARG)){
+     		emit  modelcontent: modelcontent(content( info( state(food_not_present) ) ))
+     	}
+     	println("&& butlermind wait cmd")    	
      }
 	Transition t0 
     	 whenMsg add 				-> isAvailableTask
@@ -176,16 +181,18 @@ QActor butlermind context ctxWorkInRoom{
      		["val Code = payloadArg(0)"]
      		println("&&&  butlermind doAdd")
      		solve(add($Code))
+     		emit  modelcontent: modelcontent(content( info( state(Adding) ) ))	
      		forward butlerplanexecutor -m execButlerPlan : execButlerPlan(add)
      	}	
   	}
   	Transition t0 
   			whenMsg targetReached   -> msgHandler
-  	
+  	 
   	
   	State doClear{    	
      	println("&&& butlermind doClear")
      	solve(clear)	
+     	emit  modelcontent: modelcontent(content( info( state(cleaning) ) ))	
      	forward butlerplanexecutor -m execButlerPlan : execButlerPlan(clear)
      		
   	}
