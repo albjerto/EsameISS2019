@@ -40,13 +40,17 @@ class Randomconsumptionactor ( name: String, scope: CoroutineScope ) : ActorBasi
 						solve("getRandomDelay(R)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
 									var randomDelay = getCurSol("R").toString().toLong()
-									delay(randomDelay)
+									println("randomDelay = $randomDelay")
+									delay(randomDelay * 1000)
 						solve("produceRandomFoodMessage(F)","") //set resVar	
 						if(currentSolution.isSuccess()) { var Food = getCurSol("F").toString()
+						println("Food = $Food")
 						forward("get", "get($Food)" ,"table" ) 
+						emit("modelcontent", "modelcontent(content(info(state(sent_random_consumption))))" ) 
+						forward("repeat", "repeat()" ,"randomconsumptionactor" ) 
 						 }
 						else
-						{ println("chooseRandomFood FAIL")
+						{ println("produceRandomFoodMessage FAIL")
 						 }
 						 }
 						else

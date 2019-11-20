@@ -264,8 +264,9 @@ QActor proxyfridge context ctxRoomElements{
 		//solve(showFridgeState)
 		["	val response = itunibo.coap.client.CoapClientControl.send(\"showState()\")
 			val FridgeState=response!!.getResponseText()
+
 		"]
-		emit  modelcontent: modelcontent(content( fridge( state( $FridgeState) ) ))
+		emit  modelcontent: modelcontent(content( fridge( $FridgeState ) ))  //dentro fridgestate c'è gia state(ARG)
 		
 		
 	}Goto waitCmd

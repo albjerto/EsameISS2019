@@ -32,89 +32,54 @@ class Serverproxy ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 					transition(edgeName="t01",targetState="showStateTask",cond=whenDispatch("showState"))
 					transition(edgeName="t02",targetState="getTask",cond=whenDispatch("get"))
 					transition(edgeName="t03",targetState="checkAvailability",cond=whenDispatch("isAvailable"))
-					transition(edgeName="t04",targetState="modelcontentTask",cond=whenEvent("modelcontent"))
+					transition(edgeName="t04",targetState="respond",cond=whenDispatch("yes"))
+					transition(edgeName="t05",targetState="respond",cond=whenDispatch("no"))
+					transition(edgeName="t06",targetState="respond",cond=whenDispatch("state"))
+					transition(edgeName="t07",targetState="respond",cond=whenDispatch("remove"))
+				}	 
+				state("respond") { //this:State
+					action { //it:State
+						val response=currentMsg.msgContent()
+						itunibo.coap.server.CoapServerControl.coapRespond(response)
+					}
+					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
 				state("putTask") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(C)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								forward("put", "put(C)" ,"fridge" ) 
+								val Content = payloadArg(0)
+								forward("put", "put($Content)" ,"fridge" ) 
 						}
 					}
-					 transition(edgeName="t05",targetState="removeTask",cond=whenDispatch("remove"))
-				}	 
-				state("removeTask") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("remove(ARG)"), Term.createTerm("remove(C)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								val payload=payloadArg(0)
-								val responce="remove($payload)"
-								itunibo.coap.server.CoapServerControl.coapRespond(responce)
-						}
-					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+					 transition(edgeName="t08",targetState="respond",cond=whenDispatch("remove"))
 				}	 
 				state("getTask") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("get(ARG)"), Term.createTerm("get(C)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								forward("get", "get(C)" ,"fridge" ) 
+								val Content = payloadArg(0)
+								forward("get", "get($Content)" ,"fridge" ) 
 						}
 					}
-					 transition(edgeName="t06",targetState="putTask",cond=whenDispatch("put"))
-				}	 
-				state("putTask") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("put(ARG)"), Term.createTerm("put(C)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								val payload=payloadArg(0)
-								val responce="put($payload)"
-								itunibo.coap.server.CoapServerControl.coapRespond(responce)
-						}
-					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+					 transition(edgeName="t09",targetState="respond",cond=whenDispatch("put"))
 				}	 
 				state("checkAvailability") { //this:State
 					action { //it:State
 						if( checkMsgContent( Term.createTerm("isAvailable(ARG)"), Term.createTerm("isAvailable(C)"), 
 						                        currentMsg.msgContent()) ) { //set msgArgList
-								forward("isAvailable", "isAvailable(C)" ,"fridge" ) 
+								val Content = payloadArg(0)
+								forward("isAvailable", "isAvailable($Content)" ,"fridge" ) 
 						}
 					}
-					 transition(edgeName="t07",targetState="yesTask",cond=whenDispatch("yes"))
-					transition(edgeName="t08",targetState="noTask",cond=whenDispatch("no"))
-				}	 
-				state("yesTask") { //this:State
-					action { //it:State
-						val responce="yes"
-						itunibo.coap.server.CoapServerControl.coapRespond(responce)
-					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
-				}	 
-				state("noTask") { //this:State
-					action { //it:State
-						val responce="no"
-						itunibo.coap.server.CoapServerControl.coapRespond(responce)
-					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+					 transition(edgeName="t010",targetState="respond",cond=whenDispatch("yes"))
+					transition(edgeName="t011",targetState="respond",cond=whenDispatch("no"))
 				}	 
 				state("showStateTask") { //this:State
 					action { //it:State
 						forward("showState", "showState()" ,"fridge" ) 
-						itunibo.coap.server.CoapServerControl.coapRespond("")
 					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
-				}	 
-				state("modelcontentTask") { //this:State
-					action { //it:State
-						if( checkMsgContent( Term.createTerm("modelcontent(CONTENT)"), Term.createTerm("modelcontent(ARG)"), 
-						                        currentMsg.msgContent()) ) { //set msgArgList
-								val responce=payloadArg(0)
-								itunibo.coap.server.CoapServerControl.coapNotify()
-								itunibo.coap.server.CoapServerControl.coapRespond(payloadArg(0))
-						}
-					}
-					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
+					 transition(edgeName="t012",targetState="respond",cond=whenDispatch("state"))
 				}	 
 			}
 		}

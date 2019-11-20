@@ -39,7 +39,8 @@ class Proxyfridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name,
 						println("$name in ${currentState.stateName} | $currentMsg")
 							val response = itunibo.coap.client.CoapClientControl.send("showState()")
 									val FridgeState=response!!.getResponseText()
-						emit("modelcontent", "modelcontent(content(fridge(state($FridgeState))))" ) 
+						
+						emit("modelcontent", "modelcontent(content(fridge($FridgeState)))" ) 
 					}
 					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 

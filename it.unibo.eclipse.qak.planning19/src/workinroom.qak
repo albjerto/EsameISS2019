@@ -284,7 +284,7 @@ var curmoveIsForward = false
 //var PauseTime  = 500 
 
 //VIRTUAL ROBOT
-var StepTime   = 360		//for virtual // modificato era a 330
+var StepTime   = 380		//for virtual // modificato era a 330
 var PauseTime  = 500
 
 var PauseTimeL  = PauseTime.toLong()

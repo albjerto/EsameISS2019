@@ -21,16 +21,16 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 						solve("consult('fridgeInit.pl')","") //set resVar	
 						println("&&&  fridge STARTED")
 					}
-					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
+					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
 				state("waitCmd") { //this:State
 					action { //it:State
 						println("&&&  fridge waiting for command")
 					}
-					 transition(edgeName="t09",targetState="putTask",cond=whenDispatch("put"))
-					transition(edgeName="t010",targetState="showStateTask",cond=whenDispatch("showState"))
-					transition(edgeName="t011",targetState="getTask",cond=whenDispatch("get"))
-					transition(edgeName="t012",targetState="checkTask",cond=whenDispatch("isAvailable"))
+					 transition(edgeName="t013",targetState="putTask",cond=whenDispatch("put"))
+					transition(edgeName="t014",targetState="showStateTask",cond=whenDispatch("showState"))
+					transition(edgeName="t015",targetState="getTask",cond=whenDispatch("get"))
+					transition(edgeName="t016",targetState="checkTask",cond=whenDispatch("isAvailable"))
 				}	 
 				state("showStateTask") { //this:State
 					action { //it:State
@@ -38,7 +38,7 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 						solve("getFridgeState(L)","") //set resVar	
 						if(currentSolution.isSuccess()) { 
 										val FridgeState = itunibo.prolog.prologUtils.parseFoodState(myself,"L")
-						emit("modelcontent", "modelcontent(content(fridge(state($FridgeState))))" ) 
+						forward("state", "state($FridgeState)" ,"serverproxy" ) 
 						 }
 						else
 						{ println("getFridgeState FAIL")
@@ -55,14 +55,14 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 												val Food = payloadArg(0)
 								solve("removeFoodList($Food)","") //set resVar	
 								if(currentSolution.isSuccess()) { println("Food = $Food")
-								forward("put", "put($Food)" ,"butlermind" ) 
+								forward("put", "put($Food)" ,"serverproxy" ) 
 								 }
 								else
 								{ println("fridgeGet FAIL")
 								 }
 						}
 					}
-					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
+					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
 				state("putTask") { //this:State
 					action { //it:State
@@ -71,14 +71,14 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 								println("$name in ${currentState.stateName} | $currentMsg")
 								 val Food = payloadArg(0) 
 								solve("addFoodList($Food)","") //set resVar	
-								if(currentSolution.isSuccess()) { forward("remove", "remove($Food)" ,"butlermind" ) 
+								if(currentSolution.isSuccess()) { forward("remove", "remove($Food)" ,"serverproxy" ) 
 								 }
 								else
 								{ println("fridgePut FAIL")
 								 }
 						}
 					}
-					 transition( edgeName="goto",targetState="showStateTask", cond=doswitch() )
+					 transition( edgeName="goto",targetState="waitCmd", cond=doswitch() )
 				}	 
 				state("checkTask") { //this:State
 					action { //it:State
@@ -87,10 +87,10 @@ class Fridge ( name: String, scope: CoroutineScope ) : ActorBasicFsm( name, scop
 								println("$name in ${currentState.stateName} | $currentMsg")
 								 val FoodCode = payloadArg(0) 
 								solve("isThereFoodByCode($FoodCode)","") //set resVar	
-								if(currentSolution.isSuccess()) { forward("yes", "yes($FoodCode)" ,"butlermind" ) 
+								if(currentSolution.isSuccess()) { forward("yes", "yes($FoodCode)" ,"serverproxy" ) 
 								 }
 								else
-								{ forward("no", "no($FoodCode)" ,"butlermind" ) 
+								{ forward("no", "no($FoodCode)" ,"serverproxy" ) 
 								 }
 						}
 					}
