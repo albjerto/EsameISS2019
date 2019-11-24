@@ -86,7 +86,7 @@ QActor pantry context ctxRoomElements{
 	 
 	State s0 initial{
 		println("&&& pantry STARTED")
-		solve(consult("pantryInit.pl")) //da controllare perchè non va con quel file
+		solve(consult("pantryInit.pl")) //da controllare perchÃ¨ non va con quel file
 	}
 	Goto showStateTask		
 	
@@ -164,6 +164,7 @@ QActor table context ctxRoomElements{
 		println("&&& table waiting for command")
 	}
 	Transition t0	 whenMsg put -> putTask
+			 whenMsg get -> getTask
 				 	 whenMsg clearFood -> clearFoodTask
 				 	 whenMsg clearTableware -> clearTablewareTask
 				 	 whenMsg showState -> showStateTask
@@ -179,6 +180,20 @@ QActor table context ctxRoomElements{
 			 } else {
 				println("putTableTask FAIL")
 				//invio messaggi al robot per gestione fallimenti?
+			 }		 
+		 }
+	}Goto showStateTask
+	
+	// stato utile alla sola randomConsumption
+	State getTask{
+		onMsg(get: get(ARG)){
+			printCurrentMessage
+			 [" val List = payloadArg(0) "]
+			 solve(removeGenericList($List))
+			 ifSolved {
+				emit  modelcontent: modelcontent(content(info(state(random_consumption_done))))
+			 } else {
+				println("getTableTask FAIL")
 			 }		 
 		 }
 	}Goto showStateTask
@@ -266,7 +281,7 @@ QActor proxyfridge context ctxRoomElements{
 			val FridgeState=response!!.getResponseText()
 
 		"]
-		emit  modelcontent: modelcontent(content( fridge( $FridgeState ) ))  //dentro fridgestate c'� gia state(ARG)
+		emit  modelcontent: modelcontent(content( fridge( $FridgeState ) ))  //dentro fridgestate c'è gia state(ARG)
 		
 		
 	}Goto waitCmd
@@ -342,7 +357,6 @@ QActor randomconsumptionactor context ctxRoomElements{
 				["var Food = getCurSol(\"F\").toString()"]
 				println("Food = $Food")
 				forward table -m get : get($Food)
-				emit  modelcontent: modelcontent(content(info(state(sent_random_consumption))))
 				forward randomconsumptionactor -m repeat: repeat()
 			}else{
 				println("produceRandomFoodMessage FAIL")
