@@ -535,7 +535,14 @@ Dai requisiti sopra identificati ricaviamo che:
 <ul>
 	<li>
 	Essendo i vari elementi dell'applicazione distribuiti ed autonomi, 
-	è utile utilizzare un modello ad attori con scambio di messaggi asincrono  
+	è utile utilizzare un modello ad attori con scambio di messaggi ed 
+	eventi asincrono 
+	</li>
+	<li>
+	Dato che il funzionamento dell'applicazione è piuttosto ripetitivo e 
+	deterministico, gli attori sono ben modellabili come automi a stati finiti 
+	(ASF) in cui il passaggio tra i vari stati è solitamente scandito dai 
+	messaggi ricevuti
 	</li>
 	<li>
 	I vari attori dovranno contenere ciascuno un proprio stato solo da essi 
@@ -560,8 +567,8 @@ Dai requisiti sopra identificati ricaviamo che:
     </li>
     <li>
 	Per eseguire ogni task in maniera autonoma l'<bc>RBR</bc> dovrà essere a 
-    conoscenza della posizione di ogni elemento nella stanza e dovrà essere in 
-    grado di calcolare il percorso per raggiungerli
+    conoscenza della posizione di ogni elemento nella stanza (e della propria) 
+	e dovrà essere in grado di calcolare il percorso per raggiungerli
 	</li>
     <li>
 	L'<bc>RBR</bc> dovrà conoscere i messaggi da inviare agli elementi della 
@@ -588,7 +595,18 @@ Dai requisiti sopra identificati ricaviamo che:
     fine di poterli evitare
     </li>
 </ul>
+</br>
+Detto ciò, è possibile definire un primo modello logico dell'applicazione, dal 
+punto di vista di struttura, interazione, comportamento.
 	<h3>Struttura</h3>
+	<div>
+	Secondo i requisiti, sono già definibili per i vari attori dei nodi 
+	computazionali distinti. Nello specifico avremo un nodo dedicato a 
+	<em>fridge</em>, essendo esso una risorsa smart, un nodo dedicato 
+	all'interfaccia che utilizzerà <bc>Maitre</bc> ed uno relativo al 
+	<bc>RBR</bc> ed agli attori al momento non smart
+	</div>
+	</br>
 	<div class="img" style="width:60%">
 		<center><img src="./immagini/struttura.png" width="150%" height="75%"/></center>
 	</div></br>
