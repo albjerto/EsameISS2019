@@ -420,14 +420,6 @@ as a formal model of the requirements.
       Terza attività del <bc>RBR</bc>, si svolge durante il Buffet e consiste nell'aggiunta di un cibo specifico, se presente nel frigo, sul tavolo
     </td>
   </tr>
-  <tr>
-    <td>
-      
-    </td>
-    <td>
-      
-    </td>
-  </tr>
 </table>
 <br/>
 Procediamo analizzando il testo dato e specificando i requisiti derivanti
@@ -532,19 +524,19 @@ necessary to build the system. <i>iii)</i> define a (first)
 <br/>
 <br/>
 Dai requisiti sopra identificati ricaviamo che:
-<ul>
-	<li>
+<ol type="1">
+	<li id="p1">
 	Essendo i vari elementi dell'applicazione distribuiti ed autonomi, 
 	è utile utilizzare un modello ad attori con scambio di messaggi ed 
 	eventi asincrono 
 	</li>
-	<li>
+	<li id="p2">
 	Dato che il funzionamento dell'applicazione è piuttosto ripetitivo e 
 	deterministico, gli attori sono ben modellabili come automi a stati finiti 
 	(ASF) in cui il passaggio tra i vari stati è solitamente scandito dai 
 	messaggi ricevuti
 	</li>
-	<li>
+	<li id="p3">
 	I vari attori dovranno contenere ciascuno un proprio stato solo da essi 
 	direttamente accedibile. Chi, al di fuori dell'attore stesso, necessiterà 
 	del suo stato, dovrà richiederlo e ottenerlo tramite scambio di messaggi
@@ -556,7 +548,7 @@ Dai requisiti sopra identificati ricaviamo che:
     intervalli regolari
 	</li>
     -->
-    <li>
+    <li id="p4">
     Il fatto che <em>fridge</em> debba comunicare tramite il protocollo CoAP 
     implica che anche le entità interessate ad inviargli richieste 
     dovranno utilizzare tale protocollo per farlo. Ciò dovrebbe avvenire il 
@@ -565,16 +557,16 @@ Dai requisiti sopra identificati ricaviamo che:
     ognuno debba utilizzare un proprio modulo hard-coded per il solo scambio di 
     messaggi col <em>fridge</em>
     </li>
-    <li>
+    <li id="p5">
 	Per eseguire ogni task in maniera autonoma l'<bc>RBR</bc> dovrà essere a 
     conoscenza della posizione di ogni elemento nella stanza (e della propria) 
 	e dovrà essere in grado di calcolare il percorso per raggiungerli
 	</li>
-    <li>
+    <li id="p6">
 	L'<bc>RBR</bc> dovrà conoscere i messaggi da inviare agli elementi della 
     stanza (una volta raggiunti) per realizzare ogni task
 	</li>
-    <li>
+    <li id="p7">
     <bc>Maitre</bc> dovrà poter comunicare col <bc>RBR</bc> tramite una 
     interfaccia che metta a disposizione:
     <ol type="1">
@@ -590,11 +582,11 @@ Dai requisiti sopra identificati ricaviamo che:
         </li>
     </ol>
     </li>
-    <li>
+    <li id="p8">
     <bc>RBR</bc> dovrà possedere un metodo di rilevazione degli ostacoli, al 
     fine di poterli evitare
     </li>
-</ul>
+</ol>
 </br>
 Detto ciò, è possibile definire un primo modello logico dell'applicazione, dal 
 punto di vista di struttura, interazione, comportamento.
@@ -658,13 +650,92 @@ of the <k>functional TestPlans</k>, with reference to the
 </div>
 
 <h2>Project</h2>
+
+Lista di cose di cui parlare:
+    - uso qak
+    - riutilizzo progetti prof e quindi 
+    planning e mappa della stanza relativa
+    (anche evitamento ostacoli?)
+    - uso prolog come stato (disegni?)
+    - uso proxy e coap frigo
+    - frontend node
+
+	<h3>Creazione del modello ad attori tramite linguaggio QAK</h3>
+	<div>
+    Al fine di creare il modello ad attori è riutilizzabile un linguaggio 
+    già sviluppato dalla nostra software house, detto linguaggio QAK. Tramite 
+    esso sono facilmente definibili attori come entità autonome mappate in ASF 
+    che possono comunicare tramite messaggi o eventi. Inoltre, ogni attore così 
+    definito possiede una propria knowledge base prolog, utile a mantenere stato 
+    configurabile (<a href="#p1">P1</a>).
+    Implementiamo quindi un Qactor per ogni elemento della stanza (<P2). 
+    </div>
+    <h3>Architettura</h3>
+    <div class="img" style="width:60%">
+		<center><img src="./immagini/contesti.png" width="100%" height="50%"/></center>
+    </div></br>
  
+ 	<h3>Uso delle KB degli attori</h3>
+    <div>
+    È già stato menzionato come ognuno degli attori possieda una propria KB. Questa è 
+    utilizzabile per mantenere all'interno di fatti prolog lo stato proprio dell'attore. 
+    In questo modo lo stato è direttamente accedibile solo dall'attore stesso 
+    (<a href="#p3">P3</a>) tramite regole prolog definite nella KB stessa 
+    </div>
+    
+    
+    <h3>Robot e planning</h3>
+    	<div>
+        	Per interagire con il robot(fisico/virtuale) e rilievare eventuali ostacoli riutilizziamo mainctxrobotmind
+        	Il <kc>planning</kc> è delegato all'attore <em>workerinroom</em>, all'interno del contesto mainCtxWorkInRoom
+            Tale attore è stato modificato per evitare ostacoli mobili tornando indietro e ostacoli fissi
+            ricalcolando il percorso(P8).
+            L'attore butlerplanexecutor(riutlizzato) definisce, sulla base dei task configurati, quali percorsi stabilire
+            per realizzare ogni task comunicando quando viene terminato ogni percorso
+      	</div>
+        
+      <h3>Task e messaggi </h3>
+    	<div>
+        	Allo scopo di realizzare ogni task l'attore butlermind definisce, sulla base dei task configurati, a quale 
+            destinatario e quali messaggi inviare al raggiungimento di ogni elemento della stanza(comunicato da butlerplanexecutor)       
+       </div>
+    
+    
+   
+    <h3>Interazione CoAP e attore frigo</h3>
+    <div>
+    	Come da requisiti, si implementa l'attore <em>fridge</em> in modo da utilizzare il protocollo <ks>CoAP</ks>
+        per le comunicazioni. Inoltre, si utilizza il pattern Proxy per garantire che l'attore sia
+        <i>technology-independent</i> per quanto riguardo il protocollo di comunicazione scelto.
+        
+    </div>
+    <div class="img" style="width:60%">
+		<center><img src="./immagini/coap.png" width="100%" height="50%"/></center>
+    </div></br>
+    
+        <h3>Frontend</h3>
+    <div>
+    	Si realizza il frontend tramite una pagina web, in modo che sia accessibile da mobile attraverso
+        il browser indipendentemente dal manufacturer. L'interfaccia ha lo scopo di permettere al
+        <bc>Maitre</bc> di inviare al <bc>RBR</bc> i comandi da eseguire, nonché di tenere traccia
+        dello stato di tutti gli elementi presenti nella stanza. L'interazione con i suddetti elementi
+        avviene con il protocollo <ks>MQTT</ks>: l'aggiornamento dello stato avviene per mezzo di eventi,
+        mentre l'invio dei comandi si compie mediante messaggi.
+    </div>
+    
 <h2>Testing</h2>
  
 <h2>Deployment</h2> 
-
-<h2>Maintenance</h2> 
-	      	
+ <div class="img" style="width:60%">
+	<center><img src="./immagini/deployment.png" width="100%" height="50%"/></center>
+ </div></br>
+ <div>
+      Il deployment di ctxfridge verrà ovviamente effettuato nel nodo del frigo mentre gli elementi virtuali sono 
+      inseriti all'interno dell'<bc>RBR</bc>.
+</div>
+          
+          
+          
 <br/><br/> 	
 </div>  
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;font-size:small;color:white">
