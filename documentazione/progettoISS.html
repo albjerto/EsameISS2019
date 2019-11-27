@@ -1,11 +1,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-    <!--
+
+<!--
 <link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
 <script type="text/javascript" src="../css/issStyle.js"></script>
 -->
+
 <style type="text/css">
-<!--
+
 body
 {
     margin-left:  30px;
@@ -131,8 +133,7 @@ table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
 }         
-    
-  -->
+
 </style>
     
 <head>
@@ -196,6 +197,7 @@ The <em>pantry</em> and the <em>dishwasher</em> are (at the moment) non-smart
 resources.
 <br/>
 <div class="req">
+
 <!--
 <ks>COPY</ks> here the text given by the customer.<br/>
 Remember the <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.issLabStart/userDocs/81614LabISSIntro.html#motto" target="web"> 
@@ -203,6 +205,7 @@ motto</a>:   <k>no code ... without requirements</k>.
 <br/>
 <br/>
 -->
+
 Design and build the software to put on board of the <em>fridge</em> and of the 
 <bc>RBR</bc>. In particular, the <bc>RBR</bc> must be able to accept the 
 following commands sent by the <ks>smart-phone</ks> of <bc>Maitre</bc>:
@@ -277,13 +280,16 @@ The software to put on the <em>fridge</em> should make the device able to:
 </div>
 </div>
 
-<h2>Requirement analysis</h2>
-<div >
+<h2>Analisi dei requirements</h2>
+<div>
+
+<!--
 <ks>GOAL</ks>: <i>i)</i> clarify the meaning of the <i>names</i> and of the 
 <i>verbs</i> included in the requirement text given by the customer. <i>ii)</i> 
 define a first working prototype (and a proper set of <k>functional TestPlan</k>) 
 as a formal model of the requirements.
-<br/>
+-->
+
   <h3>Glossario</h3>
 <br/>
 <table>
@@ -422,7 +428,7 @@ as a formal model of the requirements.
   </tr>
 </table>
 <br/>
-Procediamo analizzando il testo dato e specificando i requisiti derivanti
+Procediamo analizzando il testo dato e specificando i requisiti derivanti.
 <br/>
 <ul>
 	<li>
@@ -507,8 +513,10 @@ Dal riquadro verde si evince inoltre che:
 
 </div>
 
-<h2>Problem analysis</h2>
-<div >
+<h2>Analisi del problema</h2>
+<div>
+
+<!--
 <ks>WARNING</ks>: expressions like <i>'we have chosen to ...'</i>, 
 <i>'I decided ...'</i>, etc. are <k>forbidden</k> here.<br/>Rather, this section 
 should include sentences like <b><i>'this (aspect of the) problem implies 
@@ -520,8 +528,8 @@ that ...'</i></b>, etc.
 model. <i>ii)</i>give a <k>quantitative measure of the effort/resources</k> 
 necessary to build the system. <i>iii)</i> define a (first) 
 <k>product backlog</k>.
+-->
 
-<br/>
 <br/>
 Dai requisiti sopra identificati ricaviamo che:
 <ol type="1">
@@ -600,7 +608,7 @@ punto di vista di struttura, interazione, comportamento.
 	computazionali distinti. Nello specifico avremo un nodo dedicato a 
 	<em>fridge</em>, essendo esso una risorsa smart, un nodo dedicato 
 	all'interfaccia che utilizzerà <bc>Maitre</bc> ed uno relativo al 
-	<bc>RBR</bc> ed agli attori al momento non smart
+	<bc>RBR</bc> ed agli attori al momento non smart.
 	</div>
 	</br>
 	<div class="img" style="width:60%">
@@ -645,43 +653,40 @@ punto di vista di struttura, interazione, comportamento.
 </div>
 
 
-<h2>Test plans</h2> 
+<h2>Test plans</h2>
+
+<!--
 <div>
 <ks>GOAL</ks>: give a formal description (for example, by using <ks>JUnit</ks>) 
 of the <k>functional TestPlans</k>, with reference to the 
 <k>logical architecture</k> of the system.
-
 </div>
+-->
 
-<h2>Project</h2>
-
-Lista di cose di cui parlare:
-    - uso qak
-    - riutilizzo progetti prof e quindi 
-    planning e mappa della stanza relativa
-    (anche evitamento ostacoli?)
-    - uso prolog come stato (disegni?)
-    - uso proxy e coap frigo
-    - frontend node
+<h2>Progettazione</h2>
 
 	<h3>Creazione del modello ad attori tramite linguaggio QAK</h3>
 	<div>
-    Al fine di creare il modello ad attori è riutilizzabile un linguaggio 
-    già sviluppato dalla nostra software house, detto linguaggio QAK. Tramite 
-    esso sono facilmente definibili attori come entità autonome mappate in ASF 
-    che possono comunicare tramite messaggi o eventi. Inoltre, ogni attore così 
-    definito possiede una propria knowledge base prolog, utile a mantenere stato 
-    configurabile (<a href="#p1">P1</a>).
-    Implementiamo quindi un QActor per ogni elemento della stanza (<a href="#p2">P2</a>).
-    Ciò è utile anche in caso un attore non smart debba divenire smart, dato che, 
-    essendo un'unità autonoma, sarà sufficiente spostarlo in un proprio nodo dedicato ed 
-    eventualmente modificare il wiring, minimizzando le modifiche necessarie. </br>
-    (<a href="#p9">P9</a>) 
+	Al fine di creare il modello ad attori è riutilizzabile un linguaggio 
+	già sviluppato dalla nostra software house, detto linguaggio QAK. Tramite 
+	esso sono facilmente definibili attori come entità autonome mappate in ASF 
+	che possono comunicare tramite messaggi o eventi. Inoltre, ogni attore così 
+	definito possiede una propria knowledge base prolog, utile a mantenere stato 
+	configurabile (<a href="#p1">P1</a>) e fa parte di un particolare contesto. <br/>
+	Implementiamo quindi un QActor per ogni elemento della stanza (<a href="#p2">P2</a>). 
+	Ciò è utile in caso un attore non smart debba divenire smart, dato che, essendo 
+	un'unità autonoma, sarà sufficiente spostarlo in un proprio nodo dedicato ed 
+	eventualmente modificare il wiring, minimizzando le modifiche necessarie 
+	(<a href="#p9">P9</a>) 
     </div>
+	
     <h3>Architettura</h3>
-    <div class="img" style="width:60%">
+    <div class="img" style="width:80%">
 		<center><img src="./immagini/contesti.png" width="100%" height="50%"/></center>
     </div></br>
+	<div>
+	L'immagine sopra definisce i vari contesti in cui si porranno gli attori.
+	</div>
  
  	<h3>Uso delle KB degli attori</h3>
     <div>
@@ -691,47 +696,46 @@ Lista di cose di cui parlare:
     (<a href="#p3">P3</a>) tramite regole prolog definite nella KB. Inoltre, essendo il 
     prolog un linguaggio di alto livello, si useranno file .pl caricabili sugli 
     attori come veri e propri file di configurazione. È in questo modo che sono 
-	descrivibili gli stati iniziali degli attori <em>fridge</em> e <em>pantry</em>
+	descrivibili gli stati iniziali degli attori <em>fridge</em> e <em>pantry</em>.
     </div>
     
     
-    <h3>Robot e planning</h3>
-    	<div>
-        	Per interagire con il robot (fisico/virtuale) e rilievare eventuali ostacoli riutilizziamo mainCtxRobotmind
-        	Il <kc>planning</kc> è delegato all'attore <em>workerinroom</em>, all'interno del contesto ctxWorkInRoom
-            Tale attore è stato modificato per evitare ostacoli mobili tornando indietro e ostacoli fissi
-            ricalcolando il percorso (P8).
-            L'attore butlerplanexecutor (riutlizzato) definisce, sulla base dei task configurati, quali percorsi stabilire
-            per realizzare ogni task comunicando quando viene terminato ogni percorso
-      	</div>
-        
-      <h3>Task e messaggi </h3>
-    	<div>
-        	Allo scopo di realizzare ogni task l'attore butlermind definisce, sulla base dei task configurati, a quale 
-            destinatario e quali messaggi inviare al raggiungimento di ogni elemento della stanza (comunicato da butlerplanexecutor)       
-       </div>
-    
-    
+    <h3>Robot e task</h3>
+    <div>
+	Per interagire con il robot (fisico/virtuale) e rilevare eventuali ostacoli 
+	riutilizziamo mainCtxRobotmind. Il <kc>planning</kc> è delegato all'attore 
+	<em>workerinroom</em>, all'interno del contesto ctxWorkInRoom 
+	(<a href="#p5">P5</a>). Tale attore è stato riutilizzato con alcune modifiche, che 
+	gli permettono di evitare ostacoli mobili attendendone il passaggio prima di 
+	ripartire e ostacoli fissi ricalcolando il percorso (<a href="#p8">P8</a>). 
+	L'attore butlerplanexecutor (riutilizzato) definisce, sulla base del task al 
+	momento in esecuzione, quale percorso logico stabilire all'interno della mappa. 
+	Al raggiungimento di ogni elemento è notificato butlermind, il quale sa quali 
+	messaggi inviare a quale destinatario avendo precedentemente stabilito ciò nella 
+	propria KB (<a href="#p6">P6</a>).
+	</div>
    
     <h3>Interazione CoAP e attore frigo</h3>
     <div>
-    	Come da requisiti, si implementa l'attore <em>fridge</em> in modo da utilizzare il protocollo <ks>CoAP</ks>
-        per le comunicazioni. Inoltre, si utilizza il pattern Proxy per garantire che l'attore sia
-        <i>technology-independent</i> per quanto riguardo il protocollo di comunicazione scelto.
-        
+	Come da requisiti, si implementa l'attore <em>fridge</em> in modo da utilizzare 
+	il protocollo <ks>CoAP</ks> per le comunicazioni. Inoltre, si utilizza il pattern 
+	Proxy per garantire che l'attore sia <i>technology-independent</i> per quanto 
+	riguardo il protocollo di comunicazione scelto (<a href="#p4">P4</a>).        
     </div>
+	<br/>
     <div class="img" style="width:60%">
 		<center><img src="./immagini/coap.png" width="100%" height="50%"/></center>
     </div></br>
     
-        <h3>Frontend</h3>
+	<h3>Frontend</h3>
     <div>
-    	Si realizza il frontend tramite una pagina web, in modo che sia accessibile da mobile attraverso
-        il browser indipendentemente dal manufacturer. L'interfaccia ha lo scopo di permettere al
-        <bc>Maitre</bc> di inviare al <bc>RBR</bc> i comandi da eseguire, nonché di tenere traccia
-        dello stato di tutti gli elementi presenti nella stanza. L'interazione con i suddetti elementi
-        avviene con il protocollo <ks>MQTT</ks>: l'aggiornamento dello stato avviene per mezzo di eventi,
-        mentre l'invio dei comandi si compie mediante messaggi.
+    Si realizza il frontend tramite una pagina web, in modo che sia accessibile da 
+	mobile attraverso il browser indipendentemente dal manufacturer. L'interfaccia ha lo 
+	scopo di permettere al <bc>Maitre</bc> di inviare al <bc>RBR</bc> i comandi da 
+	eseguire, nonché di tenere traccia dello stato di tutti gli elementi presenti nella 
+	stanza (<a href="#p7">P7</a>). L'interazione con i suddetti elementi avviene con il 
+	protocollo <ks>MQTT</ks>: l'aggiornamento dello stato avviene per mezzo di eventi, 
+	mentre l'invio dei comandi si compie mediante messaggi.
     </div>
     
 <h2>Testing</h2>
@@ -741,8 +745,8 @@ Lista di cose di cui parlare:
 	<center><img src="./immagini/deployment.png" width="100%" height="50%"/></center>
  </div></br>
  <div>
-      Il deployment di ctxfridge verrà ovviamente effettuato nel nodo del frigo mentre gli elementi virtuali sono 
-      inseriti all'interno dell'<bc>RBR</bc>.
+      Il deployment di ctxFridge verrà ovviamente effettuato nel nodo del frigo mentre 
+	  gli elementi virtuali sono inseriti all'interno dell'<bc>RBR</bc>.
 </div>
           
           
