@@ -586,6 +586,10 @@ Dai requisiti sopra identificati ricaviamo che:
     <bc>RBR</bc> dovrà possedere un metodo di rilevazione degli ostacoli, al 
     fine di poterli evitare
     </li>
+	<li id="p9">
+    Gli elementi non smart dovranno essere ingegnerizzati per poter divenire smart 
+    con le minime modifiche possibili
+    </li>
 </ol>
 </br>
 Detto ciò, è possibile definire un primo modello logico dell'applicazione, dal 
@@ -668,7 +672,11 @@ Lista di cose di cui parlare:
     che possono comunicare tramite messaggi o eventi. Inoltre, ogni attore così 
     definito possiede una propria knowledge base prolog, utile a mantenere stato 
     configurabile (<a href="#p1">P1</a>).
-    Implementiamo quindi un Qactor per ogni elemento della stanza (<P2). 
+    Implementiamo quindi un QActor per ogni elemento della stanza (<a href="#p2">P2</a>).
+    Ciò è utile anche in caso un attore non smart debba divenire smart, dato che, 
+    essendo un'unità autonoma, sarà sufficiente spostarlo in un proprio nodo dedicato ed 
+    eventualmente modificare il wiring, minimizzando le modifiche necessarie. </br>
+    (<a href="#p9">P9</a>) 
     </div>
     <h3>Architettura</h3>
     <div class="img" style="width:60%">
@@ -680,24 +688,27 @@ Lista di cose di cui parlare:
     È già stato menzionato come ognuno degli attori possieda una propria KB. Questa è 
     utilizzabile per mantenere all'interno di fatti prolog lo stato proprio dell'attore. 
     In questo modo lo stato è direttamente accedibile solo dall'attore stesso 
-    (<a href="#p3">P3</a>) tramite regole prolog definite nella KB stessa 
+    (<a href="#p3">P3</a>) tramite regole prolog definite nella KB. Inoltre, essendo il 
+    prolog un linguaggio di alto livello, si useranno file .pl caricabili sugli 
+    attori come veri e propri file di configurazione. È in questo modo che sono 
+	descrivibili gli stati iniziali degli attori <em>fridge</em> e <em>pantry</em>
     </div>
     
     
     <h3>Robot e planning</h3>
     	<div>
-        	Per interagire con il robot(fisico/virtuale) e rilievare eventuali ostacoli riutilizziamo mainctxrobotmind
-        	Il <kc>planning</kc> è delegato all'attore <em>workerinroom</em>, all'interno del contesto mainCtxWorkInRoom
+        	Per interagire con il robot (fisico/virtuale) e rilievare eventuali ostacoli riutilizziamo mainCtxRobotmind
+        	Il <kc>planning</kc> è delegato all'attore <em>workerinroom</em>, all'interno del contesto ctxWorkInRoom
             Tale attore è stato modificato per evitare ostacoli mobili tornando indietro e ostacoli fissi
-            ricalcolando il percorso(P8).
-            L'attore butlerplanexecutor(riutlizzato) definisce, sulla base dei task configurati, quali percorsi stabilire
+            ricalcolando il percorso (P8).
+            L'attore butlerplanexecutor (riutlizzato) definisce, sulla base dei task configurati, quali percorsi stabilire
             per realizzare ogni task comunicando quando viene terminato ogni percorso
       	</div>
         
       <h3>Task e messaggi </h3>
     	<div>
         	Allo scopo di realizzare ogni task l'attore butlermind definisce, sulla base dei task configurati, a quale 
-            destinatario e quali messaggi inviare al raggiungimento di ogni elemento della stanza(comunicato da butlerplanexecutor)       
+            destinatario e quali messaggi inviare al raggiungimento di ogni elemento della stanza (comunicato da butlerplanexecutor)       
        </div>
     
     
