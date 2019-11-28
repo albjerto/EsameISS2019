@@ -10,23 +10,7 @@ import org.junit.After
 import org.junit.Test
 import it.unibo.kactor.ApplMessage
 
-class ButlerMindTest{
-	
-	class MockActor(name:String):ActorBasic( name){
-		 
-		var recivedMsg :ApplMessage? =null
-		
-		suspend override fun actorBody(msg : ApplMessage){
-			recivedMsg=msg
-			
-		}
-		
-		public fun getRecivedMessage() :ApplMessage?{
-			return recivedMsg
-		}
-		
-	}
-	
+class ButlermindTest{
 	var butler :ActorBasic? = null
 	var fridge :MockActor? = null
 	var pantry :MockActor? = null
