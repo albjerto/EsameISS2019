@@ -199,6 +199,14 @@ Lo stato della stanza virtuale deve poter inoltrare via coap le richieste che ve
  </div></br>
 Grazie a questa architettura possiamo riutilizzare il fridge precedentemente realizzato spostandolo in un contesto dedicato in cui comunica la risposta
 al proxy che la inoltrerà al giusto ricevente.
+In questo sprint viene quindi realizzato:
+<li><em>fridge.qak</em>				per definire gli attori nel contesto fridge							</li>
+<li><em>CoapServerControl.kt</em> 	classe di supporto per trasformare un QActor in un server coap		</em></li>
+<li><em>CoapClientControl.kt</em> 	classe di supporto per trasformare un QActor in un client coap		</em></li>
+
+
+Viene inoltre sostituito l'attore fridge con l'attore proxyfridge in <em>workereinroom.qak</em>
+
 
 	      	
 <br/><br/> 	
