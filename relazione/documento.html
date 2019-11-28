@@ -1,0 +1,749 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+<style type="text/css">
+<!--
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+a:hover {
+    background-color: #cccccc;
+}
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin: 10;
+    margin-right: 15px;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+    border-bottom: 1px solid #242424;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+}
+h2 {
+    background-color: #d9fbff;
+    font-size: 110%;
+}
+h3 {
+	background-color: #e6ccff;
+    font-size: 80%;
+}
+h4 {
+    background-color: #99ffcc;
+    font-size: 100%;
+	width: 750px;
+}
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 80%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #ccffff;
+    color: #0033cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 80%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+k{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #990000;
+
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+
+}
+pre{
+	font-family: "Helvetica";
+	font-size: 60%;
+	background-color: #fcf8c7;
+	border: 1px solid blue;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	width: 800px;
+    font-size: 18px;
+}
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+div.remark{
+	background-color: #FFFC33;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+  -->
+</style>
+
+<head>
+	<title>Progetto ISS</title>
+</head>
+
+<body>
+
+<div id="top">
+<h1>81614 - LABORATORIO DI SISTEMI SOFTWARE <font size="5"></font> </h1>
+</div>
+
+<div class="body">
+
+<h2>Introduzione</h2>
+Presentiamo col seguente documento il progetto realizzato dal gruppo composto da:
+<ul>
+	<li>Gioele Pisanelli</li>
+	<li>Tommaso Liverani</li>
+	<li>Alberto Jesu</li>
+</ul>
+Procediamo anzitutto riportando il testo d'esame.
+
+<h2>Requirements</h2>
+<div class="remark">
+A room dedicated to support a <kc>Standing Buffet Service</kc> is equipped with
+a set of (smart and non-smart) resources including a <em>fridge</em>, a
+<em>dishwasher</em>, a <em>pantry</em>, and a ddr robot able to work as a
+<em>Room Butler</em> (called from now on <bc>RBR</bc>
+(<tt>Room Butler Robot</tt>).
+<br/>
+The <em>fridge</em>, the <em>dishwasher</em> and the <em>pantry</em> are embedded
+into a wall of the room, so to exclude any protuberance from the wall itself.
+<br/>
+A <em>Table</em> is put at the center of the room.
+<br/>
+The behaviour of the <tt>Buffet Service</tt> is supervised by a
+<em>Maître de salle</em> (or simply <bc>Maitre</bc>) which can tell the
+<bc>RBR</bc> to perform a set of  tasks, including:
+<ol>
+	<li>
+	<i>Prepare the room</i>. This task consists in putting on the
+	<em>Table</em> dishes taken from the <em>pantry</em>, and food taken from
+	the <em>fridge</em>. The set of items to put on the table in this phase is
+	fixed and properly described somewhere.
+	</li>
+	<li>
+	<i>Clear the room</i>. This task consists in bringing non-consumed food
+	again  in the <em>fridge</em> and the dishes in the <em>dishwasher</em>.
+	</li>
+	<li>
+	<i>Add food</i> on the table. This task consists in bringing some specific
+	food (if it exists) from the <em>fridge</em> to the <em>Table</em>.
+	</li>
+</ol>
+Thus, the <em>fridge</em> is intended to be a smart device owning explicit
+knowledge of the food stored in it. Moreover, it should be able to answer (via
+<ks>CoAP</ks>) to questions about its content, asked by humans or machines.
+<br/>
+The <em>pantry</em> and the <em>dishwasher</em> are (at the moment) non-smart
+resources.
+<br/>
+<div class="req">
+<!--
+<ks>COPY</ks> here the text given by the customer.<br/>
+Remember the <a href="http://htmlpreview.github.com/?https://github.com/anatali/iss2020Lab/blob/master/it.unibo.issLabStart/userDocs/81614LabISSIntro.html#motto" target="web">
+motto</a>:   <k>no code ... without requirements</k>.
+<br/>
+<br/>
+-->
+Design and build the software to put on board of the <em>fridge</em> and of the
+<bc>RBR</bc>. In particular, the <bc>RBR</bc> must be able to accept the
+following commands sent by the <ks>smart-phone</ks> of <bc>Maitre</bc>:
+<ul>
+	<li>
+	<em>prepare</em>: the <bc>RBR</bc> must execute in autonomous way the
+	<i>Prepare the room</i> task.
+	</li>
+	<li>
+	<em>add food</em>: the <bc>RBR</bc> must execute in autonomous way the
+	<i>Add food</i> task.
+	</li>
+	<li>
+	<em>clear</em>: the <bc>RBR</bc> must execute in autonomous way the
+	<i>Clear the room</i> task.
+	</li>
+</ul>
+These tasks are normally executed in sequence, and the main scenario can be
+summarized as follows:
+<ol>
+	<li>
+	At start, the room is empty (i.e. no people is in it, besides the
+	<bc>Maitre</bc>) while the <em>pantry</em> and the <em>fridge</em> are
+	filled with a proper set of items. The <bc>RBR</bc> is in its <ks>RH</ks>
+	location and the <em>dishwasher</em> is empty.
+	</li>
+	<li>The <bc>Maitre</bc> sends to the <bc>RBR</bc> the <em>prepare</em>
+	command and waits for the completion of the related task. At the end, the
+	<bc>RBR</bc> is in its <ks>RH</ks> location again.
+	</li>
+	<li>
+	The <bc>Maitre</bc> opens the room to people. During the service, the
+	<bc>Maitre</bc> can send to the <bc>RBR</bc> the <em>add food</em> command,
+	by specifying a <em>food-code</em>. The <bc>RBR</bc> executes the task only
+	if food with the given code is available in the <em>fridge</em>, otherwise
+	it sends a warning to the <bc>Maitre</bc>. After the task completion, the
+	<bc>RBR</bc> returns is in its <ks>RH</ks> location.
+	</li>
+	<li>At the end of the party, the <bc>Maitre</bc> <bc>Maitre</bc> sends to the
+	<bc>RBR</bc> the <em>clear</em> command and waits for the completion of the
+	task. The <bc>RBR</bc> returns is in its <ks>RH</ks> location again.
+	</li>
+</ol>
+However, the <bc>Maitre</bc> is able, at any time, to use his/her smart-phone to:
+<ul>
+	<li>
+	<em>consult</em> the <kc>state of the room</kc>, e.g. to known what are the
+	objects related to each resource; for example, the object currently posed on
+	the <em>Table</em>, in the <em>dishwasher</em>, etc;
+	</li>
+	<li>
+	<em>stop</em> or <em>reactivate</em> an activated task.
+	</li>
+</ul>
+Finally, the <bc>RBR</bc> must be able to
+<ul>
+	<li>
+	<em>avoid</em> the impact with mobile obstacles (e.g. the <bc>Maitre</bc> or
+	other humans/animals present in the room).
+	</li>
+</ul>
+The software to put on the <em>fridge</em> should make the device able to:
+<ul>
+	<li>
+	<em>expose</em> its current content on the <bc>Maitre</bc> smart-phone;
+	</li>
+	<li>
+	<em>answer</em> to questions about its content (e.g. if it contains food with
+	a given code ).
+	</li>
+</ul>
+</div>
+</div>
+
+<h2>Requirement analysis</h2>
+<div >
+<ks>GOAL</ks>: <i>i)</i> clarify the meaning of the <i>names</i> and of the
+<i>verbs</i> included in the requirement text given by the customer. <i>ii)</i>
+define a first working prototype (and a proper set of <k>functional TestPlan</k>)
+as a formal model of the requirements.
+<br/>
+  <h3>Glossario</h3>
+<br/>
+<table>
+	<tr>
+  	<th>
+      Parola
+    </th>
+    <th>
+      Significato
+    </th>
+  </tr>
+  <tr>
+    <td>
+      room
+    </td>
+    <td>
+      Stanza in cui si svolge il Buffet
+    </td>
+  </tr>
+  <tr>
+  	<td>
+      smart
+    </td>
+    <td>
+      Risorsa dotata di comportamento e caratterizzata da deployment autonomi, cioè in possesso di capacità computazionali e all'interno di un nodo fisico dedicato
+    </td>
+  </tr>
+  <tr>
+    <td>
+      fridge
+    </td>
+    <td>
+      Frigorifero presente all'interno della stanza, contenente i cibi da portare sulla tavola
+    </td>
+  </tr>
+  <tr>
+    <td>
+      dishwasher
+    </td>
+    <td>
+      Lavastoviglie presente all'interno della stanza, in cui il <bc>RBR</bc> dovrà portare i piatti al termine del party
+    </td>
+  </tr>
+  <tr>
+    <td>
+      pantry
+    </td>
+    <td>
+      La credenza all'interno della stanza, contenente i piatti puliti da distribuire sul tavolo
+    </td>
+  </tr>
+  <tr>
+    <td>
+      ddr robot / Room Butler Robot
+    </td>
+    <td>
+      Il robot che lavora all'interno della stanza, il cui compito è:
+      <ul>
+        <li>
+          apparecchiare il tavolo prima dell'arrivo degli invitati;
+        </li>
+        <li>
+          aggiungere, su comando del <bc>Maitre</bc>, dei cibi dal frigo durante il buffet;
+        </li>
+        <li>
+          sparecchiare il tavolo alla fine del party
+        </li>
+      </ul>
+    </td>
+  </tr>
+	<tr>
+    <td>
+      Maitre
+    </td>
+    <td>
+      responsabile del Buffet e del controllo del <bc>RBR</bc>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      task
+    </td>
+    <td>
+      ciascuno dei tre compiti prepare, add, clear che <bc>RBR</bc> deve sapere eseguire
+    </td>
+  </tr>
+  <tr>
+    <td>
+      prepare
+    </td>
+    <td>
+      Prima delle attività del <bc>RBR</bc>, apre il Buffet e consiste nel prelevare il cibo dal frigo e i piatti dalla credenza e porli sul tavolo
+    </td>
+  </tr>
+  <tr>
+    <td>
+      dishes
+    </td>
+    <td>
+      Piatti inizialmente all'interno della credenza
+    </td>
+  </tr>
+  <tr>
+    <td>
+      food
+    </td>
+    <td>
+      Cibo inizialmente all'interno del frigo
+    </td>
+  </tr>
+  <tr>
+    <td>
+      clear
+    </td>
+    <td>
+      Seconda attività del <bc>RBR</bc>, conclude il Buffet e consiste nel portare i piatti dal tavolo e il cibo non consumato nel frigo
+    </td>
+  </tr>
+  <!--
+  <tr>
+    <td>
+      non-consumed food
+    </td>
+    <td>
+      Cibo che, al termine del party, non è stato consumato e si trova ancora sul tavolo
+    </td>
+  </tr>
+  -->
+  <tr>
+    <td>
+      add
+    </td>
+    <td>
+      Terza attività del <bc>RBR</bc>, si svolge durante il Buffet e consiste nell'aggiunta di un cibo specifico, se presente nel frigo, sul tavolo
+    </td>
+  </tr>
+</table>
+<br/>
+Procediamo analizzando il testo dato e specificando i requisiti derivanti
+<br/>
+<ul>
+	<li>
+	<i>"... putting on the Table dishes taken from the pantry, and food taken from
+	the fridge."</i> => <em>Table</em>
+	dovrà dunque permettere il deposito di item su di sè, mentre <em>fridge</em>
+	e <em>pantry</em> dovranno permetterne il prelievo
+	</li>
+	<li>
+	<i>"The set of items to put on the table
+	in this phase is fixed and properly described somewhere."</i> => <em>fridge</em>
+	e <em>pantry</em> dovranno quindi essere caricati all'avvio del programma con un
+	set di item preconfigurato
+	</li>
+    <!--
+	<li>
+	<i>"... bringing non-consumed food again in the fridge and the dishes in the
+	dishwasher."</i> => ci dovrà perciò essere una simulazione del cibo consumato,
+	quello rimanente sarà riposto di nuovo nel <em>fridge</em>. Il <em>fridge</em>
+	deve quindi permettere la reintroduzione di cibo, mentre la <em>dishwasher</em>
+	deve permettere l'aggiunta dei piatti
+	</li>
+    -->
+	<li>
+	<i>"... bringing some specific food (if it exists) from the fridge ..."</i> =>
+	<em>fridge</em> dovrà dunque fornire la possibilità di verificare la presenza
+	di un cibo al suo interno
+	</li>
+	<li>
+	<i>"... the fridge is intended to be a smart device ..."</i> =>
+	<em>fridge</em> sarà uno smart device, secondo la definizione data prima
+	</li>
+	<li>
+	<i>"Moreover, it should be able to answer (via CoAP) ..."</i> =>
+	<em>fridge</em> dovrà comunicare attraverso il protocollo CoAP
+	</li>
+	<li>
+	<i>"The pantry and the dishwasher are (at the moment) non-smart
+	resources."</i> =>
+	<em>pantry</em> e <em>dishwasher</em> non sono smart resources (secondo
+	la definizione data prima), ma dovrebbero essere facilmente rendibili
+	tali
+	</li>
+</ul>
+<br/>
+Dal riquadro verde si evince inoltre che:
+<ul>
+	<li>
+	<bc>RBR</bc> dovrà accettare, tipicamente in sequenza, i comandi
+	<em>prepare</em>, <em>add</em> (anche più volte), <em>clear</em>,
+	svolgendo per ciascuno il compito sopra definito. Il compito relativo
+	ad <em>add</em> andrà eseguito solo il cibo specificato sarà presente
+	nel <em>fridge</em>, in caso contrario il <bc>Maitre</bc> dovrà essere
+	notificato. Inoltre, ognuno dei compiti relativi ai comandi terminerà
+	col ritorno del <bc>RBR</bc> alla Robot Home
+	</li>
+	<li>
+	All'avvio dell'applicazione, oltre al caricamento degli item su
+	<em>fridge</em> e <em>pantry</em> già descritto, si dovrà avere
+	<em>dishwasher</em> vuota e <bc>RBR</bc> alla Robot Home
+	</li>
+	<li>
+	Ogni cibo avrà un proprio <em>food-code</em> e <em>fridge</em>
+	dovrà determinare la presenza del cibo dipendentemente da questo
+	codice
+	</li>
+	<li>
+	<bc>Maitre</bc> deve poter in ogni momento poter osservare lo stato
+	della stanza (ovvero degli elementi al suo interno) e deve poter
+	sospendere e riavviare il compito correntemente in esecuzione
+	</li>
+	<li>
+	<bc>RBR</bc> deve sapere evitare gli ostacoli all'interno della
+	stanza
+	</li>
+	<li>
+	<em>fridge</em> deve rendere visibile il proprio stato al
+	<bc>Maitre</bc> e deve poter rispondere a domande relativamente
+	alla presenza di un cibo con un certo codice
+	</li>
+</ul>
+
+</div>
+
+<h2>Problem analysis</h2>
+<div >
+<ks>WARNING</ks>: expressions like <i>'we have chosen to ...'</i>,
+<i>'I decided ...'</i>, etc. are <k>forbidden</k> here.<br/>Rather, this section
+should include sentences like <b><i>'this (aspect of the) problem implies
+that ...'</i></b> or <i><b>'the usage of this (legacy) component requires
+that ...'</i></b>, etc.
+<br/>
+<ks>GOAL</ks>:
+<i>i)</i>define the <k>logical architecture</k> of the system as an executable
+model. <i>ii)</i>give a <k>quantitative measure of the effort/resources</k>
+necessary to build the system. <i>iii)</i> define a (first)
+<k>product backlog</k>.
+
+<br/>
+<br/>
+Dai requisiti sopra identificati ricaviamo che:
+<ol type="1">
+	<li id="p1">
+	Essendo i vari elementi dell'applicazione distribuiti ed autonomi,
+	è utile utilizzare un modello ad attori con scambio di messaggi ed
+	eventi asincrono
+	</li>
+	<li id="p2">
+	Dato che il funzionamento dell'applicazione è piuttosto ripetitivo e
+	deterministico, gli attori sono ben modellabili come automi a stati finiti
+	(ASF) in cui il passaggio tra i vari stati è solitamente scandito dai
+	messaggi ricevuti
+	</li>
+	<li id="p3">
+	I vari attori dovranno contenere ciascuno un proprio stato solo da essi
+	direttamente accedibile. Chi, al di fuori dell'attore stesso, necessiterà
+	del suo stato, dovrà richiederlo e ottenerlo tramite scambio di messaggi
+	</li>
+    <!--
+	<li>
+	La stessa simulazione delle consumazioni di cibo sarà gestita con un elemento
+    che autonomamente si occupa di inviare un messaggio di consumazione ad
+    intervalli regolari
+	</li>
+    -->
+    <li id="p4">
+    Il fatto che <em>fridge</em> debba comunicare tramite il protocollo CoAP
+    implica che anche le entità interessate ad inviargli richieste
+    dovranno utilizzare tale protocollo per farlo. Ciò dovrebbe avvenire il
+    più possibile indipendentemente dalla tecnologia utilizzata nella normale
+    comunicazione a messaggi col resto degli attori, al fine di evitare che
+    ognuno debba utilizzare un proprio modulo hard-coded per il solo scambio di
+    messaggi col <em>fridge</em>
+    </li>
+    <li id="p5">
+	Per eseguire ogni task in maniera autonoma l'<bc>RBR</bc> dovrà essere a
+    conoscenza della posizione di ogni elemento nella stanza (e della propria)
+	e dovrà essere in grado di calcolare il percorso per raggiungerli
+	</li>
+    <li id="p6">
+	L'<bc>RBR</bc> dovrà conoscere i messaggi da inviare agli elementi della
+    stanza (una volta raggiunti) per realizzare ogni task
+	</li>
+    <li id="p7">
+    <bc>Maitre</bc> dovrà poter comunicare col <bc>RBR</bc> tramite una
+    interfaccia che metta a disposizione:
+    <ol type="1">
+    	<li>
+        i comandi prepare, add (con annesso un campo di specifica del codice),
+        clear
+        </li>
+        <li>
+        i comandi stop e reactivate
+        </li>
+        <li>
+        la visualizzazione degli stati degli attori
+        </li>
+    </ol>
+    </li>
+    <li id="p8">
+    <bc>RBR</bc> dovrà possedere un metodo di rilevazione degli ostacoli, al
+    fine di poterli evitare
+    </li>
+</ol>
+</br>
+Detto ciò, è possibile definire un primo modello logico dell'applicazione, dal
+punto di vista di struttura, interazione, comportamento.
+	<h3>Struttura</h3>
+	<div>
+	Secondo i requisiti, sono già definibili per i vari attori dei nodi
+	computazionali distinti. Nello specifico avremo un nodo dedicato a
+	<em>fridge</em>, essendo esso una risorsa smart, un nodo dedicato
+	all'interfaccia che utilizzerà <bc>Maitre</bc> ed uno relativo al
+	<bc>RBR</bc> ed agli attori al momento non smart
+	</div>
+	</br>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/struttura.png" width="150%" height="75%"/></center>
+	</div></br>
+	<h3>Interazione</h3>
+	<h4>Prepare</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/prepare.png" width="100%" height="50%"/></center>
+    </div></br>
+	<h4>Add</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/add.png" width="100%" height="50%"/></center>
+    </div></br>
+	<h4>Clear</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/clear.png" width="100%" height="50%"/></center>
+    </div></br>
+	<h3>Comportamento</h3>
+	<h4>ASF Butlermind</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/ASF-Butlermind.png" width="100%" height="50%"/></center>
+    </div></br>
+	<h4>ASF Table</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/ASF-table.png" width="100%" height="50%"/></center>
+    </div></br>
+	<h4>ASF Fridge</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/ASF-fridge.png" width="100%" height="50%"/></center>
+    </div></br>
+	<h4>ASF Dishwasher</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/ASF-dishwasher.png" width="100%" height="50%"/></center>
+    </div></br>
+	<h4>ASF Pantry</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/ASF-pantry.png" width="100%" height="50%"/></center>
+    </div></br>
+
+
+</div>
+
+
+<h2>Test plans</h2>
+<div>
+<ks>GOAL</ks>: give a formal description (for example, by using <ks>JUnit</ks>)
+of the <k>functional TestPlans</k>, with reference to the
+<k>logical architecture</k> of the system.
+
+</div>
+
+<h2>Project</h2>
+
+Lista di cose di cui parlare:
+    - uso qak
+    - riutilizzo progetti prof e quindi
+    planning e mappa della stanza relativa
+    (anche evitamento ostacoli?)
+    - uso prolog come stato (disegni?)
+    - uso proxy e coap frigo
+    - frontend node
+
+	<h3>Creazione del modello ad attori tramite linguaggio QAK</h3>
+	<div>
+    Al fine di creare il modello ad attori è riutilizzabile un linguaggio
+    già sviluppato dalla nostra software house, detto linguaggio QAK. Tramite
+    esso sono facilmente definibili attori come entità autonome mappate in ASF
+    che possono comunicare tramite messaggi o eventi. Inoltre, ogni attore così
+    definito possiede una propria knowledge base prolog, utile a mantenere stato
+    configurabile (<a href="#p1">P1</a>).
+    Implementiamo quindi un Qactor per ogni elemento della stanza (<P2).
+    </div>
+    <h3>Architettura</h3>
+    <div class="img" style="width:60%">
+		<center><img src="./immagini/contesti.png" width="100%" height="50%"/></center>
+    </div></br>
+
+ 	<h3>Uso delle KB degli attori</h3>
+    <div>
+    È già stato menzionato come ognuno degli attori possieda una propria KB. Questa è
+    utilizzabile per mantenere all'interno di fatti prolog lo stato proprio dell'attore.
+    In questo modo lo stato è direttamente accedibile solo dall'attore stesso
+    (<a href="#p3">P3</a>) tramite regole prolog definite nella KB stessa
+    </div>
+
+
+    <h3>Robot e planning</h3>
+    	<div>
+        	Per interagire con il robot(fisico/virtuale) e rilievare eventuali ostacoli riutilizziamo mainctxrobotmind
+        	Il <kc>planning</kc> è delegato all'attore <em>workerinroom</em>, all'interno del contesto mainCtxWorkInRoom
+            Tale attore è stato modificato per evitare ostacoli mobili tornando indietro e ostacoli fissi
+            ricalcolando il percorso(P8).
+            L'attore butlerplanexecutor(riutlizzato) definisce, sulla base dei task configurati, quali percorsi stabilire
+            per realizzare ogni task comunicando quando viene terminato ogni percorso
+      	</div>
+
+      <h3>Task e messaggi </h3>
+    	<div>
+        	Allo scopo di realizzare ogni task l'attore butlermind definisce, sulla base dei task configurati, a quale
+            destinatario e quali messaggi inviare al raggiungimento di ogni elemento della stanza(comunicato da butlerplanexecutor)
+       </div>
+
+
+
+    <h3>Interazione CoAP e attore frigo</h3>
+    <div>
+    	Come da requisiti, si implementa l'attore <em>fridge</em> in modo da utilizzare il protocollo <ks>CoAP</ks>
+        per le comunicazioni. Inoltre, si utilizza il pattern Proxy per garantire che l'attore sia
+        <i>technology-independent</i> per quanto riguardo il protocollo di comunicazione scelto.
+
+    </div>
+    <div class="img" style="width:60%">
+		<center><img src="./immagini/coap.png" width="100%" height="50%"/></center>
+    </div></br>
+
+        <h3>Frontend</h3>
+    <div>
+    	Si realizza il frontend tramite una pagina web, in modo che sia accessibile da mobile attraverso
+        il browser indipendentemente dal manufacturer. L'interfaccia ha lo scopo di permettere al
+        <bc>Maitre</bc> di inviare al <bc>RBR</bc> i comandi da eseguire, nonché di tenere traccia
+        dello stato di tutti gli elementi presenti nella stanza. L'interazione con i suddetti elementi
+        avviene con il protocollo <ks>MQTT</ks>: l'aggiornamento dello stato avviene per mezzo di eventi,
+        mentre l'invio dei comandi si compie mediante messaggi.
+    </div>
+
+<h2>Testing</h2>
+
+<h2>Deployment</h2>
+ <div class="img" style="width:60%">
+	<center><img src="./immagini/deployment.png" width="100%" height="50%"/></center>
+ </div></br>
+ <div>
+      Il deployment di ctxfridge verrà ovviamente effettuato nel nodo del frigo mentre gli elementi virtuali sono
+      inseriti all'interno dell'<bc>RBR</bc>.
+</div>
+
+
+
+<br/><br/>
+</div>
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;font-size:small;color:white">
+By<br/>
+Gioele Pisanelli, email: gioele.pisanelli@studio.unibo.it<br/>
+Tommaso Liverani, email: tommaso.liverani@studio.unibo.it<br/>
+Alberto Jesu, email: alberto.jesu@studio.unibo.it<br/>
+<!-- <img src="./img/emiglio.png" alt="mbot" width="8%" height="8%"> -->
+</div>
+</body>
+</html>
