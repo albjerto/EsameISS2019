@@ -700,7 +700,7 @@ Definito ciò scritto sopra, quindi, ci si aspetta che:
 	gli stati dei vari attori siano modificati correttamente
 	</li>
 	<li id="t4">
-	<bc>RBR</bc> sappia dire correttamente dove si trova all'interno della stanza
+	<bc>RBR</bc> sia effettivamente capace di evitare gli ostacoli
 	</li>
 	<li id="t5">
 	la comunicazione CoAP col <em>fridge</em> avvenga senza errori
@@ -785,6 +785,50 @@ Si implementeranno, dunque, test che verifichino ciò.
     </div>
 
 <h2>Testing</h2>
+<div>
+Si riportano alcuni dei test di cui parlato sopra nella sezione Test plans.</br>
+In alcuni di essi è stato utilizzato un elemento, detto MockActor, che simuli un attore 
+dal solo punto di vista di memorizzazione dell'ultimo messaggio ricevuto:
+</div>
+</br>
+<div class="img" style="width:60%">
+	<center><img src="./immagini/mockActor.png" width="100%" height="50%"/></center>
+</div></br>
+<div>
+Nel seguente test si controlla che vari attori ricevano messaggi adeguatamente:
+</div>
+</br>
+<div class="img" style="width:60%">
+	<center><img src="./immagini/butlermindTest.png" width="100%" height="50%"/></center>
+</div></br>
+<div>
+Nel seguente test si controlla che lo stato dell'attore <em>table</em> venga 
+correttamente modificato:
+</div>
+</br>
+<div class="img" style="width:60%">
+	<center><img src="./immagini/tableStateTest.png" width="100%" height="50%"/></center>
+</div></br>
+<div>
+Nel seguente test si controlla che <bc>RBR</bc> riesca a raggiungere <em>fridge</em> 
+nonostante l'aver incontrato un ostacolo:
+</div>
+</br>
+<div class="img" style="width:60%">
+	<center><img src="./immagini/obstacleAvoidanceTest.png" width="100%" height="50%"/></center>
+</div></br>
+<div>
+Nel seguente test si controlla che la comunicazione CoAP col <em>fridge</em> avvenga 
+adeguatamente:
+</div>
+</br>
+<div class="img" style="width:60%">
+	<center><img src="./immagini/coapCommunicationTest.png" width="100%" height="50%"/></center>
+</div></br>
+<div>
+In diversi test è implicitamente controllato che i vari attori compiano le transizioni 
+tra stati necessarie, altrimenti il test fallirebbe.
+</div>
 
 <h2>Deployment</h2>
  <div class="img" style="width:60%">

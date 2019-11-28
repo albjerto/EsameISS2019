@@ -134,50 +134,74 @@ table, th, td {
 
 <head>
 
-<title>Lab ... </title></head>
+<title>Sprint 5</title></head>
 
 <body>
 <div id="top">
-<h1>81614 - LABORATORIO DI SISTEMI SOFTWARE <font size="5"></font> </h1>
+<h1>SPRINT 5<font size="5"></font> </h1>
 </div>
 <div class="body">
 
 
 <h2>Requirements</h2>
 <div class="req">
-	Realizzare un <bc>RBR</bc> in grado di interagire con gli elementi all'interno di un ambiente virtuale(fridge, table, pantry,dishwasher)
-	per relizzare i seguenti task:
+	Realizzare un <bc>RBR</bc> in grado di interagire con gli elementi all'interno di 
+	un ambiente virtuale (<em>fridge</em>, <em>table</em>, <em>pantry</em>, 
+	<em>dishwasher</em>) per relizzare i seguenti task:
     <ul>
-        <li> Prepare: Mettere sul tavolo dei determinati cibi dal frigo e stoviglie dalla pantry</li>
-        <li> Clear: Portare dal tavolo il cibo non consumato nel frigo e le stoviglie usate nella dishwasher</li>
-        <li> Add: Aggiungere un cibo con un determinato food-code(se presente) dal frigo al tavolo</li>
+        <li>
+		Prepare: Mettere sul tavolo dei determinati cibi dal <em>fridge</em> e 
+		stoviglie dalla <em>pantry</em>
+		</li>
+        <li>
+		Clear: Portare dal <em>table</em> il cibo non consumato nel <em>fridge</em> e 
+		le stoviglie usate nella <em>dishwasher</em>
+		</li>
+        <li>
+		Add: Aggiungere un cibo con un determinato food-code (se presente) dal 
+		<em>fridge</em> al <em>table</em>
+		</li>
     </ul>
-	Vi è inoltre il vincolo che prepare può essere eseguito solo all'inizio e dopo una clear mentre add e clear possono essere eseguiti solo dopo una prepare.
+	Vi è inoltre il vincolo che prepare può essere eseguito solo come primo comando, 
+	<!--o dopo una clear--> mentre add e clear possono essere eseguiti solo dopo una 
+	prepare.
     <br/>
-	L'<bc>RBR</bc> dovrà essere in grado di spostarsi davanti ad ogni elemento nella stanza e interagire correttamente al fine di realizzare ogni task. Dovrà essere possibile
-	visualizzare un ogni momento gli oggetti temporaneamente posati sull'<bc>RBR</bc>.
+	L'<bc>RBR</bc> dovrà essere in grado di spostarsi davanti ad ogni elemento nella 
+	stanza e interagire correttamente al fine di realizzare ogni task. Dovrà essere 
+	possibile visualizzare in ogni momento gli oggetti temporaneamente posati 
+	sull'<bc>RBR</bc>.
 	<br/>
     Dovrà, infine, essere effettuato il deploy del <bc>RBR</bc> su un robot fisico.
 </div>
 
 
-<h2>Requirement analysis</h2>
-
+<h2>Analisi dei requisiti</h2>
 <div>
 All'<bc>RBR</bc> dovrà essere chiesto di <br/>
 <ul>
-    <li> Visualizzare il suo stato in ogni momento</li>
-    <li> Di eseguire un determianto task (solo se questo può essere eseguito)</li>
-    <li> Interagire con gli elementi della stanza per realizzare i task</li>
-    <li> Permettere agli oggetti della stanza di aggiungere elementi al suo stato</li>
-    <li> Spostarsi correttamente all'interno della stanza alla fine di realizzare il task</li>
+    <li>
+	Visualizzare il suo stato in ogni momento
+	</li>
+    <li>
+	Eseguire un determianto task (solo se questo può essere eseguito)
+	</li>
+    <li>
+	Interagire con gli elementi della stanza per realizzare i task
+	</li>
+    <li>
+	Permettere agli elementi della stanza di aggiungere elementi al loro stato
+	</li>
+    <li>
+	Spostarsi correttamente all'interno della stanza alla fine di realizzare i task
+	</li>
 </ul>
-Il deploy del <bc>RBR</bc> verrà effettuato su un <ks>mBot</ks> equipaggiato con un <ks>raspberry Pi</ks>.
+Il deploy dell'<bc>RBR</bc> verrà effettuato su un <ks>mBot</ks> equipaggiato con un 
+<ks>raspberry Pi</ks>.
 </div>
 
 
 
-<h2>Problem analysis</h2>
+<h2>Analisi del problema</h2>
 
 	<h4>STRUTTURA</h4>
 	<div class="img" style="width:60%">
@@ -197,61 +221,68 @@ Il deploy del <bc>RBR</bc> verrà effettuato su un <ks>mBot</ks> equipaggiato co
 	<div class="img" style="width:60%">
 		<center><img src="./immagini/ASF-butlermind.png" width="100%" height="50%"/></center>
     </div></br>
-
-
 </div>
 
 
 
-<h2>Project</h2>
+<h2>Progettazione</h2>
 <div class="img" style="width:60%">
 		<center><img src="./immagini/contesti.png" width="100%" height="50%"/></center>
- </div></br>
+</div></br>
+<div>
+Rispetto al prototipo dello sprint 4 viene modificato soltanto l'attore butlermind di 
+<em>workinroom.qak</em>, che si occupava unicamente di garantire l'ordine dei comandi.
+Adesso, al raggiungimento di ogni elemento della stanza, gestisce l'interazione con il 
+componente al fine di realizzare il task.</br>
+Viene inoltre realizzato un file prolog di supporto, detto <em>butlermindInit.pl</em>, 
+per gestire lo stato degli oggetti correntemente sul robot.
+</div>
 
-
- Rispetto al prototipo dello sprint 3 viene modificato soltanto l'attore butlermind di <em>workereinroom.qak</em> che si occupava unicamente di garantire l'ordine dei comandi.
- Adesso, al raggiungimento di ogni elemento della stanza, gestisce l'interazione con il componente al fine di realizzare il task.
- Viene inoltre realizzato un file prolog di supporto <em>butlermindInit.pl</em> per gestire lo stato degli oggetti correntemente sul robot.
 
 <h2>Deployment</h2>
 <div>
-    L'architettura scelta per il progetto è costruita in modo tale da rendere il passaggio da deployment su nodo virtuale a nodo fisico estremamente semplice e veloce.
-    Il deployment è effettuato su un <ks>mBot</ks> equipaggiato con un <ks>raspberry Pi</ks>.
-    <br />
-    Viene, innanzitutto, modificato il file <em>basicRobotConfig.pl</em>, dove risiede la configurazione
-    del sistema per quanto riguarda il tipo di robot utilizzato.
-    Dopodiché, viene modificato lo <code>StepTime</code> all'interno dell'attore <em>workerinroom</em>, allo scopo di rendere il tempo di avanzamento di ogni singolo passo del robot fisico
-    apprezzabile.
-    Successivamente, sono stati creati i file di distribuzione degli attori:
-    <ul>
-        <li>
-            <em>basicRobot</em>
-        </li>
-        <li>
-            <em>robotMind</em>
-        </li>
-        <li>
-            <em>resourceModel</em>
-        </li>
-        <li>
-            <em>oneStepAhead</em>
-        </li>
-        <li>
-            <em>sonarHandler</em>
-        </li>
-    </ul>
-    per quanto riguarda il progetto robotMinds, mentre, per quanto riguarda il progetto planning19, sono stati
-    compilati e distribuiti (in due .zip diversi) gli attori:
-    <ul>
-        <li>
-            <em>butlermind</em>, <em>butlerplanexecutor</em>, <em>workerinroom</em> per il contesto <em>ctxWorkInRoom</em>;
-        </li>
-        <li>
-            <em>dishwasher</em>, <em>pantry</em>, <em>table</em>, <em>proxyfridge</em> per il contesto <em>ctxRoomElements</em>, contenente gli oggetti <i>non-smart</i> della stanza.
-        </li>
-    </ul>
-
-    Vengono infile lanciati i tre file di distribuzione all'interno del raspberry attraverso ssh.
+L'architettura scelta per il progetto è costruita in modo tale da rendere il 
+passaggio da deployment su nodo virtuale a nodo fisico estremamente semplice e veloce.
+Il deployment è effettuato su un <ks>mBot</ks> equipaggiato con un <ks>raspberry Pi</ks>.
+<br/>
+Viene, innanzitutto, modificato il file <em>basicRobotConfig.pl</em>, dove risiede la 
+configurazione del sistema per quanto riguarda il tipo di robot utilizzato. Dopodiché, 
+viene modificato lo <code>StepTime</code> all'interno dell'attore <em>workerinroom</em>, 
+allo scopo di rendere il tempo di avanzamento di ogni singolo passo del robot fisico
+apprezzabile.<br/>
+Successivamente sono stati creati i file di distribuzione degli attori:
+<ul>
+	<li>
+	<em>basicrobot</em>
+	</li>
+	<li>
+	<em>robotmind</em>
+	</li>
+	<li>
+	<em>resourcemodel</em>
+	</li>
+	<li>
+	<em>onestepahead</em>
+	</li>
+	<li>
+	<em>sonarhandler</em>
+	</li>
+</ul>
+per quanto riguarda il progetto robotMinds, mentre, per quanto riguarda il progetto 
+planning19, sono stati compilati e distribuiti (in due .zip diversi) gli attori:
+<ul>
+	<li>
+	<em>butlermind</em>, <em>butlerplanexecutor</em>, <em>workerinroom</em> per il 
+	contesto <em>ctxWorkInRoom</em>;
+	</li>
+	<li>
+	<em>dishwasher</em>, <em>pantry</em>, <em>table</em>, <em>proxyfridge</em> per il 
+	contesto <em>ctxRoomElements</em>, contenente gli oggetti <i>non-smart</i> della 
+	stanza
+	</li>
+</ul>
+Vengono infile lanciati i tre file di distribuzione all'interno del raspberry 
+attraverso ssh.
 </div>
 
 

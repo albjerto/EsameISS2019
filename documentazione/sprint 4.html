@@ -5,7 +5,6 @@
 <script type="text/javascript" src="../css/issStyle.js"></script>
 -->
 <style type="text/css">
-<!--
 body
 {
     margin-left:  30px;
@@ -131,17 +130,15 @@ table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
 }         
-    
-  -->
 </style>
     
 <head>
    
-<title>Lab ...</title></head>
+<title>Sprint 4</title></head>
     
 <body>
 <div id="top">
-<h1>81614 - LABORATORIO DI SISTEMI SOFTWARE <font size="5"></font> </h1>
+<h1>SPRINT 4<font size="5"></font> </h1>
 </div>  
 <div class="body"> 
 
@@ -149,68 +146,83 @@ table, th, td {
 <h2>Requirements</h2>
 <div class="req">
 	<ol>
-		<li>Realizzazione di un frigo intelligente che metta a disposizione le seguenti funzionalità tramite il protocollo coap:
+		<li>
+		Realizzare un frigo intelligente che metta a disposizione le seguenti 
+		funzionalità tramite il protocollo CoAP:
 		<ul>
-			<li> Visualizzare del suo stato </li>
-			<li> Prelevare un determinato cibo </li>
-			<li> Prelevare una lista di cibi</li>
-			<li> Rispondere alla richiesta di presenza di un determinato cibo</li>
+			<li>Visualizzare il suo stato</li>
+			<li>Prelevare un determinato cibo</li>
+			<li>Prelevare una lista di cibi</li>
+			<li>Rispondere alla richiesta di presenza di un determinato cibo</li>
 		</ul>
-		<li> Realizzazione di un prototipo che rappresenti lo stato della stanza virtuale e che renda trasparente la presenza di un frigo intelligente rispetto ad un frigo virtuale  
-	
-	
+		</li>
+		<li>
+		Realizzare un prototipo che rappresenti lo stato della stanza virtuale 
+		e che renda trasparente la presenza di un frigo intelligente rispetto ad un 
+		frigo virtuale
+		</li>
 	</ol>
 </div>
 
 
-<h2>Requirement analysis</h2>
-
+<h2>Analisi dei requisiti</h2>
 <div>
-Al frigo intelligente deve poter essere chiesto via coap <br/>
-		<li>Di visualizzare il suo stato </li>
-		<li>Di prelevare un determinato cibo </li>
-        <li> Di prelevare una lista di cibi</li>
-        <li> Se un cibo con un determinato food-code è presente</li>
-		<li>Di aggiungere al suo stato una lista di cibi</li>
-		
-Lo stato della stanza virtuale deve poter inoltrare via coap le richieste che venivano inviate al frigo virtuale 
+Al frigo intelligente deve poter essere chiesto via CoAP:
+<ul>
+	<li>Di visualizzare il suo stato</li>
+	<li>Di prelevare un determinato cibo</li>
+	<li>Di prelevare una lista di cibi</li>
+	<li>Se un cibo con un determinato food-code è presente</li>
+	<li>Di aggiungere al suo stato una lista di cibi</li>
+</ul>
+Le richieste che sarebbero state inviate al frigo virtuale devono poter essere 
+inoltrate al frigo intelligente tramite protocollo CoAP.
 </div>
 
 
+<h2>Analisi del problema</h2>
 
-<h2>Problem analysis</h2>
-
-	<h4>PATTERN PROXY</h4>
+<h4>PATTERN PROXY</h4>
 	<div class="img" style="width:60%">
 		<center><img src="./immagini/coap.png" width="100%" height="50%"/></center>
     </div></br>
-	
-	
-	Tramite il pattern proxy possiamo soddisfare i requisiti richiesti rendendo la comunicazione <i>technology-independent</i>.
-	
-
+<div>
+Tramite il pattern proxy possiamo soddisfare i requisiti richiesti rendendo la 
+comunicazione <i>technology-independent</i>.
 </div>
 
 
 
-<h2>Project</h2> 
+<h2>Progettazione</h2> 
 <div class="img" style="width:60%">
 		<center><img src="./immagini/sprint 4.png" width="100%" height="50%"/></center>
- </div></br>
-Grazie a questa architettura possiamo riutilizzare il fridge precedentemente realizzato spostandolo in un contesto dedicato in cui comunica la risposta
-al proxy che la inoltrerà al giusto ricevente.
+</div></br>
+<div>
+Grazie a questa architettura possiamo riutilizzare il <em>fridge</em> precedentemente 
+realizzato spostandolo in un contesto dedicato, in cui è anche presente un proxyServer. 
+È a quest'ultimo che <em>fridge</em> comuniherà ogni risposta, che verrà dunque 
+inoltrata al giusto ricevente.</br>
 In questo sprint viene quindi realizzato:
-<li><em>fridge.qak</em>				per definire gli attori nel contesto fridge							</li>
-<li><em>CoapServerControl.kt</em> 	classe di supporto per trasformare un QActor in un server coap		</em></li>
-<li><em>CoapClientControl.kt</em> 	classe di supporto per trasformare un QActor in un client coap		</em></li>
+<ul>
+	<li>
+	<em>fridge.qak</em>, per definire gli attori nel ctxFridge
+	</li>
+	<li>
+	<em>CoapServerControl.kt</em>, classe di supporto per trasformare un QActor 
+	in un server coap
+	</li>
+	<li>
+	<em>CoapClientControl.kt</em>, classe di supporto per trasformare un QActor 
+	in un client coap
+	</li>
+</ul>
 
-
-Viene inoltre sostituito l'attore fridge con l'attore proxyfridge in <em>workereinroom.qak</em>
-
-
-	      	
-<br/><br/> 	
-</div>  
+Viene inoltre sostituito l'attore <em>fridge</em> con l'attore <em>proxyfridge</em> in 
+<em>roomelements.qak</em>
+</div>
+     	
+<br/></br>
+  
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;font-size:small;color:white">
 By<br/>
 Gioele Pisanelli, email: gioele.pisanelli@studio.unibo.it<br/>
