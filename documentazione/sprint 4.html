@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <!--
+<link rel="stylesheet" type="text/css" href="../css/issStyle1.css">
+<script type="text/javascript" src="../css/issStyle.js"></script>
+-->
+<style type="text/css">
+<!--
+body
+{
+    margin-left:  30px;
+    margin-right: 30px;
+};
+P
+{
+    font-family: Tahoma;
+    font-size: 10pt;
+};
+a, a:visited, a:active, a:link, a:hover {
+    text-decoration: underline;
+    color: #545454;
+    background-color: transparent;
+}
+a:hover {
+    background-color: #cccccc;
+}
+hr {
+    clear: both;
+    height: 1px;
+    color: #242424;
+    background-color: transparent;
+}
+h1, h2, h3 {
+    color: #242424;
+    clear: left;
+    font: 100% Tahoma, Helvetica, Arial, sans-serif;
+    margin: 10;
+    margin-right: 15px;
+    margin-bottom: 0.5em;
+    padding-top: 0.5em;
+    border-bottom: 1px solid #242424;
+}
+h1 {
+    font-size: 150%;
+    background-color: #b2c0ff;
+}
+h2 {
+    background-color: #d9fbff;
+    font-size: 110%;
+}
+h3 {
+	background-color: #e6ccff;
+    font-size: 80%;
+}
+h4 {
+    background-color: #99ffcc;
+    font-size: 100%;
+	width: 750px;
+}
+#i {
+    color: #ff1010;
+}
+tt{
+	font-family: "Arial";
+    font-size: 80%;
+	color: #006600;
+}
+em{
+	font-family: "Arial";
+    font-size: 80%;
+	font-weight: bold;
+	border-style:solid;
+	border-color: #ccffff;
+    color: #0033cc;
+}
+bc{
+	font-family: "Arial";
+	font-size: 80%;
+	font-weight: bold;
+    color: #990000;
+	background-color: #fcf8c7;
+}
+k{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #990000;
+	 
+}
+ks{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #0000CD	;
+	 
+}
+kc{
+	font-family: "Arial";
+	font-weight: bold;
+    color: #008000	;
+	 
+}
+pre{
+	font-family: "Helvetica";
+	font-size: 60%;
+	background-color: #fcf8c7;
+	border: 1px solid blue;
+}
+m{
+	font-family: "Helvetica";
+	line-height: 100%;
+ 	font-size: 75%;
+}
+div.body{
+	width: 800px;
+    font-size: 18px;
+}    
+div.req{
+	background-color: #d9ffb3;
+    font-size: 18px;
+	width: 700px;
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}       
+div.remark{
+	background-color: #FFFC33;     
+    border: 3px solid green;
+    padding: 15px;
+    margin: 10px;
+}  
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}         
+    
+  -->
+</style>
+    
+<head>
+   
+<title>Lab ...</title></head>
+    
+<body>
+<div id="top">
+<h1>81614 - LABORATORIO DI SISTEMI SOFTWARE <font size="5"></font> </h1>
+</div>  
+<div class="body"> 
+
+  
+<h2>Requirements</h2>
+<div class="req">
+	<ol>
+		<li>Realizzazione di un frigo intelligente che metta a disposizione le seguenti funzionalità tramite il protocollo coap:
+		<ul>
+			<li> Visualizzare del suo stato </li>
+			<li> Prelevare un determinato cibo </li>
+			<li> Prelevare una lista di cibi</li>
+			<li> Rispondere alla richiesta di presenza di un determinato cibo</li>
+		</ul>
+		<li> Realizzazione di un prototipo che rappresenti lo stato della stanza virtuale e che renda trasparente la presenza di un frigo intelligente rispetto ad un frigo virtuale  
+	
+	
+	</ol>
+</div>
+
+
+<h2>Requirement analysis</h2>
+
+<div>
+Al frigo intelligente deve poter essere chiesto via coap <br/>
+		<li>Di visualizzare il suo stato </li>
+		<li>Di prelevare un determinato cibo </li>
+        <li> Di prelevare una lista di cibi</li>
+        <li> Se un cibo con un determinato food-code è presente</li>
+		<li>Di aggiungere al suo stato una lista di cibi</li>
+		
+Lo stato della stanza virtuale deve poter inoltrare via coap le richieste che venivano inviate al frigo virtuale 
+</div>
+
+
+
+<h2>Problem analysis</h2>
+
+	<h4>PATTERN PROXY</h4>
+	<div class="img" style="width:60%">
+		<center><img src="./immagini/coap.png" width="100%" height="50%"/></center>
+    </div></br>
+	
+	
+	Tramite il pattern proxy possiamo soddisfare i requisiti richiesti rendendo la comunicazione <i>technology-independent</i>.
+	
+
+</div>
+
+
+
+<h2>Project</h2> 
+<div class="img" style="width:60%">
+		<center><img src="./immagini/sprint 4.png" width="100%" height="50%"/></center>
+ </div></br>
+Grazie a questa architettura possiamo riutilizzare il fridge precedentemente realizzato spostandolo in un contesto dedicato in cui comunica la risposta
+al proxy che la inoltrerà al giusto ricevente.
+
+	      	
+<br/><br/> 	
+</div>  
+<div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;font-size:small;color:white">
+By<br/>
+Gioele Pisanelli, email: gioele.pisanelli@studio.unibo.it<br/>
+Tommaso Liverani, email: tommaso.liverani@studio.unibo.it<br/>
+Alberto Jesu, email: alberto.jesu@studio.unibo.it<br/>  
+</div> 
+</body>
+</html>
