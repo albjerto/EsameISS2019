@@ -33,7 +33,7 @@ class CoapCommunicationTest {
 	
 	@After
 	fun terminate(){
-		println("TableStateTest terminate")	
+		println("CoapCommunicationTest terminate")	
 	}
 	
 	@Test
