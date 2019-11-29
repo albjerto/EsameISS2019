@@ -83,19 +83,19 @@ k{
 	font-family: "Arial";
 	font-weight: bold;
     color: #990000;
-	 
+
 }
 ks{
 	font-family: "Arial";
 	font-weight: bold;
     color: #0000CD	;
-	 
+
 }
 kc{
 	font-family: "Arial";
 	font-weight: bold;
     color: #008000	;
-	 
+
 }
 pre{
 	font-family: "Helvetica";
@@ -111,7 +111,7 @@ m{
 div.body{
 	width: 800px;
     font-size: 18px;
-}    
+}
 div.req{
 	background-color: #d9ffb3;
     font-size: 18px;
@@ -119,46 +119,47 @@ div.req{
     border: 3px solid green;
     padding: 15px;
     margin: 10px;
-}       
+}
 div.remark{
-	background-color: #FFFC33;     
+	background-color: #FFFC33;
     border: 3px solid green;
     padding: 15px;
     margin: 10px;
-}  
+}
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
-}         
+}
 </style>
-    
+
 <head>
-   
+
 <title>Sprint 4</title></head>
-    
+
 <body>
 <div id="top">
 <h1>SPRINT 4<font size="5"></font> </h1>
-</div>  
-<div class="body"> 
+</div>
+<div class="body">
 
-  
+
 <h2>Requirements</h2>
 <div class="req">
 	<ol>
 		<li>
-		Realizzare un frigo intelligente che metta a disposizione le seguenti 
+		Realizzare un frigo intelligente che metta a disposizione le seguenti
 		funzionalità tramite il protocollo CoAP:
 		<ul>
 			<li>Visualizzare il suo stato</li>
 			<li>Prelevare un determinato cibo</li>
 			<li>Prelevare una lista di cibi</li>
 			<li>Rispondere alla richiesta di presenza di un determinato cibo</li>
+            <li>Inserire una lista di cibi</li>
 		</ul>
 		</li>
 		<li>
-		Realizzare un prototipo che rappresenti lo stato della stanza virtuale 
-		e che renda trasparente la presenza di un frigo intelligente rispetto ad un 
+		Realizzare un prototipo che rappresenti lo stato della stanza virtuale
+		e che renda trasparente la presenza di un frigo intelligente rispetto ad un
 		frigo virtuale
 		</li>
 	</ol>
@@ -175,7 +176,7 @@ Al frigo intelligente deve poter essere chiesto via CoAP:
 	<li>Se un cibo con un determinato food-code è presente</li>
 	<li>Di aggiungere al suo stato una lista di cibi</li>
 </ul>
-Le richieste che sarebbero state inviate al frigo virtuale devono poter essere 
+Le richieste che sarebbero state inviate al frigo virtuale devono poter essere
 inoltrate al frigo intelligente tramite protocollo CoAP.
 </div>
 
@@ -187,20 +188,20 @@ inoltrate al frigo intelligente tramite protocollo CoAP.
 		<center><img src="./immagini/coap.png" width="100%" height="50%"/></center>
     </div></br>
 <div>
-Tramite il pattern proxy possiamo soddisfare i requisiti richiesti rendendo la 
+Tramite il pattern proxy possiamo soddisfare i requisiti richiesti rendendo la
 comunicazione <i>technology-independent</i>.
 </div>
 
 
 
-<h2>Progettazione</h2> 
+<h2>Progettazione</h2>
 <div class="img" style="width:60%">
 		<center><img src="./immagini/sprint 4.png" width="100%" height="50%"/></center>
 </div></br>
 <div>
-Grazie a questa architettura possiamo riutilizzare il <em>fridge</em> precedentemente 
-realizzato spostandolo in un contesto dedicato, in cui è anche presente un proxyServer. 
-È a quest'ultimo che <em>fridge</em> comunicherà ogni risposta, che verrà dunque 
+Grazie a questa architettura possiamo riutilizzare il <em>fridge</em> precedentemente
+realizzato spostandolo in un contesto dedicato, in cui è anche presente un proxyServer.
+È a quest'ultimo che <em>fridge</em> comunicherà ogni risposta, che verrà dunque
 inoltrata al giusto ricevente.</br>
 In questo sprint viene quindi realizzato:
 <ul>
@@ -208,26 +209,26 @@ In questo sprint viene quindi realizzato:
 	<em>fridge.qak</em>, per definire gli attori nel ctxFridge
 	</li>
 	<li>
-	<em>CoapServerControl.kt</em>, classe di supporto per trasformare un QActor 
+	<em>CoapServerControl.kt</em>, classe di supporto per trasformare un QActor
 	in un server coap
 	</li>
 	<li>
-	<em>CoapClientControl.kt</em>, classe di supporto per trasformare un QActor 
+	<em>CoapClientControl.kt</em>, classe di supporto per trasformare un QActor
 	in un client coap
 	</li>
 </ul>
 
-Viene inoltre sostituito l'attore <em>fridge</em> con l'attore <em>proxyfridge</em> in 
+Viene inoltre sostituito l'attore <em>fridge</em> con l'attore <em>proxyfridge</em> in
 <em>roomelements.qak</em>
 </div>
-     	
-<br/></br>
-  
+</div>
+<br/><br/>
+
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;font-size:small;color:white">
 By<br/>
 Gioele Pisanelli, email: gioele.pisanelli@studio.unibo.it<br/>
 Tommaso Liverani, email: tommaso.liverani@studio.unibo.it<br/>
-Alberto Jesu, email: alberto.jesu@studio.unibo.it<br/>  
-</div> 
+Alberto Jesu, email: alberto.jesu@studio.unibo.it<br/>
+</div>
 </body>
 </html>

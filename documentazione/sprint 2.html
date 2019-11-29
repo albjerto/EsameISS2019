@@ -83,19 +83,19 @@ k{
 	font-family: "Arial";
 	font-weight: bold;
     color: #990000;
-	 
+
 }
 ks{
 	font-family: "Arial";
 	font-weight: bold;
     color: #0000CD	;
-	 
+
 }
 kc{
 	font-family: "Arial";
 	font-weight: bold;
     color: #008000	;
-	 
+
 }
 pre{
 	font-family: "Helvetica";
@@ -111,7 +111,7 @@ m{
 div.body{
 	width: 800px;
     font-size: 18px;
-}    
+}
 div.req{
 	background-color: #d9ffb3;
     font-size: 18px;
@@ -119,42 +119,42 @@ div.req{
     border: 3px solid green;
     padding: 15px;
     margin: 10px;
-}       
+}
 div.remark{
-	background-color: #FFFC33;     
+	background-color: #FFFC33;
     border: 3px solid green;
     padding: 15px;
     margin: 10px;
-}  
+}
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
-}         
+}
 </style>
-    
+
 <head>
-   
+
 <title>Sprint 2</title></head>
-    
+
 <body>
 <div id="top">
 <h1>SPRINT 2<font size="5"></font> </h1>
-</div>  
-<div class="body"> 
+</div>
+<div class="body">
 
-  
+
 <h2>Requirements</h2>
 <div class="req">
-	Realizzare un <bc>RBR</bc> in grado di eseguire determinati task 
-	(prepare, add, clear). Alla ricezione del messaggio relativo ad un determinato 
-	task l'<bc>RBR</bc> dovrà essere in grado di pianificare autonomamente un 
-	percorso passando da determinati punti dell'ambiente virtuale associati a quel 
-	task. Durante l'esecuzione del task l'<bc>RBR</bc> dovrà evitare eventuali 
-	ostacoli fissi o mobili. L'<bc>RBR</bc> dovrà inoltre mostrare la funzionalità 
+	Realizzare un <bc>RBR</bc> in grado di eseguire determinati task
+	(prepare, add, clear). Alla ricezione del messaggio relativo ad un determinato
+	task l'<bc>RBR</bc> dovrà essere in grado di pianificare autonomamente un
+	percorso passando da determinati punti dell'ambiente virtuale associati a quel
+	task. Durante l'esecuzione del task l'<bc>RBR</bc> dovrà evitare eventuali
+	ostacoli fissi o mobili. L'<bc>RBR</bc> dovrà inoltre mostrare la funzionalità
 	di pausa e riattivazione di un task in esecuzione.<br/>
 	I comandi add e clear potranno essere eseguiti solo dopo un comando prepare.<br/>
 	Il comando prepare è consentito solo come primo comando.
-	<!-- o dopo un comando clear.-->	
+	<!-- o dopo un comando clear.-->
 </div>
 
 
@@ -180,40 +180,38 @@ Il prototipo realizzato deve essere in grado di:
 </br>
 <ul>
 	<li>
-	L'attore butlermind si occuperà di garantire l'ordine dei messaggi e inoltrarli 
+	L'attore butlermind si occuperà di garantire l'ordine dei messaggi e inoltrarli
 	a butlerplanexecutor
 	</li>
 	<li>
-	butlerplanexecutor si occuperà di recuperare i punti da cui passare per ciascun 
+	butlerplanexecutor si occuperà di recuperare i punti da cui passare per ciascun
 	task
 	</li>
 	<li>
-	workerinroom si occuperà di pianificare il percorso ed evitare ostacoli 
+	workerinroom si occuperà di pianificare il percorso ed evitare ostacoli
 	mobili/fissi
 	</li>
 </ul>
-</div>
 
 
-<h2>Progettazione</h2> 
+<h2>Progettazione</h2>
 <div>
-Si riutilizzano interamente i componenti dello sprint precedente modificando solamente 
+Si riutilizzano interamente i componenti dello sprint precedente modificando solamente
 il frontend per predisporlo all'invio dei comandi prepare add e clear.<br/>
-Tutti gli attori necessari sono già stati forniti dalla software house 
-(<em>workinroom.qak</em> di <em>it.unibo.eclipse.qak.planning19</em>), ma è necessario 
-modificare l'attore workerinroom affinchè all'incontro di un ostacolo fisso modifichi 
+Tutti gli attori necessari sono già stati forniti dalla software house
+(<em>workinroom.qak</em> di <em>it.unibo.eclipse.qak.planning19</em>), ma è necessario
+modificare l'attore workerinroom affinchè all'incontro di un ostacolo fisso modifichi
 la mappa e ricalcoli il percorso per evitarlo.
 </div>
 
+</div>
 
-	      	
-<br/><br/> 	
-</div>  
+<br/><br/>
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;font-size:small;color:white">
 By<br/>
 Gioele Pisanelli, email: gioele.pisanelli@studio.unibo.it<br/>
 Tommaso Liverani, email: tommaso.liverani@studio.unibo.it<br/>
-Alberto Jesu, email: alberto.jesu@studio.unibo.it<br/>  
-</div> 
+Alberto Jesu, email: alberto.jesu@studio.unibo.it<br/>
+</div>
 </body>
 </html>
