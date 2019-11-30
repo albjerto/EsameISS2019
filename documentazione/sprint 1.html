@@ -129,7 +129,7 @@ div.remark{
 table, th, td {
   border: 1px solid black;
   border-collapse: collapse;
-}         
+}
 </style>
 
 <head>
@@ -145,9 +145,9 @@ table, th, td {
 
 <h2>Requirements</h2>
 <div class="req">
-	Realizzare il prototipo di un sistema in cui un robot virtuale riceve dei comandi 
-	da un'interfaccia visibile da smartphone, muovendosi di conseguenza, e comunichi 
-	l'incontro con ostacoli senza scontrarcisi.<br/>
+	Realizzare il prototipo di un sistema in cui un robot virtuale riceve dei comandi
+	da un'interfaccia visibile da smartphone, muovendosi di conseguenza, e comunichi
+	l'incontro con ostacoli.<br/>
 	I comandi stabiliti sono:								<br/>
 			"w" 	avanti									<br/>
 			"l"		rotazione a sinistra di 90 gradi		<br/>
@@ -155,7 +155,7 @@ table, th, td {
 			"s"		indietro								<br/>
 			"h"		stop									<br/>
 
-	Realizzare tale prototipo in modo da rendere facile il deployment su un robot 
+	Realizzare tale prototipo in modo da rendere facile il deployment su un robot
 	fisico.
 </div>
 
@@ -165,13 +165,13 @@ table, th, td {
 Il prototipo realizzato deve essere in grado di:
 <ol>
 	<li>
-	Mostrare un robot virtuale che esegue i comandi(w,l,r,s,h)
+	Mostrare un robot virtuale che esegue i comandi (w,l,r,s,h)
 	</li>
 	<li>
-	Fermare il robot virtuale prima dell'impatto con un ostacolo
+	Individuare l'impatto del robot virtuale con un ostacolo
 	</li>
 	<li>
-	Mostrare un frontend in grado di inoltrare i comandi al robot e notificare 
+	Mostrare un frontend in grado di inoltrare i comandi al robot e notificare
 	l'incontro con eventuali ostacoli
 	</li>
 </ol>
@@ -183,20 +183,19 @@ Il prototipo realizzato deve essere in grado di:
 	<center><img src="./immagini/sprint 1.png" width="100%" height="50%"/></center>
  </div></br>
 
-Robotmind sarà il componente che inoltrerà i comandi dal frontend al robot virtuale 
-e bloccherà il robot prima di scontrarsi con un ostacolo.
-</div>
+All'interno del contesto ctxRobotMind saranno presenti i componenti che si occuperanno di inoltrare i comandi al robot
+virtuale ed individuare gli impatti dello stesso con ostacoli.
 
 <h2>Progettazione</h2>
-Tutti i componenti delineati sono già stati forniti dalla software house e quindi 
+Tutti i componenti delineati sono già stati forniti dalla software house e quindi
 verranno riutilizzati. In particolare verranno riutilizzati i progetti:
 	<li><em>it.unibo.frontend19</em></li>
 	<li><em>it.unibo.eclipse.qak.robotMinds19</em></li>
 	<li><em>it.unibo.robots19</em></li>
 
+</div>
 
 <br/><br/>
-</div>
 <div style="background-color:rgba(86, 56, 253, 0.9); width:60%;text-align:left;font-size:small;color:white">
 By<br/>
 Gioele Pisanelli, email: gioele.pisanelli@studio.unibo.it<br/>
