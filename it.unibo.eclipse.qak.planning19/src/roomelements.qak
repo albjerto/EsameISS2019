@@ -336,12 +336,7 @@ QActor randomconsumptionactor context ctxRoomElements{
 			["enabled = true"]
 		}
 	}
-	Goto waitCmd if "enabled" else doNothing
-	
-	State waitCmd{
-		println("&&& radomconsumptionactor waiting for command")
-	}
-	Transition t0 whenMsg prepare -> timerStart 
+	Goto timerStart if "enabled" else doNothing
 	
 	State timerStart{
 		println("&&& randomconsumptionactor starting timer")
@@ -355,7 +350,7 @@ QActor randomconsumptionactor context ctxRoomElements{
 			solve(produceRandomFoodMessage(F))
 			ifSolved{
 				["var Food = getCurSol(\"F\").toString()"]
-				println("Food = $Food")
+				println("randomFood = $Food")
 				forward table -m get : get($Food)
 				forward randomconsumptionactor -m repeat: repeat()
 			}else{
@@ -366,7 +361,6 @@ QActor randomconsumptionactor context ctxRoomElements{
 		}
 	}
 	Transition t0 	whenMsg repeat -> timerStart
-					whenMsg clear -> waitCmd
 					
 	State doNothing{
 		println("&&& randomconsumptionactor disabled")
