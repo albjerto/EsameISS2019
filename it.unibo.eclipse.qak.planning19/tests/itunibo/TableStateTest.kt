@@ -18,6 +18,7 @@ class TableStateTest {
 		GlobalScope.launch{
 			it.unibo.ctxRoomElements.main()
 		}
+		delay(3000)
 		table = sysUtil.getActor("table")
 	}	
 	
@@ -54,7 +55,17 @@ class TableStateTest {
 	fun clearTablewareStateTest(){
 		table!!.solve("clearTableware(L)")
 		table!!.solve("getTablewareTableState(L)")
-		assertTrue(table!!.getCurSol("L").toString() == "")
+		assertTrue(table!!.getCurSol("L").toString() == "[]")
+	}
+	
+	fun solveCheckGoal( actor : ActorBasic, goal : String ){
+		actor.solve(goal)
+		var result =  actor.resVar
+		assertTrue("", result == "success" )
+	}
+	
+	fun delay( time : Long ){
+		Thread.sleep( time )
 	}
 
 }

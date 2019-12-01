@@ -10,50 +10,56 @@ import org.junit.After
 import org.junit.Test
 import it.unibo.kactor.ApplMessage
 
-class ObstacleAvoidanceTest {
+class MovingObstacleAvoidanceTest {
 	var butlermind: ActorBasic? = null
 	var workerinroom: ActorBasic? = null
-	var proxyFridge: MockActor? = null
 	
 	@Before
 	fun systemSetUp(){
 		GlobalScope.launch{
 			it.unibo.ctxWorkInRoom.main()
 		}
+		delay(3000)
 		butlermind = sysUtil.getActor("butlermind")
 		workerinroom = sysUtil.getActor("workerinroom")
-		proxyFridge = MockActor("proxyfridge")
 	}	
 	
 	@After
 	fun terminate(){
-		println("ObstacleAvoidanceTest terminate")
+		println("MovingObstacleAvoidanceTest terminate")
 	}
 	
 	@Test
-	fun obstacleAvoidanceTest(){
-		butlermind!!.scope.launch{
+	fun movingObstacleAvoidanceTest(){
+		GlobalScope.launch{
 			butlermind!!.autoMsg("prepare","prepare()")
-		}
-		delay(2000)
-		// simulo il movimento verso il frigo, il terzo passo incontra un ostacolo
-		workerinroom!!.scope.launch{
-			workerinroom!!.autoMsg("stepOk","stepOk()")
 			delay(1000)
+			// simulo il movimento verso il frigo, alla seconda w incontro un ostacolo mobile
 			workerinroom!!.autoMsg("stepOk","stepOk()")
-			delay(1000)
+			delay(500)
+			workerinroom!!.autoMsg("stepOk","stepOk()")
+			delay(500)
+			workerinroom!!.autoMsg("stepOk","stepOk()")
+			delay(500)
 			workerinroom!!.autoMsg("stepFail","stepFail()")
-			delay(1000)
+			delay(500)
 			workerinroom!!.autoMsg("stepOk","stepOk()")
-			delay(1000)
+			delay(500)
 			workerinroom!!.autoMsg("stepOk","stepOk()")
-			delay(1000)
+			delay(500)
 			workerinroom!!.autoMsg("stepOk","stepOk()")
-			delay(1000)
+			delay(500)
 			workerinroom!!.autoMsg("stepOk","stepOk()")
-			delay(1000)
 		}
-		assertTrue(proxyFridge!!.getReceivedMessage()!!.msgId() == "get")
+		delay(10000)
+		// se tutto ok il fatto in clause non deve essere più presente
+		solveCheckGoalFailed(butlermind!!, "clause(msg(proxyfridge, get, get(_)), true)")
+	}
+	
+	fun solveCheckGoalFailed( actor : ActorBasic, goal : String ){
+		actor.solve(goal)
+		var result =  actor.resVar
+		assertTrue("", result == "fail" )
 	}
 	
 	fun delay( time : Long ){
