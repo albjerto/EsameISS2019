@@ -1,4 +1,4 @@
-# buonNatali
+# Esame ISS 2019
 Ancora da fare (aggiornare se ci ricordiamo altro):
 - fare la roba nei commenti dei vari file
 - capire come mai (ma chi sarai) dopo un tot dall'ultimo messaggio inviato, il frontend lo ri-invia -> crea problemi con la add se non faccio niente per un po' dato che la ripete -> apparently chrome's fault -> interrompere il caricamento della pagina se necessario (X in alto a sinistra)
