@@ -146,10 +146,10 @@ table, th, td {
 <table>
     <tr>
         <th>
-            Tag
+            Component
         </th>
         <th>
-            Story
+            User Story
         </th>
         <th>
             Story Points
@@ -159,14 +159,14 @@ table, th, td {
         </th>
     </tr>
     <tr>
-        <td>
-            RBR_COMMANDS
+        <td rowspan="13">
+            RBR
         </td>
         <td>
             <bc>RBR</bc> deve ricevere i comandi dal <bc>Maitre</bc>
         </td>
         <td>
-
+            1
         </td>
         <td>
             1
@@ -174,366 +174,335 @@ table, th, td {
     </tr>
     <tr>
         <td>
-            RBR_CRASH
-        </td>
-        <td>
             <bc>RBR</bc> deve identificare eventuali impatti con ostacoli
         </td>
         <td>
-
+            1
         </td>
         <td>
-
+            2
         </td>
     </tr>
     <tr>
         <td>
-            MAITRE_UI
+            <bc>RBR</bc> deve essere in grado di pianificare un percorso per raggiungere gli elementi della stanza
+        </td>
+        <td>
+            1
+        </td>
+        <td>
+            3
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> deve riuscire ad evitare gli ostacoli fissi e mobili all'interno della stanza
+        </td>
+        <td>
+            3
+        </td>
+        <td>
+            4
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> non deve poter eseguire comandi di tipo <i>add</i> o <i>clear</i> prima di aver ricevuto <i>prepare</i>
+        </td>
+        <td>
+            1
+        </td>
+        <td>
+            5
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> può solo eseguire <i>prepare</i> come primo comando
+        </td>
+        <td>
+            1
+        </td>
+        <td>
+            6
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> deve poter sospendere l'esecuzione di un task
+        </td>
+        <td>
+            1
+        </td>
+        <td>
+            7
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> deve poter riprendere l'esecuzione di un task dopo la sospensione
+        </td>
+        <td>
+            1
+        </td>
+        <td>
+            8
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> deve poter poter eseguire il comando di <i>prepare</i>
+        </td>
+        <td>
+            5
+        </td>
+        <td>
+            9
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> deve poter eseguire il comando <i>clear</i>
+        </td>
+        <td>
+            5
+        </td>
+        <td>
+            10
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> deve poter eseguire il comando <i>add</i>
+        </td>
+        <td>
+            5
+        </td>
+        <td>
+            11
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> deve notificare il <bc>Maitre</bc> in caso di assenza del cibo richiesto
+        </td>
+        <td>
+            2
+        </td>
+        <td>
+            12
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <bc>RBR</bc> deve poter essere inserito in un robot fisico
+        </td>
+        <td>
+            2
+        </td>
+        <td>
+            13
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="4">
+            MAITRE
         </td>
         <td>
             <bc>Maitre</bc> deve disporre di un'interfaccia attraverso cui mandare messaggi a <bc>RBR</bc> e tramite cui essere notificato di eventuali ostacoli
         </td>
         <td>
-
+            1
         </td>
         <td>
-
+            1
         </td>
     </tr>
     <tr>
-        <td>
-            RBR_PLAN
-        </td>
-        <td>
-            <bc>RBR</bc> deve essere in grado di pianificare un percorso per raggiungere gli elementi della stanza
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            RBR_AVOID
-        </td>
-        <td>
-            <bc>RBR</bc> deve riuscire ad evitare gli ostacoli fissi e mobili all'interno della stanza
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            MAITRE_CMDS
-        </td>
         <td>
             <bc>Maitre</bc> deve disporre, all'interno della sua interfaccia, dei comandi <i>prepare, add</i> e <i>clear</i>
         </td>
         <td>
-
+            2
         </td>
         <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Associare ad ogni task un insieme di punti da cui passare?
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-        <td>
-
+            2
         </td>
     </tr>
     <tr>
         <td>
-            RBR_LOGIC
+            <bc>Maitre</bc> deve poter visualizzare lo stato corrente di tutti gli elementi all'interno della stanza
         </td>
         <td>
-            <bc>RBR</bc> non deve poter eseguire comandi di tipo <i>add</i> o <i>clear</i> prima di aver ricevuto <i>prepare</i>
+            3
         </td>
         <td>
-
-        </td>
-        <td>
-
+            3
         </td>
     </tr>
     <tr>
         <td>
-            RBR_LOGIC_2
+            <bc>Maitre</bc> deve poter visualizzare quando il task <i>add</i> fallisce a causa dell'assenza del cibo richiesto
         </td>
         <td>
-            <bc>RBR</bc> può solo eseguire <i>prepare</i> come primo comando
+            2
         </td>
         <td>
-
+            4
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="6">
+            FRIDGE
         </td>
         <td>
-
+            <em>fridge</em> deve poter mostrare il suo stato in qualsiasi momento
+        </td>
+        <td>
+            3
+        </td>
+        <td>
+            1
         </td>
     </tr>
     <tr>
         <td>
-            FRIDGE_STATE
+            <em>fridge</em> deve poter permettere di prelevare una lista di cibi
         </td>
         <td>
-            <ks>fridge</ks> deve poter mostrare il suo stato quando richiesto
+            3
         </td>
         <td>
-
-        </td>
-        <td>
-
+            2
         </td>
     </tr>
     <tr>
         <td>
-            FRIDGE_GET_1
+            <em>fridge</em> deve poter permettere di prelevare un singolo cibo
         </td>
         <td>
-            <ks>fridge</ks> deve poter permettere di prelevare una lista di cibi
+            3
         </td>
         <td>
-
-        </td>
-        <td>
-
+            3
         </td>
     </tr>
     <tr>
         <td>
-            FRIDGE_GET_2
+            <em>fridge</em> deve poter controllare la presenza di un cibo, dato un determinato <ks>food-code</ks>
         </td>
         <td>
-            <ks>fridge</ks> deve poter permettere di prelevare un singolo cibo
+            2
         </td>
         <td>
-
-        </td>
-        <td>
-
+            4
         </td>
     </tr>
     <tr>
         <td>
-            FRIDGE_CHECK
+            <em>fridge</em> deve poter aggiungere al suo stato una lista di cibi
         </td>
         <td>
-            <ks>fridge</ks> deve poter controllare la presenza di un cibo, dato un determinato <ks>food-code</ks>
+            3
         </td>
         <td>
-
-        </td>
-        <td>
-
+            5
         </td>
     </tr>
     <tr>
         <td>
-            FRIDGE_PUT
+            <em>fridge</em> deve comunicare tramite CoAP
         </td>
         <td>
-            <ks>fridge</ks> deve poter aggiungere al suo stato una lista di cibi
+            3
         </td>
         <td>
-
+            6
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="3">
+            TABLE
         </td>
         <td>
-
+            <em>table</em> deve poter mostrare il suo stato in qualsiasi momento
+        <td>
+            3
+        </td>
+        <td>
+            1
         </td>
     </tr>
     <tr>
         <td>
-            TABLE_STATE
+            <em>table</em> deve permettere a <bc>RBR</bc> di prelevare i cibi non consumati e i piatti
         </td>
         <td>
-            <ks>table</ks> deve poter mostrare il suo stato quando richiesto
+            3
         </td>
         <td>
-
-        </td>
-        <td>
-
+            2
         </td>
     </tr>
     <tr>
         <td>
-            TABLE_GET
+            <em>table</em> deve poter aggiungere al suo stato cibi e piatti
         </td>
         <td>
-            <ks>table</ks> deve permettere a <bc>RBR</bc> di prelevare i cibi non consumati e i piatti
+            3
         </td>
         <td>
-
+            3
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">
+            PANTRY
         </td>
         <td>
-
+            <em>pantry</em> deve mostrare il suo stato in qualsiasi momento
+        </td>
+        <td>
+            3
+        </td>
+        <td>
+            1
         </td>
     </tr>
     <tr>
         <td>
-            TABLE_PUT
+            <em>pantry</em> deve permettere a <bc>RBR</bc> di prelevare una lista di stoviglie
         </td>
         <td>
-            <ks>table</ks> deve poter aggiungere al suo stato cibi e piatti
+            3
         </td>
         <td>
-
+            2
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">
+            DISHWASHER
         </td>
         <td>
-
+            <em>dishawasher</em> deve mostrare il suo stato in qualsiasi momento
+        </td>
+        <td>
+            3
+        </td>
+        <td>
+            1
         </td>
     </tr>
     <tr>
         <td>
-            PANTRY_STATE
+            <em>dishwasher</em> deve poter aggiungere al suo stato una lista di stoviglie
         </td>
         <td>
-            <ks>pantry</ks> deve mostrare il suo stato quando richiesto
+            3
         </td>
         <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            PANTRY_GET
-        </td>
-        <td>
-            <ks>pantry</ks> deve permettere a <bc>RBR</bc> di prelevare una lista di stoviglie
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            DISHWASHER_STATE
-        </td>
-        <td>
-            <ks>dishawasher</ks> deve mostrare il suo stato quando richiesto
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            DISHAWASHER_PUT
-        </td>
-        <td>
-            <ks>dishawasher</ks> deve poter aggiungere al suo stato una lista di stoviglie
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            TABLE_STATE
-        </td>
-        <td>
-            <ks>table</ks> deve poter mostrare il suo stato quando richiesto
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            FRIDGE_COAP
-        </td>
-        <td>
-            <ks>fridge</ks> deve comunicare tramite CoAP
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            RBR_PREPAPRE
-        </td>
-        <td>
-            <bc>RBR</bc> deve poter poter eseguire il comando di <i>prepare</i>
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            RBR_CLEAR
-        </td>
-        <td>
-            <bc>RBR</bc> deve poter eseguire il comando <i>clear</i>
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            RBR_ADD
-        </td>
-        <td>
-            <bc>RBR</bc> deve poter eseguire il comando <i>add</i>
-        </td>
-        <td>
-
-        </td>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td>
-            RBR_PHYSICAL
-        </td>
-        <td>
-            <bc>RBR</bc> deve poter essere inserito in un robot fisico
-        </td>
-        <td>
-
-        </td>
-        <td>
-
+            2
         </td>
     </tr>
 </table>
