@@ -397,12 +397,6 @@ var timeBack = -1 // tempo di backstep
  		// backstep senza usare delay che non accetta variabili
 		run itunibo.planner.moveUtils.backToCompensate(myself, timeBack, 0)
  		
- 		/*
- 		 * Valutare la possibilità di aggiungere un altro stato per evitare
- 		 * di avere tutto sto bordello con l'if, tipo handleStepFail aumenta
- 		 * il counter e un altro stato per rifare il plan e risettare il 
- 		 * counter a 0
- 		 */
  		if "(crashCounter > 1)"{ // messo in modo da sbattere max 2 volte
 			println("Static obstacle found!")
 			["val ButlerDirection = itunibo.planner.moveUtils.getDirection(myself)"]
