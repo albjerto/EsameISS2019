@@ -164,11 +164,11 @@ Il prototipo realizzato deve essere in grado di:
 <ol>
 	<li>Pianificare un percorso passando da determinati punti</li>
 	<li>Evitare gli ostacoli fissi o mobili incontrati nel percorso</li>
-	<li>Mostrare un frontend che preveda i comandi prepare, add e clear</li>
+	<li>Mostrare un frontend che preveda i comandi prepare, add, clear, stop e reactivate</li>
 	<li>Associare ad ogni task un insieme di punti da cui passare</li>
 	<li>Eseguire i comandi add e clear solo dopo un comando prepare</li>
 	<li>Consentire il comando prepare solo come primo comando</li>
-    <li>Fermare e riattivare l'esecuzione di un task</li>
+    	<li>Fermare e riattivare l'esecuzione di un task</li>
 	<!-- o dopo un comando clear -->
 </ol>
 </div>
@@ -181,7 +181,7 @@ Il prototipo realizzato deve essere in grado di:
 </br>
 <ul>
 	<li>
-	L'attore butlermind si occuperà di garantire l'ordine dei messaggi e inoltrarli
+	L'attore butlermind si occuperà di garantire l'ordine dei task ricevuti e inoltrarli
 	a butlerplanexecutor
 	</li>
 	<li>
@@ -198,7 +198,7 @@ Il prototipo realizzato deve essere in grado di:
 <h2>Progettazione</h2>
 <div>
 Si riutilizzano interamente i componenti dello sprint precedente modificando solamente
-il frontend per predisporlo all'invio dei comandi prepare add e clear.<br/>
+il frontend per predisporlo all'invio dei comandi prepare, add, clear, stop e reactivate.<br/>
 Tutti gli attori necessari sono già stati forniti dalla software house
 (<em>workinroom.qak</em> di <em>it.unibo.eclipse.qak.planning19</em>), ma è necessario
 modificare l'attore workerinroom affinchè all'incontro di un ostacolo fisso modifichi
