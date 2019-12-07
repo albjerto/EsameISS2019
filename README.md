@@ -1,6 +1,40 @@
-# Esame ISS 2019
-Ancora da fare (aggiornare se ci ricordiamo altro):
-- fare la roba nei commenti dei vari file
-- capire come mai (ma chi sarai) dopo un tot dall'ultimo messaggio inviato, il frontend lo ri-invia -> crea problemi con la add se non faccio niente per un po' dato che la ripete -> apparently chrome's fault -> interrompere il caricamento della pagina se necessario (X in alto a sinistra)
-- decidere come gestire i cibi del frigo dopo la clear (se prevediamo che si possa fare <b>prepare</b> dopo <b>clear</b>, bisogna decidere se mantenere nel frigo il cibo inserito dalla clear alla fine del party o se cassare via tutto e ri-inizializzare il frigo)
-- rendere meno strongly coupled gli enti non intelligenti (table, dishwasher ecc) prevedendo la possibilità che diventino intelligenti? (regola prolog del tipo smart(true) che ricerco nella kb e se solved allora ricerco anche locazione dell'ente per parlargli altrimenti si svolge tutto come già è?)
+# Esame ISS 2019 #
+Progetto relativo al tema d'esame di Ingegneria dei Sistemi Software M 2019.
+Autori:
+* Gioele Pisanelli
+* Tommaso Liverani
+* Alberto Jesu
+
+## Usage con robot virtuale ##
+Si riporta la procedura d'avvio dei vari elementi. È importante avviare sempre tutto nel seguente ordine:
+* robot virtuale
+* frontend
+* MainCtxRobotMind
+* MainCtxWorkInRoom
+* MainCtxFridge
+* MainCtxRoomElements
+### Robot virtuale ###
+Per poter eseguire l'ambiente virtuale, è prima necessario ottenere i moduli richiesti. Per far ciò:
+* eseguire da terminale `npm install` al percorso `it.unibo.robots19/node/WEnv/WebGLScene`
+* eseguire da terminale `npm install` al percorso `it.unibo.robots19/node/WEnv/server`
+Per avviare il robot virtuale eseguire `node main 8999` alla directory `it.unibo.robots19/node/WEnv/server/src`. Il robot virtuale sarà visibile all'url `localhost:8090`.
+### Frontend ###
+Per poter eseguire il frontend, è prima necessario ottenere i moduli richiesti. Per far ciò:
+* eseguire da terminale `npm install` alla directory `it.unibo.frontend19/nodeCode/frontend` 
+Per avviare il frontend eseguire eseguire `node frontendServer localhost` al percorso `it.unibo.frontend19/nodeCode/frontend`. Il frontend sarà visibile all'url `localhost:8080`.
+### MainCtxRobotMind ###
+* controllare che l'ip del broker mqtt specificato nel file `robotmind.qak` sia coerente con il deployment che si vuole effettuare
+* controllare che all'interno del file `basicRobotConfig.pl` sia decommentata solo la riga relativa al robot virtuale
+Avviare quindi `MainCtxRobotMind`.
+### MainCtxWorkInRoom ###
+* controllare che l'ip del broker mqtt specificato nel file `workinroom.qak` sia coerente con il deployment che si vuole effettuare
+* controllare che nell'attore `workerinroom` siano decommentati lo `stepTime` e `pauseTime` relativi al robot virtuale
+Avviare quindi `MainCtxWorkInRoom`.
+### MainCtxFridge ###
+* controllare che l'ip del broker mqtt specificato nel file `fridge.qak` sia coerente con il deployment che si vuole effettuare
+Avviare quindi `MainCtxFridge`.
+### MainCtxRoomElements ###
+* controllare che l'ip del broker mqtt specificato nel file `roomelements.qak` sia coerente con il deployment che si vuole effettuare
+Avviare quindi `MainCtxRoomElements`.
+
+## Usage con robot fisico ##
