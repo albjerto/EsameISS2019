@@ -23,18 +23,18 @@ Per poter eseguire il frontend, è prima necessario ottenere i moduli richiesti.
 * eseguire da terminale `npm install` alla directory `it.unibo.frontend19/nodeCode/frontend` 
 Per avviare il frontend eseguire eseguire `node frontendServer localhost` al percorso `it.unibo.frontend19/nodeCode/frontend`. Il frontend sarà visibile all'url `localhost:8080`.
 ### MainCtxRobotMind ###
-* controllare che l'ip del broker mqtt specificato nel file `robotmind.qak` sia coerente con il deployment che si vuole effettuare
-* controllare che all'interno del file `basicRobotConfig.pl` sia decommentata solo la riga relativa al robot virtuale
-Avviare quindi `MainCtxRobotMind`.
+* controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.robotMinds19/src/robotmind.qak` sia coerente con il deployment che si vuole effettuare
+* controllare che all'interno del file `it.unibo.eclipse.qak.robotMinds19/basicRobotConfig.pl` sia decommentata solo la riga relativa al robot virtuale
+Avviare quindi `it.unibo.eclipse.qak.robotMinds19/src/it/unibo/ctxRobotMind/MainCtxRobotMind`.
 ### MainCtxWorkInRoom ###
-* controllare che l'ip del broker mqtt specificato nel file `workinroom.qak` sia coerente con il deployment che si vuole effettuare
+* controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.planning19/src/workinroom.qak` sia coerente con il deployment che si vuole effettuare
 * controllare che nell'attore `workerinroom` siano decommentati lo `stepTime` e `pauseTime` relativi al robot virtuale
-Avviare quindi `MainCtxWorkInRoom`.
+Avviare quindi `it.unibo.eclipse.qak.planning19/src/it/unibo/ctxWorkInRoom/MainCtxWorkInRoom`.
 ### MainCtxFridge ###
-* controllare che l'ip del broker mqtt specificato nel file `fridge.qak` sia coerente con il deployment che si vuole effettuare
-Avviare quindi `MainCtxFridge`.
+* controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.planning19/src/fridge.qak` sia coerente con il deployment che si vuole effettuare
+Avviare quindi `it.unibo.eclipse.qak.planning19/src/ctxFridge/MainCtxFridge`.
 ### MainCtxRoomElements ###
-* controllare che l'ip del broker mqtt specificato nel file `roomelements.qak` sia coerente con il deployment che si vuole effettuare
-Avviare quindi `MainCtxRoomElements`.
+* controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.planning19/src/roomelements.qak` sia coerente con il deployment che si vuole effettuare
+Avviare quindi `it.unibo.eclipse.qak.planning19/src/ctxRoomElements/MainCtxRoomElements`.
 
 ## Usage con robot fisico ##
