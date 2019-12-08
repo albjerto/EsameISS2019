@@ -1,0 +1,112 @@
+
+/*
+ * 0) Activate mosquitto on the PC (192.168.43.5)
+ * 1) Prepare the real execution room and place the real robot (mbot/nano) in cell(0,0)
+ * 2) Activate it.unibo.ctxRobotMind.MainCtxRobotMindKt on the real robot
+ * 3) Launch ctxMindButler on the PC to make application-debugging easier
+ * 
+ * These actors can be viewed as an EXTENSION of the 'mind' 
+ * that implements the application logic
+ * 
+ * =====================================================================
+ * This version does not use the planner, but the floorMap.pl
+ * =====================================================================
+ * 
+ * Better to use roomboundaryplanned, roomexplore and workinroom
+ */
+
+System mindbutler
+mqttBroker "localhost" : 1883  
+
+Dispatch modelChange  : modelChange( TARGET, VALUE )   
+
+Dispatch onestep       : onestep(DURATION)	//Used by onestepahead
+Dispatch stepOk        : stepOk(V)			//TODO eliminate  V
+Dispatch stepFail      : stepFail(R,T) 		//R=obstacle, T = time
+
+Event  sonarRobot     : sonar( DISTANCE )	     //from  sonar on robot 
+ 
+Context ctxMindButler    ip [host="localhost" port=8038]   -mqtt 
+Context ctxDummy         ip [host="otherhost" port=8035]   -mqtt 
+ 
+ExternalQActor resourcemodel context ctxDummy
+ExternalQActor onestepahead  context ctxDummy
+
+/*
+ * 
+ */ 
+QActor butler context ctxMindButler{     
+["
+var Tback       = 0
+var Direction   = \"\" 
+
+//REAL ROBOT
+//var StepTime   = 1000 	 
+//var PauseTime  = 500 
+
+//VIRTUAL ROBOT
+var StepTime   = 330	//for virtual
+var PauseTime  = 250
+
+var PauseTimeL  = PauseTime.toLong()
+
+"]	
+	State s0 initial {	
+		println("&&&  butler STARTED")
+		solve( consult("sysRules.pl")	 )       
+		solve( consult("floorMap.pl")	 )
+		solve( showMap	 )
+ 	}
+	Goto moveAhead  
+		
+ 	State moveAhead{ 
+		delayVar PauseTimeL 
+		//forward onestepahead -m onestep : onestep( $StepTime )
+		run itunibo.planner.moveUtils.attemptTomoveAhead(myself, StepTime,"onestepahead")
+ 	}
+	Transition t0   whenMsg stepOk   -> hadleStepOk
+					whenMsg stepFail -> hadleStepKo 
+
+	State hadleStepOk{
+		//println("&&& moveAhead done")
+ 		solve( updateMapAfterStep )
+		//solve( showMap	 )
+	}
+	Goto moveAhead 
+	
+	State hadleStepKo{
+ 		//printCurrentMessage		
+		//println("&&& moveAhead failed")
+		onMsg( stepFail:stepFail(R,D) ) {
+["Tback=payloadArg(1).toString().toInt() / 2   "]
+		println(" ................... BACK TIME= $Tback")
+		}
+  	 	//IMPORTANT: the virtual robot could not work without a back step 		  
+  		run itunibo.planner.moveUtils.backToCompensate(myself, Tback, PauseTime) 
+     	solve( updateMapAfterStep )  
+  //ROTATE left
+ 		forward resourcemodel -m modelChange : modelChange(robot,l)
+		solve( changeDirection )  //updates robotdirection/1
+		
+		solve( robotdirection(D) )
+		["Direction = getCurSol(\"D\").toString()"]		
+		solve( showMap	 )   
+		//solve( dialog(F) ) 
+	}
+    Goto endOfExploration  if "(Direction == \"sud\")" else tuning   
+
+   	State tuning{	//to tune at hand a real robot
+		println(" ---- TUNING --- ")
+		//solve( dialog(F) )	//to tune at hand
+	} 
+	Goto moveAhead
+	 
+	State endOfExploration{
+		println("EXPLORATION ENDS")
+	}
+	   
+}	
+
+
+ 
+ 

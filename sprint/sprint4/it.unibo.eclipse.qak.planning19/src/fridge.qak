@@ -1,0 +1,271 @@
+System fridge
+mqttBroker "localhost" : 1883  
+
+
+Dispatch add			: add(ARG)
+Dispatch get			: get(ARG)
+Dispatch put         	: put(ARG)
+Dispatch showState	: showState()
+Dispatch isAvailable	:	isAvailable(ARG)
+Dispatch yes			:	yes()
+Dispatch no				: 	no()
+Dispatch state			: 	state(ARG)
+
+
+Event modelcontent: modelcontent(CONTENT)
+
+Dispatch remove			:	remove(ARG)
+
+
+Context ctxFridge     ip [host="localhost" port=8038]   -mqtt 
+
+
+/*
+QActor fridgecoap context ctxFridge{	
+
+	
+	 ["val actor=this"]
+
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		["itunibo.coap.server.CoapServerControl.create(actor,\"fridge\")"]
+		println("&&&  coap fridge STARTED")
+	}
+	Goto waitCmd
+	
+	State waitCmd{
+		println("&&&  fridge waiting for command")
+	}
+	
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg showState -> showStateTask
+				 	 whenMsg get -> getTask
+				 	 whenMsg isAvailable -> checkTask
+
+	
+	
+	State showStateTask{
+		printCurrentMessage
+		solve(getFridgeState(L))
+		ifSolved{
+			["
+				val FridgeState = itunibo.prolog.prologUtils.parseFoodState(myself,\"L\")
+			"]
+			["itunibo.coap.server.CoapServerControl.coapRespond(FridgeState)"]
+  			
+   		}else{
+   			println("getFridgeState FAIL")
+   		}
+	}Goto waitCmd
+	
+	
+	
+	State getTask{
+		printCurrentMessage
+		onMsg(get: get(ARG)){
+			[" 
+				val Food = payloadArg(0)
+			"]
+			
+			solve(removeFoodList($Food))
+			ifSolved {
+				println("Food = $Food")
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"put($Food)\")"]
+				//["itunibo.coap.server.CoapServerControl.coapNotify()"]		
+			} else {
+				println("fridgeGet FAIL")
+			}
+		}
+	}
+	Goto waitCmd
+	
+	
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			[" val Food = payloadArg(0) "]
+			solve(addFoodList($Food))
+			ifSolved {
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"remove($Food)\")"]
+				//["itunibo.coap.server.CoapServerControl.coapNotify()"]		
+			} else {
+				println("fridgePut FAIL")
+			}		
+		}
+	}Goto waitCmd
+	
+	State checkTask{
+		onMsg(isAvailable: isAvailable(ARG)){
+			printCurrentMessage
+			[" val foodCode = payloadArg(0) "]
+			solve(isThereFoodByCode("$foodCode"))
+			ifSolved {
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"yes($foodCode)\")"]
+			} else {
+				["itunibo.coap.server.CoapServerControl.coapRespond(\"no($foodCode)\")"]
+			}	
+		}
+	}Goto waitCmd
+}
+
+ */
+
+QActor serverproxy context ctxFridge{
+	["val actor=this"]	
+	State s0 initial{
+		println("&&&  fridgeProxy starting")
+		["itunibo.coap.server.CoapServerControl.create(actor,\"fridge\")"]	
+		
+	}Goto waitCmd
+	
+	State waitCmd{
+		println("&&&  fridgeProxy waiting for command")
+	}
+	Transition t0  	whenMsg put -> putTask
+				 	whenMsg showState -> showStateTask
+				 	whenMsg get -> getTask
+				 	whenMsg isAvailable -> checkAvailability
+					whenMsg yes			-> respond
+					whenMsg no			-> respond
+					whenMsg state		-> respond
+					whenMsg remove			-> respond
+					
+					
+					
+	State respond{		 
+		["val response=currentMsg.msgContent()"]
+		["itunibo.coap.server.CoapServerControl.coapRespond(response)"]
+		
+	}Goto waitCmd	
+	
+	// se mando una put al frigo mi deve rispondere con una remove			
+	State putTask{
+			onMsg(put : put(C)){
+				["val Content = payloadArg(0)"]
+				forward fridge -m put : put($Content)   
+		}
+	}	  
+	Transition t0 whenMsg remove			-> respond
+	
+	
+	
+	
+	// se mando una get al frigo mi deve rispondere con una put
+	State getTask{
+			onMsg(get : get(C)){
+				["val Content = payloadArg(0)"]
+				forward fridge -m get : get($Content)   
+		}
+	}	  
+	Transition t0  whenMsg put			-> respond		  
+	
+			
+	State checkAvailability{
+		onMsg(isAvailable : isAvailable(C)){
+				["val Content = payloadArg(0)"]
+				forward fridge -m isAvailable : isAvailable($Content)   
+		}	
+	}  
+	Transition t0  whenMsg yes			-> respond	
+				  whenMsg no			-> respond	
+
+	
+
+			
+	State showStateTask{
+		forward fridge -m showState : showState()
+	}	  
+	Transition t0  whenMsg state			-> respond		  
+}
+
+
+QActor fridge context ctxFridge{
+	
+
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		println("&&&  fridge STARTED")
+	}
+	Goto waitCmd
+	
+	State waitCmd{
+		println("&&&  fridge waiting for command")
+	}
+	
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg showState -> showStateTask
+				 	 whenMsg get -> getTask
+				 	 whenMsg isAvailable -> checkTask
+
+	
+	
+	State showStateTask{
+		printCurrentMessage
+		//solve(showFridgeState)
+		solve(getFridgeState(L))
+		ifSolved{
+			["
+				val FridgeState = itunibo.prolog.prologUtils.parseFoodState(myself,\"L\")
+			"]
+  			forward serverproxy -m state : state($FridgeState)	
+   		}else{
+   			println("getFridgeState FAIL")
+   		}
+	}Goto waitCmd
+	
+	State getTask{
+		printCurrentMessage
+		onMsg(get: get(ARG)){
+			[" 
+				val Food = payloadArg(0)
+			"]
+			
+			solve(removeFoodList($Food))
+			ifSolved {
+				println("Food = $Food")
+				forward serverproxy -m put : put($Food)	
+			} else {
+				println("fridgeGet FAIL")
+			}
+		}
+	}
+	Goto waitCmd
+	
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			[" val Food = payloadArg(0) "]
+			solve(addFoodList($Food))
+			ifSolved {
+				forward serverproxy -m remove : remove($Food)
+			} else {
+				println("fridgePut FAIL")
+			}		
+		}
+	}Goto waitCmd
+	
+	State checkTask{
+		onMsg(isAvailable: isAvailable(ARG)){
+			printCurrentMessage
+			[" val FoodCode = payloadArg(0) "]
+			solve(isThereFoodByCode($FoodCode))
+			ifSolved {
+				forward serverproxy -m yes : yes($FoodCode)
+			} else {
+				forward serverproxy -m no : no($FoodCode)
+			}	
+		}
+	}Goto waitCmd
+}
+
+
+
+
+
+
+
+
+
+
+
+

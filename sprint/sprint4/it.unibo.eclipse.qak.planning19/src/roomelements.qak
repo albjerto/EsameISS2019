@@ -1,0 +1,456 @@
+System roomelements
+ 
+mqttBroker "localhost" : 1883
+
+
+Dispatch showState	: showState()
+
+
+Event modelcontent: modelcontent(CONTENT)
+
+Dispatch prepare		:	prepare(ARG)
+Dispatch isAvailable	:	isAvailable(ARG)
+Dispatch clear			:	clear(ARG)
+Dispatch add			:	add(ARG)
+Dispatch get			:	get(ARG)
+Dispatch put			:	put(ARG)
+Dispatch remove			:	remove(ARG)
+Dispatch yes			:	yes(ARG)
+Dispatch no			: 	no(ARG)
+Dispatch clearFood		:	clearFood(ARG)
+Dispatch clearTableware		:	clearTableware(ARG)
+Dispatch repeat			:	repeat()
+
+Context ctxRoomElements    	ip [host="localhost" port=8037]   -mqtt 
+Context ctxDummyWorkInRoom 	ip [host="workinroomhost" port=8038]   -mqtt
+
+ExternalQActor butlermind context ctxDummyWorkInRoom
+
+QActor dishwasher context ctxRoomElements{
+	/*
+	 * dishawasher:
+	 * ->put, <-remove
+	 */
+	 
+	State s0 initial{
+		println("&&& dishwasher STARTED")
+		// preparazione futura gestione dishwasher
+		solve(consult("dishwasherSupport.pl"))
+	}
+	Goto showStateTask	
+	
+	State waitCmd{
+		println("&&& dishwasher waiting for command")
+	}
+	Transition t0	whenMsg showState -> showStateTask
+					whenMsg	put -> putTask		//da fare	per aggiungere piatti sporchi
+
+	State showStateTask{
+		printCurrentMessage
+		solve(getDishwasherState(L))
+		ifSolved{
+			/* 
+			 * Porre il parsing in un metodo utility, tanto e' lo stesso per tutti
+			 * Parsing in questo modo perche' il resto e' lato frontend
+			 */
+			["
+				val DishwasherState = itunibo.prolog.prologUtils.parseTablewareState(myself, \"L\")
+			"]
+			emit  modelcontent: modelcontent(content( dishwasher( state( $DishwasherState ) ) ))
+   		}else{
+   			println("getTableware dishwasher FAIL")
+   		}
+	}
+	Goto waitCmd
+
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			[" val List = payloadArg(0) "]
+			solve(addTablewareList($List))
+			ifSolved {
+				forward butlermind -m remove : remove($List)
+			} else {
+				println("dishwasherPut FAIL")
+			}
+		}
+		
+	}Goto showStateTask
+}
+
+QActor pantry context ctxRoomElements{
+	/*
+	 * pantry:
+	 * ->get, <-put
+	 */
+	 
+	State s0 initial{
+		println("&&& pantry STARTED")
+		solve(consult("pantryInit.pl")) //da controllare perchÃ¨ non va con quel file
+	}
+	Goto showStateTask		
+	
+	State waitCmd{
+		println("&&& pantry waiting for command")
+	}
+	Transition t0	whenMsg showState -> showStateTask
+					whenMsg get -> getTask
+					whenMsg put -> putTask	// per riaggiungere piatti puliti?
+					
+	State showStateTask{
+		printCurrentMessage
+		solve(getPantryState(L))
+		ifSolved{
+			/* 
+			 * Porre il parsing in un metodo utility, tanto e' lo stesso per tutti
+			 * Parsing in questo modo perche' il resto e' lato frontend
+			 */
+			["
+				val PantryState = itunibo.prolog.prologUtils.parseTablewareState(myself, \"L\")
+			"]
+			emit  modelcontent: modelcontent(content( pantry( state( $PantryState ) ) ))
+ 		}else{
+   			println("getPantryState FAIL")
+   		}
+	}
+	Goto waitCmd
+	
+	State getTask{
+		onMsg(get: get(ARG)){
+			printCurrentMessage
+			["val Tableware = payloadArg(0)"]
+			solve(removeTablewareList($Tableware))
+			ifSolved {
+				forward butlermind -m put : put($Tableware)
+			} else {
+				println("pantryGet FAIL")
+			}	
+		}
+	}
+	Goto showStateTask
+	
+	State putTask{
+		onMsg(get: get(ARG)){
+			printCurrentMessage
+			["val Tableware = payloadArg(0)"]
+			solve(addTablewareList($Tableware))
+			ifSolved {
+				forward butlermind -m remove : remove($Tableware)
+			} else {
+				println("pantryPut FAIL")
+			}	
+		}
+	}
+	Goto showStateTask
+	
+}
+
+
+
+QActor table context ctxRoomElements{
+	/*
+	 * table:
+	 * ->put, <-remove
+	 * ->clear, <-put
+	 */
+	 
+	State s0 initial{
+		println("&&& table STARTED")
+		solve(consult("tableSupport.pl")) 
+	}
+	Goto showStateTask	
+	
+	State waitCmd{
+		println("&&& table waiting for command")
+	}
+	Transition t0	 whenMsg put -> putTask
+			 whenMsg get -> getTask
+				 	 whenMsg clearFood -> clearFoodTask
+				 	 whenMsg clearTableware -> clearTablewareTask
+				 	 whenMsg showState -> showStateTask
+	
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			 [" val List = payloadArg(0) "]
+			 //solve della lista di roba da mettere sulla tavola : come gestire la lista?
+			 solve(addGenericList($List))
+			 ifSolved {
+				forward butlermind -m remove : remove($List)
+			 } else {
+				println("putTableTask FAIL")
+				//invio messaggi al robot per gestione fallimenti?
+			 }		 
+		 }
+	}Goto showStateTask
+	
+	// stato utile alla sola randomConsumption
+	State getTask{
+		onMsg(get: get(ARG)){
+			printCurrentMessage
+			 [" val List = payloadArg(0) "]
+			 solve(removeGenericList($List))
+			 ifSolved {
+				emit  modelcontent: modelcontent(content(info(state(random_consumption_done))))
+			 } else {
+				println("getTableTask FAIL")
+			 }		 
+		 }
+	}Goto showStateTask
+	
+	State clearFoodTask{
+		printCurrentMessage
+		 solve(clearFood(L))
+		 ifSolved {
+			["
+			val List = getCurSol(\"L\").toString()
+			"]
+			forward butlermind -m put : put($List)
+		 } else {
+			println("clearFoodTable FAIL")
+		 }
+	}Goto showStateTask
+	
+	State clearTablewareTask{
+		printCurrentMessage
+		 solve(clearTableware(L))
+		 ifSolved {
+			["
+			val List = getCurSol(\"L\").toString()
+			"]
+			forward butlermind -m put : put($List)
+		 } else {
+			println("clearTablewareTable FAIL")
+		 }
+	}Goto showStateTask
+	
+	State showStateTask{
+		printCurrentMessage
+		solve(getFoodTableState(F))
+			ifSolved{
+			["		
+				val FoodState = itunibo.prolog.prologUtils.parseFoodState(myself, \"F\")
+			"]
+  			emit  modelcontent: modelcontent(content(tableFood(state($FoodState) ) ))
+  			}else{
+   				println("getFoodTableState FAIL")
+   			}
+  		solve(getTablewareTableState(T))
+			ifSolved{
+			["
+				val TablewareState = itunibo.prolog.prologUtils.parseTablewareState(myself, \"T\")
+			"]
+  			emit  modelcontent: modelcontent(content(tableTableware(state( $TablewareState) ) ))
+   		}else{
+   			println("getTablewareTableState FAIL")
+   		}
+	}Goto waitCmd
+	
+}
+
+QActor proxyfridge context ctxRoomElements{
+	/*
+	 *fridge:
+	 * ->get, <-put
+	 * ->isAvailable, <-yes/<-no
+	 * ->put, <-remove
+	 */
+	["val actor=this"]
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		["itunibo.coap.client.CoapClientControl.create(actor,\"fridge\")"]
+		println("&&&  proxyfridge STARTED")
+	}
+	Goto showStateTask
+	
+	State waitCmd{
+		println("&&&  proxyfridge waiting for command")
+	}
+	
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg showState -> showStateTask
+				 	 whenMsg get -> getTask
+				 	 whenMsg isAvailable -> checkTask
+
+	
+	
+	State showStateTask{
+		printCurrentMessage
+		//solve(showFridgeState)
+		["	val response = itunibo.coap.client.CoapClientControl.send(\"showState()\")
+			val FridgeState=response!!.getResponseText()
+
+		"]
+		emit  modelcontent: modelcontent(content( fridge( $FridgeState ) ))  //dentro fridgestate c'è gia state(ARG)
+		
+		
+	}Goto waitCmd
+	
+	State getTask{
+		printCurrentMessage
+		onMsg(get: get(ARG)){
+			
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+			"]
+			forward butlermind -m put : $Message
+			
+		}
+	}
+	Goto showStateTask
+	
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+			"]
+			forward butlermind -m remove : $Message
+		}
+	}Goto showStateTask
+	
+	
+	State checkTask{
+		onMsg(isAvailable: isAvailable(ARG)){
+			printCurrentMessage
+			[" val foodCode = payloadArg(0) "]
+			["	val response = itunibo.coap.client.CoapClientControl.send(currentMsg.msgContent())
+				val Message = response!!.getResponseText()
+				val Id = Message.substringBefore(\"(\")
+				forward(Id, Message ,\"butlermind\" ) 
+				println(\"id:$Id Message:$Message\")
+			"]
+		}
+	}Goto waitCmd
+}
+
+QActor randomconsumptionactor context ctxRoomElements{
+	
+	["var enabled = false"]
+	
+	State s0 initial{
+		println("&&& randomconsumptionactor STARTED")
+		solve(consult("randomConsumptionActorSupport.pl"))
+		solve(randomConsumptionEnabled(true))
+		ifSolved{
+			["enabled = true"]
+		}
+	}
+	Goto waitCmd if "enabled" else doNothing
+	
+	State waitCmd{
+		println("&&& radomconsumptionactor waiting for command")
+	}
+	Transition t0 whenMsg prepare -> timerStart 
+	
+	State timerStart{
+		println("&&& randomconsumptionactor starting timer")
+		solve(getRandomDelay(R))
+		ifSolved{
+			["
+			var randomDelay = getCurSol(\"R\").toString().toLong()
+			println(\"randomDelay = $randomDelay\")
+			delay(randomDelay * 1000)
+			"]
+			solve(produceRandomFoodMessage(F))
+			ifSolved{
+				["var Food = getCurSol(\"F\").toString()"]
+				println("Food = $Food")
+				forward table -m get : get($Food)
+				forward randomconsumptionactor -m repeat: repeat()
+			}else{
+				println("produceRandomFoodMessage FAIL")
+			}
+		}else{
+			println("randomDelay FAIL")
+		}
+	}
+	Transition t0 	whenMsg repeat -> timerStart
+					whenMsg clear -> waitCmd
+					
+	State doNothing{
+		println("&&& randomconsumptionactor disabled")
+	}
+	
+}
+
+/*
+QActor fridge context ctxRoomElements{
+	
+
+	State s0 initial{
+		solve(consult("fridgeInit.pl"))
+		println("&&&  fridge STARTED")
+	}
+	Goto showStateTask
+	
+	State waitCmd{
+		println("&&&  fridge waiting for command")
+	}
+	
+	Transition t0	 whenMsg put -> putTask
+				 	 whenMsg showState -> showStateTask
+				 	 whenMsg get -> getTask
+				 	 whenMsg isAvailable -> checkTask
+
+	
+	
+	State showStateTask{
+		printCurrentMessage
+		//solve(showFridgeState)
+		solve(getFridgeState(L))
+		ifSolved{
+			["
+				val FridgeState = itunibo.prolog.prologUtils.parseFoodState(myself,\"L\")
+			"]
+  			emit  modelcontent: modelcontent(content( fridge( state( $FridgeState) ) ))
+   		}else{
+   			println("getFridgeState FAIL")
+   		}
+	}Goto waitCmd
+	
+	State getTask{
+		printCurrentMessage
+		onMsg(get: get(ARG)){
+			[" 
+				val Food = payloadArg(0)
+			"]
+			
+			solve(removeFoodList($Food))
+			ifSolved {
+				println("Food = $Food")
+				forward butlermind -m put : put($Food)	
+			} else {
+				println("fridgeGet FAIL")
+			}
+		}
+	}
+	Goto showStateTask
+	
+	State putTask{
+		onMsg(put: put(ARG)){
+			printCurrentMessage
+			[" val Food = payloadArg(0) "]
+			solve(addFoodList($Food))
+			ifSolved {
+				forward butlermind -m remove : remove($Food)
+			} else {
+				println("fridgePut FAIL")
+			}		
+		}
+	}Goto showStateTask
+	
+	State checkTask{
+		onMsg(isAvailable: isAvailable(ARG)){
+			printCurrentMessage
+			[" val FoodCode = payloadArg(0) "]
+			solve(isThereFoodByCode($FoodCode))
+			ifSolved {
+				forward butlermind -m yes : yes($FoodCode)
+			} else {
+				forward butlermind -m no : no($FoodCode)
+			}	
+		}
+	}Goto waitCmd
+}
+*/
