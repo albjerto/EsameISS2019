@@ -5,6 +5,14 @@ Autori:
 * Tommaso Liverani
 * Alberto Jesu
 
+## Struttura della repo ##
+### documentazione ###
+All'interno di questa cartella troviamo la documentazione relativa al progetto, ai vari sprint ed al product backlog.
+### progettoFinale ###
+All'interno di questa cartella troviamo il codice del progetto ultimato. Seguire le istruzioni qui sotto per l'avvio.
+### sprint ###
+All'interno di questa cartella troviamo il codice dei vari prototipi prodotti al termine di ciascuno sprint. Il prototipo ottenuto al termine dello sprint 5 non è riportato, trattandosi del progetto ultimato visibile nella cartella `progettoFinale`.
+
 ## Usage con robot virtuale ##
 Si riporta la procedura d'avvio dei vari elementi. È importante avviare sempre tutto nel seguente ordine:
 * robot virtuale
