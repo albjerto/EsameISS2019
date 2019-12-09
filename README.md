@@ -35,6 +35,7 @@ Per avviare il frontend eseguire eseguire `node frontendServer localhost` al per
 ### MainCtxRobotMind ###
 * importare il progetto `it.unibo.eclipse.qak.robotMinds19`, modificare nel file `it.unibo.eclipse.qak.robotMinds19/build.gradle` il percorso relativo alle librerie col proprio, eseguire `gradle build eclipse` alla root del progetto e refresharlo
 * controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.robotMinds19/src/robotmind.qak` sia coerente con il deployment che si vuole effettuare
+* se non sono state fatte variazioni, comunque modificare il file `it.unibo.eclipse.qak.robotMinds19/src/robotmind.qak` per poi salvarlo, per assicurarsi che il codice generato a partire da esso sia coerente
 * controllare che all'interno del file `it.unibo.eclipse.qak.robotMinds19/basicRobotConfig.pl` sia decommentata solo la riga relativa al robot virtuale
 
 Avviare quindi `it.unibo.eclipse.qak.robotMinds19/src/it/unibo/ctxRobotMind/MainCtxRobotMind`.
@@ -42,14 +43,17 @@ Avviare quindi `it.unibo.eclipse.qak.robotMinds19/src/it/unibo/ctxRobotMind/Main
 * importare il progetto `it.unibo.eclipse.qak.planning19`, modificare nel file `it.unibo.eclipse.qak.planning19/build.gradle` il percorso relativo alle librerie col proprio, eseguire `gradle build eclipse` alla root del progetto e refresharlo
 * controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.planning19/src/workinroom.qak` sia coerente con il deployment che si vuole effettuare
 * controllare che nell'attore `workerinroom` siano decommentati lo `StepTime` e `PauseTime` relativi al robot virtuale
+* se non sono state fatte variazioni, comunque modificare il file `it.unibo.eclipse.qak.planning19/src/workinroom.qak` per poi salvarlo, per assicurarsi che il codice generato a partire da esso sia coerente
 
 Avviare quindi `it.unibo.eclipse.qak.planning19/src/it/unibo/ctxWorkInRoom/MainCtxWorkInRoom`.
 ### MainCtxFridge ###
 * controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.planning19/src/fridge.qak` sia coerente con il deployment che si vuole effettuare
+* se non sono state fatte variazioni, comunque modificare il file `it.unibo.eclipse.qak.planning19/src/fridge.qak` per poi salvarlo, per assicurarsi che il codice generato a partire da esso sia coerente
 
 Avviare quindi `it.unibo.eclipse.qak.planning19/src/ctxFridge/MainCtxFridge`.
 ### MainCtxRoomElements ###
 * controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.planning19/src/roomelements.qak` sia coerente con il deployment che si vuole effettuare
+* se non sono state fatte variazioni, comunque modificare il file `it.unibo.eclipse.qak.planning19/src/roomelements.qak` per poi salvarlo, per assicurarsi che il codice generato a partire da esso sia coerente
 * controllare che il file `it.unibo.eclipse.qak.planning19/resources/itunibo.coap.client/CoapClientControl.kt` contenga l'indirizzo del frigo secondo il deployment che si vuole effettuare
 
 Avviare quindi `it.unibo.eclipse.qak.planning19/src/ctxRoomElements/MainCtxRoomElements`.
@@ -85,6 +89,7 @@ Si può infine eseguire `sudo bash it.unibo.eclipse.qak.robotMinds19-1.0` all'in
 ### MainCtxFridge ###
 * importare il progetto `it.unibo.eclipse.qak.planning19`, modificare nel file `it.unibo.eclipse.qak.planning19/build.gradle` il percorso relativo alle librerie col proprio, eseguire `gradle build eclipse` alla root del progetto e refresharlo
 * controllare che l'ip del broker mqtt specificato nel file `it.unibo.eclipse.qak.planning19/src/fridge.qak` sia coerente con il deployment che si vuole effettuare
+* se non sono state fatte variazioni, comunque modificare il file `it.unibo.eclipse.qak.planning19/src/fridge.qak` per poi salvarlo, per assicurarsi che il codice generato a partire da esso sia coerente
 
 Avviare quindi `it.unibo.eclipse.qak.planning19/src/ctxFridge/MainCtxFridge`.
 ### MainCtxRoomElements ###
