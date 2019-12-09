@@ -16,7 +16,7 @@ USAGE:
 plugins {
     id 'java'
     id 'eclipse'
-    //id 'application'
+    id 'application'
     id 'org.jetbrains.kotlin.jvm' version '1.3.21'
 }
 
@@ -88,10 +88,10 @@ compileTestKotlin {
 
 sourceSets {
     main.java.srcDirs += 'src'
-    //main.java.srcDirs += 'resources'
+    main.java.srcDirs += 'resources'
 }
-/*
-mainClassName = 'it.unibo.TODOKt'
+
+mainClassName = 'it.unibo.ctxWorkInRoom.MainCtxWorkInRoomKt'
 
 jar {
     println("executing jar")
@@ -100,4 +100,12 @@ jar {
         attributes 'Main-Class': "$mainClassName"
     }
 }
-*/
+
+applicationDistribution.from('.') {
+	include 'butlermindInit.pl', 'prepareFoodList.pl', 'prepareTablewareList.pl', 'foodCodePairs.pl', 'butlerplansapriori.pl', 'roomMbotWithTable.txt', 'roomMbotWithTable.bin', 'roomMapWithTable.txt', 'roomMapWithTable.bin', 'sysRules.pl', 'workinroom.pl'
+	into 'bin'
+}
+
+distZip {
+	archiveName 'workInRoom-1.0.zip'
+}
