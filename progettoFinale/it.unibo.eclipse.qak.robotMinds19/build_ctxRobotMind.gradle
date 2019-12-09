@@ -102,3 +102,12 @@ jar {
     }
 }
  
+applicationDistribution.from('.') {
+	include 'sysRules.pl', 'resourceModel.pl', 'robotmind.pl', 'basicRobotConfig.pl', 'hardwareConfiguration.properties', 'sonarDataConfig.pl'
+	into 'bin'
+}
+
+distZip {
+	archiveName 'robotMind-1.0.zip'
+}
+ 
