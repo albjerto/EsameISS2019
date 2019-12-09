@@ -16,7 +16,7 @@ USAGE:
 plugins {
     id 'java'
     id 'eclipse'
-    //id 'application'
+    id 'application'
     id 'org.jetbrains.kotlin.jvm' version '1.3.21'
 }
 
@@ -85,13 +85,12 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
-
 sourceSets {
     main.java.srcDirs += 'src'
-    //main.java.srcDirs += 'resources'
+    main.java.srcDirs += 'resources'
 }
-/*
-mainClassName = 'it.unibo.TODOKt'
+
+mainClassName = 'it.unibo.ctxRoomElements.MainCtxRoomElementsKt'
 
 jar {
     println("executing jar")
@@ -100,4 +99,12 @@ jar {
         attributes 'Main-Class': "$mainClassName"
     }
 }
-*/
+
+applicationDistribution.from('.') {
+	include 'dishwasherSupport.pl', 'pantryInit.pl', 'roomelements.pl', 'sysRules.pl', 'tableSupport.pl', 'randomConsumptionActor.pl'
+	into 'bin'
+}
+
+distZip {
+	archiveName 'roomElements-1.0.zip'
+}
