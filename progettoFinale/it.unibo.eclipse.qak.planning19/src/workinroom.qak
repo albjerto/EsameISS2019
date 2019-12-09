@@ -296,7 +296,7 @@ var timeBack = -1 // tempo di backstep
 "]	 
 	State s0 initial {	    
 	    solve( consult("moves.pl")	 )
-		run itunibo.coap.client.resourceObserverCoapClient.create( "coap://localhost:5683/resourcemodel" )
+		//run itunibo.coap.client.resourceObserverCoapClient.create( "coap://localhost:5683/resourcemodel" )
  		run itunibo.planner.plannerUtil.initAI()
   		run itunibo.planner.moveUtils.loadRoomMap( myself, mapname )	
   		run itunibo.planner.moveUtils.showCurrentRobotState()
